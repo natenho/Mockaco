@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "route": "hello/{message}",
+    "condition": null
+  },
+  "response": {
+    "status": "OK",
+    "body": [
+      {
+        "guid": "${Faker.Random.Guid()}",
+        "date": "${Faker.Date.Recent()}",
+        "message": "${Route[\"message\"]}"
+      }
+    ]
+  }
+}
