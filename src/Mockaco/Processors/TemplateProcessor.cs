@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ namespace Mockore
                     continue;
                 }
 
-                httpContext.Response.StatusCode = (int)template.Response.Status;
+                httpContext.Response.StatusCode = (int)template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
                 httpContext.Response.ContentType = "application/json"; // TODO Can we support other content types ? XML ?
 
                 var responseBody = ProcessResponseBody(template.Response, scriptContext);
@@ -88,20 +89,26 @@ namespace Mockore
         // TODO Refactor SRP
         private async Task<bool> RequestMatchesTemplate(HttpContext httpContext, RequestTemplate requestTemplate, ScriptContext scriptContext)
         {
-            var methodMatches = httpContext.Request.Method.Equals(requestTemplate.Method.ToString(), StringComparison.InvariantCultureIgnoreCase);
-            if (!methodMatches)
+            if (requestTemplate.Method != null)
             {
-                return false;
+                var methodMatches = httpContext.Request.Method.Equals(requestTemplate.Method.ToString(), StringComparison.InvariantCultureIgnoreCase);
+                if (!methodMatches)
+                {
+                    return false;
+                }
             }
 
-            var routeMatcher = new RouteMatcher();
-            var routeMatches = routeMatcher.IsMatch(requestTemplate.Route, httpContext.Request.Path);
-            if (!routeMatches)
+            if (!string.IsNullOrWhiteSpace(requestTemplate.Route))
             {
-                return false;
+                var routeMatcher = new RouteMatcher();
+                var routeMatches = routeMatcher.IsMatch(requestTemplate.Route, httpContext.Request.Path);
+                if (!routeMatches)
+                {
+                    return false;
+                }
             }
 
-            if (!string.IsNullOrEmpty(requestTemplate.Condition))
+            if (!string.IsNullOrWhiteSpace(requestTemplate.Condition))
             {
                 var conditionMatches = await Run(requestTemplate.Condition, scriptContext);
                 if (!(conditionMatches is bool) || !(bool)conditionMatches)
@@ -109,6 +116,7 @@ namespace Mockore
                     return false;
                 }
             }
+
             return true;
         }
 

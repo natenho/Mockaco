@@ -7,6 +7,11 @@ namespace Mockore
     {
         public RouteValueDictionary Match(string routeTemplate, string requestPath)
         {
+            if(string.IsNullOrWhiteSpace(routeTemplate))
+            {
+                return null;
+            }
+
             var template = TemplateParser.Parse(routeTemplate);
 
             var matcher = new TemplateMatcher(template, GetDefaults(template));

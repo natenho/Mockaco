@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 namespace Mockore
 {
@@ -34,8 +35,8 @@ namespace Mockore
                     foreach (var template in templateRepository.GetAll())
                     {
                         r.MapVerb(
-                            template.Request.Method.ToString(),
-                            template.Request.Route,
+                            template.Request.Method?.ToString() ?? HttpMethod.Get.ToString(),
+                            template.Request.Route ?? string.Empty,
                             httpContext =>
                             {
                                 var processor = app.ApplicationServices.GetRequiredService<ITemplateProcessor>();
@@ -43,7 +44,7 @@ namespace Mockore
                                 return processor.ProcessResponse(httpContext);
                             });
                     }
-                });
+                });            
         }
     }
 }
