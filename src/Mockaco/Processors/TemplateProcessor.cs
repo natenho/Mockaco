@@ -49,10 +49,11 @@ namespace Mockore
                     await httpContext.Response.WriteAsync(responseBody).ConfigureAwait(false);
                 }
 
-                // TODO Refactor SRP (Middleware?)
-                while (stopwatch.ElapsedMilliseconds < template.Response.Delay)
+                // TODO Move to middleware
+                var remainingTime = template.Response.Delay - (int)stopwatch.ElapsedMilliseconds;
+                if (remainingTime > 0)
                 {
-                    await Task.Delay(10).ConfigureAwait(false);
+                    await Task.Delay(remainingTime).ConfigureAwait(false);
                 }
 
                 return;
