@@ -13,11 +13,16 @@ namespace Mockore
 {
     public class TemplateProcessor : ITemplateProcessor
     {
+        private readonly IScriptRunnerFactory _scriptRunnerFactory;
         private readonly ILogger<TemplateProcessor> _logger;
         private readonly IEnumerable<Template> _templates;
 
-        public TemplateProcessor(ITemplateRepository templateRepository, ILogger<TemplateProcessor> logger)
+        public TemplateProcessor(
+            ITemplateRepository templateRepository,
+            IScriptRunnerFactory scriptRunnerFactory,
+            ILogger<TemplateProcessor> logger)
         {
+            _scriptRunnerFactory = scriptRunnerFactory;
             _logger = logger;
             _templates = templateRepository.GetAll();
         }
@@ -126,10 +131,7 @@ namespace Mockore
 
             try
             {
-                var evaluator = new ScriptEvaluator<ScriptContext, object>(code); // TODO Cache
-                evaluator.Compile();
-
-                result = await evaluator.Run(scriptContext);
+                result = await _scriptRunnerFactory.Invoke<ScriptContext, object>(scriptContext, code);
 
                 _logger.LogDebug($"Processed script {code} with result {result}");
             }

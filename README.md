@@ -1,7 +1,7 @@
 <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
 
 # Mockaco
-A Roslyn-powered HTTP-based API mock server, useful to simulate HTTP/HTTPS responses, leveraging ASP.NET Core 2+ features, built-in fake data generation and pure C# scripting.
+A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered HTTP-based API mock server, useful to simulate HTTP/HTTPS responses, leveraging ASP.NET Core 2+ features, built-in fake data generation and pure C# scripting.
 
 # Quick Start
 
