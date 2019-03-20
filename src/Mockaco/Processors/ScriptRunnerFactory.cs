@@ -63,13 +63,9 @@ namespace Mockore
                 globalsType: typeof(TContext),
                 options: scriptOptions);
 
-            _logger.LogTrace($"Created script in {stopWatch.ElapsedMilliseconds}ms");
-
-            stopWatch.Restart();
-
             runner = script.CreateDelegate();
 
-            _logger.LogTrace($"Created delegate in {stopWatch.ElapsedMilliseconds}ms");
+            _logger.LogTrace($"Created runner in {stopWatch.ElapsedMilliseconds}ms");
 
             return runner;
         }

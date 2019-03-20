@@ -35,46 +35,57 @@ namespace Mockore
 
             foreach (var template in _templates.OrderByDescending(t => t.Request.Condition?.Length)) // TODO Implement priority 
             {
-                if (!await RequestMatchesTemplate(httpContext, template.Request, scriptContext).ConfigureAwait(false))
+                if (await RequestMatchesTemplate(httpContext, template.Request, scriptContext).ConfigureAwait(false))
                 {
-                    continue;
+                    await PrepareResponse(httpContext.Response, scriptContext, template);
+
+                    // TODO Move to middleware
+                    var remainingTime = template.Response.Delay - (int)stopwatch.ElapsedMilliseconds;
+                    if (remainingTime > 0)
+                    {
+                        await Task.Delay(remainingTime).ConfigureAwait(false);
+                    }
+
+                    return;
                 }
-
-                httpContext.Response.StatusCode = (int)template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
-                httpContext.Response.ContentType = "application/json"; // TODO Can we support other content types ? XML ?
-
-                var responseBody = ProcessResponseBody(template.Response, scriptContext);
-                if (responseBody != null)
-                {
-                    await httpContext.Response.WriteAsync(responseBody).ConfigureAwait(false);
-                }
-
-                // TODO Move to middleware
-                var remainingTime = template.Response.Delay - (int)stopwatch.ElapsedMilliseconds;
-                if (remainingTime > 0)
-                {
-                    await Task.Delay(remainingTime).ConfigureAwait(false);
-                }
-
-                return;
             }
 
             throw new InvalidOperationException("No templates matching the request");
         }
 
-        private string ProcessResponseBody(ResponseTemplate responseTemplate, ScriptContext scriptContext)
+        // TODO Refactor SRP violation
+        private async Task PrepareResponse(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-            const string codeRegex = @"(\""?)\$\{(?<code>.*)\}(\""?)";
+            response.ContentType = "application/json"; // TODO Can we support other content types ? XML ?
+            response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
 
-            if (responseTemplate.Body == null)
+            foreach (var header in template.Response.Headers)
             {
-                return null;
+                string key = ProcessResponsePart(header.Key, scriptContext);
+                string value = ProcessResponsePart(header.Value, scriptContext);
+                
+                response.Headers.Add(key, value);
             }
 
-            var body = responseTemplate.Body.ToString();
+            var responseBody = ProcessResponsePartAsJson(template.Response.Body?.ToString(), scriptContext);
+            if (responseBody != null)
+            {
+                await response.WriteAsync(responseBody).ConfigureAwait(false);
+            }
+        }
+
+        // TODO Refactor SRP violation
+        private string ProcessResponsePart(string input, ScriptContext scriptContext)
+        {
+            const string codeRegex = @"(?=\""?)\$\{(?<code>.*?)\}(?=\""?)";
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return input;
+            }
 
             return Regex.Replace(
-                body,
+                input,
                 codeRegex,
                 match =>
                 {
@@ -88,11 +99,16 @@ namespace Mockore
 
                     // TODO Reflect results (make generated variables available to be added somewhere else)
 
-                    return JsonConvert.SerializeObject(result, Formatting.None, new JsonSerializerSettings());
+                    return result.ToString();
                 });
         }
 
-        // TODO Refactor SRP
+        private string ProcessResponsePartAsJson(string input, ScriptContext scriptContext)
+        {
+            return JsonConvert.SerializeObject(ProcessResponsePart(input, scriptContext), Formatting.None, new JsonSerializerSettings());
+        }
+
+        // TODO Refactor SRP violation
         private async Task<bool> RequestMatchesTemplate(HttpContext httpContext, RequestTemplate requestTemplate, ScriptContext scriptContext)
         {
             if (requestTemplate.Method != null)
