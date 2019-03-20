@@ -59,15 +59,18 @@ namespace Mockore
             response.ContentType = "application/json"; // TODO Can we support other content types ? XML ?
             response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
 
-            foreach (var header in template.Response.Headers)
+            if (template.Response.Headers != null)
             {
-                string key = ProcessResponsePart(header.Key, scriptContext);
-                string value = ProcessResponsePart(header.Value, scriptContext);
-                
-                response.Headers.Add(key, value);
+                foreach (var header in template.Response.Headers)
+                {
+                    string key = ProcessResponsePart(header.Key, scriptContext);
+                    string value = ProcessResponsePart(header.Value, scriptContext);
+
+                    response.Headers.Add(key, value);
+                }
             }
 
-            var responseBody = ProcessResponsePartAsJson(template.Response.Body?.ToString(), scriptContext);
+            var responseBody = ProcessResponsePart(template.Response.Body?.ToString(), scriptContext);
             if (responseBody != null)
             {
                 await response.WriteAsync(responseBody).ConfigureAwait(false);
