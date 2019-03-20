@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mockaco;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -37,14 +39,11 @@ namespace Mockore
             {
                 if (await RequestMatchesTemplate(httpContext, template.Request, scriptContext).ConfigureAwait(false))
                 {
-                    await PrepareResponse(httpContext.Response, scriptContext, template);
+                    var mockacoContext = httpContext.RequestServices.GetRequiredService<MockacoContext>();
 
-                    // TODO Move to middleware
-                    var remainingTime = template.Response.Delay - (int)stopwatch.ElapsedMilliseconds;
-                    if (remainingTime > 0)
-                    {
-                        await Task.Delay(remainingTime).ConfigureAwait(false);
-                    }
+                    mockacoContext.ResponseDelay = int.Parse(ProcessResponsePart(template.Response.Delay, scriptContext));
+
+                    await PrepareResponse(httpContext.Response, scriptContext, template);
 
                     return;
                 }
@@ -63,7 +62,7 @@ namespace Mockore
             {
                 string key = ProcessResponsePart(header.Key, scriptContext);
                 string value = ProcessResponsePart(header.Value, scriptContext);
-                
+
                 response.Headers.Add(key, value);
             }
 

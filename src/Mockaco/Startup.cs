@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mockaco;
 using System.Net.Http;
 
 namespace Mockore
@@ -19,14 +20,18 @@ namespace Mockore
         {
             services.AddRouting();
 
+            services.AddScoped<MockacoContext>();
+
             services.AddSingleton<ITemplateRepository, TemplateRepository>();
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
-            services.AddTransient<ITemplateProcessor, TemplateProcessor>();
+            services.AddTransient<ITemplateProcessor, TemplateProcessor>();            
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseMiddleware<DelayMiddleware>();
+
             app.UseRouter(
                 r =>
                 {
