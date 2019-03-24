@@ -56,6 +56,7 @@ namespace Mockore
                     "System.Collections.Generic",
                     typeof(Faker).Namespace,
                     typeof(ScriptRunnerFactory).Namespace,
+                    "Newtonsoft.Json",
                     "Newtonsoft.Json.Linq");
 
             var script = CSharpScript.Create<TResult>(
