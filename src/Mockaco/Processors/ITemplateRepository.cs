@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Mockore
+namespace Mockaco
 {
     public interface ITemplateRepository
     {

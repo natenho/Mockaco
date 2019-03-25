@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 
-namespace Mockore
+namespace Mockaco
 {
     public class Startup
     {

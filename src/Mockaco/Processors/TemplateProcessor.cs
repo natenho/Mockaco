@@ -9,7 +9,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Mockore
+namespace Mockaco
 {
     public class TemplateProcessor : ITemplateProcessor
     {

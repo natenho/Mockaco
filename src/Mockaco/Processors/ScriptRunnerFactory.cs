@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Mockore
+namespace Mockaco
 {
     public class ScriptRunnerFactory : IScriptRunnerFactory
     {

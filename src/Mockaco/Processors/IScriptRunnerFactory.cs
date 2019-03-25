@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.Scripting;
 using System.Threading.Tasks;
 
-namespace Mockore
+namespace Mockaco
 {
     public interface IScriptRunnerFactory
     {

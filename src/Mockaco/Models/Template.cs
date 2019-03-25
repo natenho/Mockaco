@@ -1,4 +1,4 @@
-﻿namespace Mockore
+﻿namespace Mockaco
 {
     public class Template
     {

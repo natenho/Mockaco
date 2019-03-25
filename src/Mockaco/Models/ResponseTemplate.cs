@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Mockore
+namespace Mockaco
 {
     public class ResponseTemplate
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 
-namespace Mockore
+namespace Mockaco
 {
     public class RequestTemplate
     {

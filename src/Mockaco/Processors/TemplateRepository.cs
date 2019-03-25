@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Mockore
+namespace Mockaco
 {
     //TODO Implement Swagger importer
     public sealed class TemplateRepository : ITemplateRepository
