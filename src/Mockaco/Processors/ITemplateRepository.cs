@@ -4,6 +4,6 @@ namespace Mockaco
 {
     public interface ITemplateRepository
     {
-        IEnumerable<Template> GetAll();
+        IEnumerable<TemplateFile> GetAll();
     }
 }

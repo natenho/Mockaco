@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Mockaco.Processors;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -14,14 +15,19 @@ namespace Mockaco
     public class TemplateProcessor : ITemplateProcessor
     {
         private readonly IScriptRunnerFactory _scriptRunnerFactory;
+        private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<TemplateProcessor> _logger;
-        private readonly IEnumerable<Template> _templates;
+        private readonly IEnumerable<TemplateFile> _templates;
 
         public TemplateProcessor(
             ITemplateRepository templateRepository,
             IScriptRunnerFactory scriptRunnerFactory,
+            ITemplateTransformer templateTransformer,
             ILogger<TemplateProcessor> logger)
         {
+            _scriptRunnerFactory = scriptRunnerFactory;
+            _templateTransformer = templateTransformer;
+            _logger = logger;
             _scriptRunnerFactory = scriptRunnerFactory;
             _logger = logger;
             _templates = templateRepository.GetAll();
@@ -33,17 +39,28 @@ namespace Mockaco
 
             var scriptContext = new ScriptContext(httpContext);
 
-            foreach (var template in _templates.OrderByDescending(t => t.Request.Condition?.Length)) // TODO Implement priority 
+            var transformedTemplates = new List<Template>();
+
+            foreach (var templateFile in _templates)
             {
-                if (await RequestMatchesTemplate(httpContext, template.Request, scriptContext).ConfigureAwait(false))
+                var transformedTemplate = await _templateTransformer.Transform(templateFile.Content, scriptContext);
+                var template = JsonConvert.DeserializeObject<Template>(transformedTemplate);
+                transformedTemplates.Add(template);
+            }
+
+            foreach (var template in transformedTemplates.OrderByDescending(t => t.Request.Condition?.Length)) // TODO Implement priority 
+            {
+                if (await RequestMatchesTemplate(httpContext, template.Request, scriptContext)
+                    .ConfigureAwait(false))
                 {
                     await PrepareResponse(httpContext.Response, scriptContext, template);
 
                     // TODO Move to middleware
-                    var remainingTime = template.Response.Delay - (int)stopwatch.ElapsedMilliseconds;
+                    var remainingTime = template.Response.Delay - (int) stopwatch.ElapsedMilliseconds;
                     if (remainingTime > 0)
                     {
-                        await Task.Delay(remainingTime).ConfigureAwait(false);
+                        await Task.Delay(remainingTime)
+                            .ConfigureAwait(false);
                     }
 
                     return;
@@ -56,59 +73,51 @@ namespace Mockaco
         // TODO Refactor SRP violation
         private async Task PrepareResponse(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-            response.ContentType = "application/json"; // TODO Can we support other content types ? XML ?
-            response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
+            response.StatusCode = template.Response.Status == 0 ? (int) HttpStatusCode.OK : (int) template.Response.Status;
 
+            await PrepareHeaders(response, scriptContext, template);
+
+            await PrepareBody(response, scriptContext, template);
+        }
+
+        private async Task PrepareHeaders(HttpResponse response, ScriptContext scriptContext, Template template)
+        {
             if (template.Response.Headers != null)
             {
                 foreach (var header in template.Response.Headers)
                 {
-                    string key = ProcessResponsePart(header.Key, scriptContext);
-                    string value = ProcessResponsePart(header.Value, scriptContext);
+                    var key = await _templateTransformer.Transform(header.Key, scriptContext);
+                    var value = await _templateTransformer.Transform(header.Value, scriptContext);
+
+                    if (response.Headers.ContainsKey(key))
+                    {
+                        response.Headers.Remove(key);
+                    }
 
                     response.Headers.Add(key, value);
                 }
             }
 
-            var responseBody = ProcessResponsePart(template.Response.Body?.ToString(), scriptContext);
+            if (string.IsNullOrEmpty(response.ContentType))
+            {
+                response.ContentType = "application/json";
+            }
+        }
+
+        private async Task PrepareBody(HttpResponse response, ScriptContext scriptContext, Template template)
+        {
+            var responseBody = await _templateTransformer.Transform(template.Response.Body?.ToString(CultureInfo.InvariantCulture), scriptContext);
+
+            if (response.ContentType != "application/json")
+            {
+                responseBody = JsonConvert.DeserializeObject<string>(responseBody);
+            }
+
             if (responseBody != null)
             {
-                await response.WriteAsync(responseBody).ConfigureAwait(false);
+                await response.WriteAsync(responseBody)
+                    .ConfigureAwait(false);
             }
-        }
-
-        // TODO Refactor SRP violation
-        private string ProcessResponsePart(string input, ScriptContext scriptContext)
-        {
-            const string codeRegex = @"(?=\""?)\$\{(?<code>.*?)\}(?=\""?)";
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return input;
-            }
-
-            return Regex.Replace(
-                input,
-                codeRegex,
-                match =>
-                {
-                    var code = Regex.Unescape(
-                        match.Groups["code"]
-                            .ToString()); // TODO Fix hybrid value behavior i.e. "FOO ${Fake.Name.FullName()} BAR" is not working
-
-                    var result = Run(code, scriptContext)
-                        .GetAwaiter()
-                        .GetResult(); // TODO Make async
-
-                    // TODO Reflect results (make generated variables available to be added somewhere else)
-
-                    return result.ToString();
-                });
-        }
-
-        private string ProcessResponsePartAsJson(string input, ScriptContext scriptContext)
-        {
-            return JsonConvert.SerializeObject(ProcessResponsePart(input, scriptContext), Formatting.None, new JsonSerializerSettings());
         }
 
         // TODO Refactor SRP violation
@@ -136,7 +145,7 @@ namespace Mockaco
             if (!string.IsNullOrWhiteSpace(requestTemplate.Condition))
             {
                 var conditionMatches = await Run(requestTemplate.Condition, scriptContext);
-                if (!(conditionMatches is bool) || !(bool)conditionMatches)
+                if (!(conditionMatches is bool) || !(bool) conditionMatches)
                 {
                     return false;
                 }
@@ -145,6 +154,7 @@ namespace Mockaco
             return true;
         }
 
+        // TODO Remove repeated code
         private async Task<object> Run(string code, ScriptContext scriptContext)
         {
             object result = null;

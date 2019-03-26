@@ -6,12 +6,11 @@
   },
   "response": {
     "status": "OK",
-    "body": [
-      {
-        "guid": "${Faker.Random.Guid()}",
-        "date": "${Faker.Date.Recent()}",
-        "message": "${Route[\"message\"]}"
-      }
-    ]
+    "body": {
+      "message": "<#= Route["message"] #>",
+      "product": "<#= Faker.Commerce.ProductName() #>",
+      
+      "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
+    }
   }
 }
