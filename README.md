@@ -218,7 +218,7 @@ The code must be escaped to a valid JSON string.
     "body": {
       "id": "${Faker.Random.Guid()}",
       "fruit": "${Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) }",
-      "recentDate": "${Faker.Date.Recent()}"
+      "recentDate": "${JsonConvert.SerializeObject(Faker.Date.Recent())}"
     }
   }
 }
