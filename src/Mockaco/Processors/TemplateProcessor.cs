@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mockaco.Processors;
-using Mockaco;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -57,7 +56,7 @@ namespace Mockaco
                 {
                     var mockacoContext = httpContext.RequestServices.GetRequiredService<MockacoContext>();
 
-                    mockacoContext.ResponseDelay = int.Parse(ProcessResponsePart(template.Response.Delay, scriptContext));
+                    mockacoContext.ResponseDelay = int.Parse(await _templateTransformer.Transform(template.Response.Delay, scriptContext));
 
                     await PrepareResponse(httpContext.Response, scriptContext, template);
 
@@ -71,7 +70,8 @@ namespace Mockaco
         // TODO Refactor SRP violation
         private async Task PrepareResponse(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-            response.StatusCode = template.Response.Status == 0 ? (int) HttpStatusCode.OK : (int) template.Response.Status;
+
+            response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
 
             await PrepareHeaders(response, scriptContext, template);
 
@@ -143,7 +143,7 @@ namespace Mockaco
             if (!string.IsNullOrWhiteSpace(requestTemplate.Condition))
             {
                 var conditionMatches = await Run(requestTemplate.Condition, scriptContext);
-                if (!(conditionMatches is bool) || !(bool) conditionMatches)
+                if (!(conditionMatches is bool) || !(bool)conditionMatches)
                 {
                     return false;
                 }

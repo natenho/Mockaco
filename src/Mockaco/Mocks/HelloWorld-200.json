@@ -9,7 +9,7 @@
     "body": {
       "message": "<#= Route["message"] #>",
       "product": "<#= Faker.Commerce.ProductName() #>",
-      
+      "inexistent header item": "<#= Header["inexistent"] #>",
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     }
   }
