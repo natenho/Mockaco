@@ -24,6 +24,8 @@ namespace Mockaco
         {
             services.AddRouting();
 
+            services.AddScoped<MockacoContext>();
+
             services.AddSingleton<ITemplateRepository, TemplateRepository>();
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
@@ -33,6 +35,8 @@ namespace Mockaco
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseMiddleware<DelayMiddleware>();
+
             app.UseRouter(
                 async routeBuilder =>
                 {
