@@ -14,16 +14,15 @@
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     }
   },
-  "callback": 
-    {
+  "callback": {
     "method": "GET",
     "headers": {
-      "X-Foo": "Bar" 
+      "X-Foo": "Bar"
     },
-    "url": "http://localhost:5000/hello/<#= Response["id"] #>",
-    "delay": 1000,
-    "body":  {
-      "message": "<#= Route["message"] #>"
-    } 
+    "url": "http://localhost:5000/api/v1/customers",
+    "delay": 5000
+    //"body": {
+    //  "message": "\"<#= Route[\"message\"] #>\""
+    //}
   }
 }

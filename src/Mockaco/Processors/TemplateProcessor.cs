@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -35,9 +37,7 @@ namespace Mockaco
         }
 
         public async Task ProcessResponse(HttpContext httpContext)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
+        {           
             var scriptContext = new ScriptContext(httpContext);
 
             var transformedTemplates = new List<Template>();
@@ -56,9 +56,19 @@ namespace Mockaco
                 {
                     var mockacoContext = httpContext.RequestServices.GetRequiredService<MockacoContext>();
 
-                    mockacoContext.ResponseDelay = int.Parse(await _templateTransformer.Transform(template.Response.Delay, scriptContext));
+                    string delayString = await _templateTransformer.Transform(template.Response.Delay, scriptContext);
+
+                    if (int.TryParse(delayString, out var delay))
+                    {
+                        mockacoContext.ResponseDelay = delay;
+                    }
 
                     await PrepareResponse(httpContext.Response, scriptContext, template);
+
+                    if (template.Callback != null)
+                    {
+                        httpContext.Response.OnCompleted(PerformCallback(httpContext, scriptContext, template));
+                    }
 
                     return;
                 }
@@ -67,33 +77,95 @@ namespace Mockaco
             throw new InvalidOperationException("No templates matching the request");
         }
 
+        private Func<Task> PerformCallback(HttpContext httpContext, ScriptContext scriptContext, Template template)
+        {
+            return async () =>
+            {
+                var stopwatch = Stopwatch.StartNew();
+
+                var factory = httpContext.RequestServices.GetService<IHttpClientFactory>();
+
+                var httpClient = factory.CreateClient();
+
+                if (int.TryParse(template.Callback.Timeout, out var timeout))
+                {
+                    httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
+                }
+
+                var request = new HttpRequestMessage(
+                    new HttpMethod(template.Callback.Method),
+                    template.Callback.Url);
+
+                await PrepareCallbackHeaders(scriptContext, template, request);
+
+                if(template.Callback.Body != null)
+                {
+                    request.Content = new StringContent(template.Callback.Body.ToString());
+                }
+
+                if (int.TryParse(template.Callback.Delay, out var delay))
+                {
+                    var remainingDelay = TimeSpan.FromMilliseconds(delay - stopwatch.ElapsedMilliseconds);
+                    if (stopwatch.ElapsedMilliseconds < remainingDelay.TotalMilliseconds)
+                    {
+                        _logger.LogDebug("Waiting {0} ms to perform callback on time", remainingDelay.TotalMilliseconds);
+                        await Task.Delay(remainingDelay);
+                    }
+                }
+                
+                stopwatch.Restart();
+
+                _logger.LogDebug("Callback starting");
+
+                try
+                {
+                    var response = await httpClient.SendAsync(request);
+
+                    _logger.LogDebug("Callback response {0}", response);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Callback error");
+                }
+
+                _logger.LogDebug("Callback finished in {0} ms", stopwatch.ElapsedMilliseconds);
+
+                return;
+            };
+        }
+
+        private async Task PrepareCallbackHeaders(ScriptContext scriptContext, Template template, HttpRequestMessage httpRequest)
+        {
+            var headers = await TransformHeaders(scriptContext, template.Callback.Headers);
+
+            foreach (var header in headers)
+            {
+                httpRequest.Headers.Add(header.Key, header.Value);
+            }
+
+            if (!httpRequest.Headers.Accept.Any())
+            {
+                httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+        }
+
         // TODO Refactor SRP violation
         private async Task PrepareResponse(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-
             response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
 
-            await PrepareHeaders(response, scriptContext, template);
+            await PrepareResponseHeaders(response, scriptContext, template);
 
-            await PrepareBody(response, scriptContext, template);
+            await PrepareResponseBody(response, scriptContext, template);
         }
 
-        private async Task PrepareHeaders(HttpResponse response, ScriptContext scriptContext, Template template)
+        private async Task PrepareResponseHeaders(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-            if (template.Response.Headers != null)
+            var headers = await TransformHeaders(scriptContext, template.Response.Headers);
+
+            foreach (var header in headers)
             {
-                foreach (var header in template.Response.Headers)
-                {
-                    var key = await _templateTransformer.Transform(header.Key, scriptContext);
-                    var value = await _templateTransformer.Transform(header.Value, scriptContext);
-
-                    if (response.Headers.ContainsKey(key))
-                    {
-                        response.Headers.Remove(key);
-                    }
-
-                    response.Headers.Add(key, value);
-                }
+                response.Headers.Add(header.Key, header.Value);
             }
 
             if (string.IsNullOrEmpty(response.ContentType))
@@ -102,7 +174,29 @@ namespace Mockaco
             }
         }
 
-        private async Task PrepareBody(HttpResponse response, ScriptContext scriptContext, Template template)
+        private async Task<IDictionary<string, string>> TransformHeaders(
+            ScriptContext scriptContext,
+            IDictionary<string, string> inputDictionary)
+        {
+            var outputDictionary = new PermissiveDictionary<string, string>();
+
+            if (inputDictionary == null)
+            {
+                return outputDictionary;
+            }
+
+            foreach (var header in inputDictionary)
+            {
+                var key = await _templateTransformer.Transform(header.Key, scriptContext);
+                var value = await _templateTransformer.Transform(header.Value, scriptContext);
+
+                outputDictionary.Add(key, value);
+            }
+
+            return outputDictionary;
+        }
+
+        private async Task PrepareResponseBody(HttpResponse response, ScriptContext scriptContext, Template template)
         {
             var responseBody = await _templateTransformer.Transform(template.Response.Body?.ToString(CultureInfo.InvariantCulture), scriptContext);
 

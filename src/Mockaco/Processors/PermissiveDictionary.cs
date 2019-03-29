@@ -22,5 +22,20 @@ namespace Mockaco
                 base[key] = value;
             }
         }
+
+        public new void Add(TKey key, TValue value)
+        {
+            Replace(key, value);
+        }
+
+        public void Replace(TKey key, TValue value)
+        {
+            if (ContainsKey(key))
+            {
+                Remove(key);
+            }
+
+            base.Add(key, value);
+        }
     }
 }

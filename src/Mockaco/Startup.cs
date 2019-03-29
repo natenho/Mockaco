@@ -25,6 +25,7 @@ namespace Mockaco
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
+            services.AddHttpClient();
 
             services.AddScoped<MockacoContext>();
 
@@ -48,7 +49,7 @@ namespace Mockaco
 
             foreach (var templateFile in templateRepository.GetAll())
             {
-                var template = await ProcessTemplate(routeBuilder, templateFile);
+                var template = await ProcessTemplate(routeBuilder.ServiceProvider, templateFile);
 
                 if (template == null)
                 {
@@ -69,15 +70,15 @@ namespace Mockaco
             return processor.ProcessResponse(httpContext);
         }
 
-        private static async Task<Template> ProcessTemplate(IRouteBuilder routeBuilder, TemplateFile templateFile)
+        private static async Task<Template> ProcessTemplate(IServiceProvider serviceProvider, TemplateFile templateFile)
         {
             Template template = null;
 
-            var logger = routeBuilder.ServiceProvider.GetService<ILogger<Startup>>();
+            var logger = serviceProvider.GetService<ILogger<Startup>>();
 
             try
             {
-                var templateTransformer = routeBuilder.ServiceProvider.GetService<ITemplateTransformer>();
+                var templateTransformer = serviceProvider.GetService<ITemplateTransformer>();
                 var scriptContext = new ScriptContext();
                 var parsedTemplate = await templateTransformer.Transform(templateFile.Content, scriptContext);
 
