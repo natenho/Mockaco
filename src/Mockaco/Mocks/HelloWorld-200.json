@@ -5,12 +5,24 @@
     "condition": null
   },
   "response": {
+    "delay": 0, 
     "status": "OK",
     "body": {
       "message": "<#= Route["message"] #>",
       "product": "<#= Faker.Commerce.ProductName() #>",
-      
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     }
+  },
+  "callback": 
+    {
+    "method": "GET",
+    "headers": {
+      "X-Foo": "Bar" 
+    },
+    "url": "http://localhost:5000/hello/<#= Response["id"] #>",
+    "delay": 1000,
+    "body":  {
+      "message": "<#= Route["message"] #>"
+    } 
   }
 }
