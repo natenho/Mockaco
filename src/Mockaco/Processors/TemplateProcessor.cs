@@ -37,7 +37,7 @@ namespace Mockaco
         }
 
         public async Task ProcessResponse(HttpContext httpContext)
-        {           
+        {
             var scriptContext = new ScriptContext(httpContext);
 
             var transformedTemplates = new List<Template>();
@@ -67,7 +67,11 @@ namespace Mockaco
 
                     if (template.Callback != null)
                     {
-                        httpContext.Response.OnCompleted(PerformCallback(httpContext, scriptContext, template));
+                        httpContext.Response.OnCompleted(() =>
+                        {
+                            var fireAndForgetTask = PerformCallback(httpContext, scriptContext, template);
+                            return Task.CompletedTask;
+                        });
                     }
 
                     return;
@@ -77,61 +81,61 @@ namespace Mockaco
             throw new InvalidOperationException("No templates matching the request");
         }
 
-        private Func<Task> PerformCallback(HttpContext httpContext, ScriptContext scriptContext, Template template)
+        private async Task PerformCallback(HttpContext httpContext, ScriptContext scriptContext, Template template)
         {
-            return async () =>
+            var stopwatch = Stopwatch.StartNew();
+
+            var factory = httpContext.RequestServices.GetService<IHttpClientFactory>();
+
+            var httpClient = factory.CreateClient();
+
+            if (int.TryParse(template.Callback.Timeout, out var timeout))
             {
-                var stopwatch = Stopwatch.StartNew();
+                httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
+            }
 
-                var factory = httpContext.RequestServices.GetService<IHttpClientFactory>();
+            var request = new HttpRequestMessage(
+                new HttpMethod(template.Callback.Method),
+                template.Callback.Url);
 
-                var httpClient = factory.CreateClient();
+            await PrepareCallbackHeaders(scriptContext, template, request);
 
-                if (int.TryParse(template.Callback.Timeout, out var timeout))
+            if (template.Callback.Body != null)
+            {
+                var body = await _templateTransformer.Transform(template.Callback.Body.ToString(), scriptContext);
+                request.Content = new StringContent(body);
+            }
+
+            if (int.TryParse(template.Callback.Delay, out var delay))
+            {
+                var remainingDelay = TimeSpan.FromMilliseconds(delay - stopwatch.ElapsedMilliseconds);
+                if (stopwatch.ElapsedMilliseconds < remainingDelay.TotalMilliseconds)
                 {
-                    httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
+                    _logger.LogDebug("Waiting {0} ms to perform callback on time", remainingDelay.TotalMilliseconds);
+                    await Task.Delay(remainingDelay);
                 }
+            }
 
-                var request = new HttpRequestMessage(
-                    new HttpMethod(template.Callback.Method),
-                    template.Callback.Url);
+            stopwatch.Restart();
 
-                await PrepareCallbackHeaders(scriptContext, template, request);
+            _logger.LogDebug("Callback starting");
 
-                if(template.Callback.Body != null)
-                {
-                    request.Content = new StringContent(template.Callback.Body.ToString());
-                }
+            try
+            {
+                var response = await httpClient.SendAsync(request);
 
-                if (int.TryParse(template.Callback.Delay, out var delay))
-                {
-                    var remainingDelay = TimeSpan.FromMilliseconds(delay - stopwatch.ElapsedMilliseconds);
-                    if (stopwatch.ElapsedMilliseconds < remainingDelay.TotalMilliseconds)
-                    {
-                        _logger.LogDebug("Waiting {0} ms to perform callback on time", remainingDelay.TotalMilliseconds);
-                        await Task.Delay(remainingDelay);
-                    }
-                }
-                
-                stopwatch.Restart();
+                _logger.LogDebug("Callback response {0}", response);
+            }
+            catch(OperationCanceledException ex)
+            {
+                _logger.LogError(ex, "Callback request timeout");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Callback error");
+            }
 
-                _logger.LogDebug("Callback starting");
-
-                try
-                {
-                    var response = await httpClient.SendAsync(request);
-
-                    _logger.LogDebug("Callback response {0}", response);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Callback error");
-                }
-
-                _logger.LogDebug("Callback finished in {0} ms", stopwatch.ElapsedMilliseconds);
-
-                return;
-            };
+            _logger.LogDebug("Callback finished in {0} ms", stopwatch.ElapsedMilliseconds);
         }
 
         private async Task PrepareCallbackHeaders(ScriptContext scriptContext, Template template, HttpRequestMessage httpRequest)
