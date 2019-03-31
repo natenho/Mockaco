@@ -5,8 +5,10 @@ A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered 
 
 # Quick Start
 
-```# git clone https://github.com/natenho/Mockaco.git```
-```# cd Mockaco\src\Mockaco```
+```
+# git clone https://github.com/natenho/Mockaco.git
+# cd Mockaco\src\Mockaco
+```
 
 ## Create a request/response template
 Create a file named `PingPong.json` under `Mocks` folder:
@@ -194,6 +196,7 @@ Calls another API whenever a request arrives.
 	"delay": 5000
   }
 }
+```
 
 ## Delay attribute
 
