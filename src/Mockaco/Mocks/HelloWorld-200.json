@@ -5,13 +5,22 @@
     "condition": null
   },
   "response": {
+    "delay": 0, 
     "status": "OK",
-    "body": [
-      {
-        "guid": "${Faker.Random.Guid()}",
-        "date": "${Faker.Date.Recent()}",
-        "message": "${Route[\"message\"]}"
-      }
-    ]
+    "body": {
+      "message": "<#= Route["message"] #>",
+      "product": "<#= Faker.Commerce.ProductName() #>",
+      "inexistent header item": "<#= Header["inexistent"] #>",
+      "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
+    }
+  },
+  "callback": {
+    "method": "GET",
+    "timeout": 2000,
+    "headers": {
+      "X-Foo": "Bar"
+    },
+    "url": "http://numbersapi.com/random/date?json",
+    "delay": 5000
   }
 }

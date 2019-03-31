@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
+﻿using System.Net.Http;
 
-namespace Mockore
+namespace Mockaco
 {
     public class RequestTemplate
     {
-        public HttpMethod? Method { get; set; }
+        public string Method { get; set; }
         public string Route { get; set; }
         public string Condition { get; set; }
     }

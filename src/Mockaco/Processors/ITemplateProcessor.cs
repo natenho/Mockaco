@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace Mockore
+namespace Mockaco
 {
     public interface ITemplateProcessor
     {

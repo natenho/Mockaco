@@ -1,9 +1,12 @@
 <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
 
 # Mockaco
-A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered HTTP-based API mock server, useful to simulate HTTP/HTTPS responses, leveraging ASP.NET Core 2+ features, built-in fake data generation and pure C# scripting.
+A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered HTTP-based API mock server, useful to simulate HTTP/HTTPS responses, leveraging ASP.NET Core 2+ features, built-in fake data generation with [Bogus](https://github.com/bchavez/Bogus) and pure C# scripting.
 
 # Quick Start
+
+```# git clone https://github.com/natenho/Mockaco.git```
+```# cd Mockaco\src\Mockaco```
 
 ## Create a request/response template
 Create a file named `PingPong.json` under `Mocks` folder:
@@ -23,8 +26,8 @@ Create a file named `PingPong.json` under `Mocks` folder:
 }
 ```
 
-## Run the project in a separate terminal
-```# dotnet run --project src/Mockaco/Mockaco.csproj```
+## Run the project
+```# dotnet run```
     
 ## Send a request and get the mocked response
 ```http
@@ -41,7 +44,7 @@ Transfer-Encoding: chunked
 ```
 
 # Request Template Matching
-Use the ```request``` attribute to provide the neccessary information for the engine to decide which response will be returned. All criteria must evaluate to ```true``` to produce the response of a given template.
+Use the ```request``` attribute to provide the necessary information for the engine to decide which response will be returned. All criteria must evaluate to ```true``` to produce the response of a given template.
 
 ## Method attribute
 
@@ -56,7 +59,7 @@ Any request with the matching HTTP method will return the response. Supported HT
 - CONNECT
 - OPTIONS
 
-If ommited, defaults to ```GET```.
+If omitted, defaults to ```GET```.
 
 ### Example
 ```json
@@ -74,7 +77,7 @@ If ommited, defaults to ```GET```.
 
 Any request with the matching route will return the response. Any AspNet route template is supported.
 
-If ommited, empty or null, defaults to base route.
+If omitted, empty or null, defaults to base route.
 
 ### Example
 ```json
@@ -92,13 +95,13 @@ If ommited, empty or null, defaults to base route.
 
 Any condition that evaluates to ```true``` will return the response. The condition is any C# expression.
 
-If ommited, empty or null, defaults to ```true```.
+If omitted, empty or null, defaults to ```true```.
 
 ### Example
 ```json
 {
   "request": {
-    "condition": "DateTime.Now.Second % 2 == 0"
+    "condition": "<#= DateTime.Now.Second % 2 == 0 #>"
   },
   "response": {
     "status": "OK"
@@ -106,13 +109,13 @@ If ommited, empty or null, defaults to ```true```.
 }
 ```
 
-# Response Template Scripting
+# Response Template
 
 ## Delay attribute
 
 Define a minimum response time in milliseconds.
 
-If ommited, empty or null, defaults to ```0```.
+If omitted, empty or null, defaults to ```0```.
 
 ### Example
 ```json
@@ -131,7 +134,7 @@ If ommited, empty or null, defaults to ```0```.
 
 Set the HTTP status code for the response. Can be a string or a number, as defined in [System.Net.HttpStatusCode](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netcore-2.2) enum.
 
-If ommited, empty or null, defaults to ```OK``` (200).
+If omitted, empty or null, defaults to ```OK``` (200).
 
 ### Example
 ```json
@@ -149,7 +152,7 @@ If ommited, empty or null, defaults to ```OK``` (200).
 
 Set the HTTP response body. Supports only JSON.
 
-If ommited, empty or null, defaults to empty.
+If omitted, empty or null, defaults to empty.
 
 ### Example
 ```json
@@ -166,11 +169,47 @@ If ommited, empty or null, defaults to empty.
 }
 ```
 
+# Callback Template
+
+Calls another API whenever a request arrives.
+
+```json
+{
+  "request": {
+    "method": "GET"
+  },
+  "response": {
+    "status": "OK",
+    "body": {
+      "currentTime": "<#= DateTime.Now.ToString() #>"
+    }
+  },
+  "callback": {
+	"method": "GET",
+	"timeout": 2000,
+	"headers": {
+		"X-Foo": "Bar"
+	},
+	"url": "http://numbersapi.com/random/date?json",
+	"delay": 5000
+  }
+}
+
+## Delay attribute
+
+The time to wait after a response before calling the callback.
+
+## Timeout attribute
+
+Defines a time in milliseconds to wait the callback response before cancelling the operation.
+
 # Scripting
 
-Template attribute values are scriptable using C# code surrounded by ```${}```.
+Every part of the template file is scriptable, so you can add code to programatically generate parts of the template.
 
-The code must be escaped to a valid JSON string.
+Use C# code surrounded by ```<#=``` and ```#>```.
+
+The template code and generation will run for each request.
 
 ### Example: Return current date and time
 ```json
@@ -181,11 +220,13 @@ The code must be escaped to a valid JSON string.
   "response": {
     "status": "OK",
     "body": {
-      "currentTime": "${DateTime.Now.ToString()}"
+      "currentTime": "<#= DateTime.Now.ToString() #>"
     }
   }
 }
 ```
+
+The code tag structure ressembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
 ### Example: Access request data
 ```json
@@ -197,11 +238,11 @@ The code must be escaped to a valid JSON string.
   "response": {
     "status": "OK",
     "body": {
-      "url": "${Url}",
-      "customerId": "${Route[\"id\"]}",
-      "acceptHeader": "${Header[\"accept\"]}",
-      "queryString": "${Query[\"dummy\"]}",
-      "requestBodyAttribute": "${Body[\"address\"][0]}"
+      "url": "<#= Url #>",
+      "customerId": "<#= Route[\"id\"] #>",
+      "acceptHeader": "<#= Header[\"accept\"] #>",
+      "queryString": "<#= Query[\"dummy\"] #>",
+      "requestBodyAttribute": "<#= Body[\"address\"][0] #>"
     }
   }
 }
@@ -216,9 +257,9 @@ The code must be escaped to a valid JSON string.
   "response": {
     "status": "OK",
     "body": {
-      "id": "${Faker.Random.Guid()}",
-      "fruit": "${Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) }",
-      "recentDate": "${JsonConvert.SerializeObject(Faker.Date.Recent())}"
+      "id": "<#= Faker.Random.Guid() #>",
+      "fruit": "<#= Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) #>",
+      "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
     }
   }
 }

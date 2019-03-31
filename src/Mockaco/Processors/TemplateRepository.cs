@@ -1,25 +1,24 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Mockore
+namespace Mockaco
 {
     //TODO Implement Swagger importer
     public sealed class TemplateRepository : ITemplateRepository
     {
-        private readonly List<Template> _templates = new List<Template>();
+        private readonly List<TemplateFile> _templates = new List<TemplateFile>();
 
         public TemplateRepository()
         {
             var directory = new DirectoryInfo("Mocks");
-            foreach (var file in directory.GetFiles("*.json", SearchOption.AllDirectories))
+            foreach (var file in directory.GetFiles("*.json"))
             {
-                var value = File.ReadAllText(file.FullName);
-                _templates.Add(JsonConvert.DeserializeObject<Template>(value));
+                var rawContent = File.ReadAllText(file.FullName);
+                _templates.Add(new TemplateFile(file.Name, rawContent));
             }
         }
 
-        public IEnumerable<Template> GetAll()
+        public IEnumerable<TemplateFile> GetAll()
         {
             return _templates;
         }
