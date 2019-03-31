@@ -16,13 +16,11 @@
   },
   "callback": {
     "method": "GET",
+    "timeout": 2000,
     "headers": {
       "X-Foo": "Bar"
     },
-    "url": "http://localhost:5000/api/v1/customers",
+    "url": "http://numbersapi.com/random/date?json",
     "delay": 5000
-    //"body": {
-    //  "message": "\"<#= Route[\"message\"] #>\""
-    //}
   }
 }

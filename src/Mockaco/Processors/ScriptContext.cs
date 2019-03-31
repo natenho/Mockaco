@@ -6,10 +6,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Mockaco
 {
+
     public class ScriptContext
     {
         public Uri Url { get; }
@@ -22,17 +22,16 @@ namespace Mockaco
 
         public IReadOnlyDictionary<string, string> Header { get; }
 
-        public JRaw Body { get; } // TODO Fix the need to do a ToString() to get the value 
-        // TODO Improve error handling when the Body item is not found
+        public PermissiveJraw Body { get; }
 
         public ScriptContext()
         {
             Faker = new Faker("pt_BR"); // TODO Localize based on the request
-            Url = default(Uri);
+            Url = default;
             Route = new PermissiveDictionary<string, string>();
             Query = new PermissiveDictionary<string, string>();
             Header = new PermissiveDictionary<string, string>();
-            Body = new JRaw(string.Empty);            
+            Body = new PermissiveJraw(string.Empty);
         }
 
         public ScriptContext(HttpContext httpContext)
@@ -45,11 +44,11 @@ namespace Mockaco
             Body = ParseJsonBody(httpContext.Request);
         }
 
-        private static JRaw ParseJsonBody(HttpRequest httpRequest)
+        private static PermissiveJraw ParseJsonBody(HttpRequest httpRequest)
         {
             if (httpRequest.ContentType != "application/json")
             {
-                return default(JRaw);
+                return new PermissiveJraw(string.Empty);
             }
 
             httpRequest.EnableRewind();
@@ -60,13 +59,13 @@ namespace Mockaco
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
-                    return new JRaw(json);
+                    return new PermissiveJraw(json);
                 }
 
                 httpRequest.Body.Seek(0, SeekOrigin.Begin);
             }
 
-            return default(JRaw);
+            return new PermissiveJraw(string.Empty);
         }
     }
 }
