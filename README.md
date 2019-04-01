@@ -1,7 +1,12 @@
 <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
 
 # Mockaco
-A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered HTTP-based API mock server, useful to simulate HTTP/HTTPS responses, leveraging ASP.NET Core 2+ features, built-in fake data generation with [Bogus](https://github.com/bchavez/Bogus) and pure C# scripting.
+Mockaco is an HTTP-based API mock server with quick setup, featuring:
+
+- Simple JSON-based configuration
+- Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
+- Fake data generation - hassle-free fake data generation
+- Callback support - trigger another service call when a request hits your mocked API
 
 # Quick Start
 
@@ -134,7 +139,7 @@ If omitted, empty or null, defaults to ```0```.
 
 ## Status attribute
 
-Set the HTTP status code for the response. Can be a string or a number, as defined in [System.Net.HttpStatusCode](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netcore-2.2) enum.
+Set the HTTP status code for the response. Can be a string or a number, as defined in [System.Net.HttpStatusCode](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netcore-2.2) enumeration.
 
 If omitted, empty or null, defaults to ```OK``` (200).
 
@@ -187,13 +192,13 @@ Calls another API whenever a request arrives.
     }
   },
   "callback": {
-	"method": "GET",
-	"timeout": 2000,
-	"headers": {
-		"X-Foo": "Bar"
-	},
-	"url": "http://numbersapi.com/random/date?json",
-	"delay": 5000
+    "method": "GET",
+    "timeout": 2000,
+    "headers": {
+      "X-Foo": "Bar"
+    },
+    "url": "http://numbersapi.com/random/date?json",
+    "delay": 5000
   }
 }
 ```
@@ -204,7 +209,7 @@ The time to wait after a response before calling the callback.
 
 ## Timeout attribute
 
-Defines a time in milliseconds to wait the callback response before cancelling the operation.
+Defines a time in milliseconds to wait the callback response before canceling the operation.
 
 # Scripting
 
@@ -214,7 +219,9 @@ Use C# code surrounded by ```<#=``` and ```#>```.
 
 The template code and generation will run for each request.
 
-### Example: Return current date and time
+The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples).
+
+### Example
 ```json
 {
   "request": {
@@ -223,15 +230,15 @@ The template code and generation will run for each request.
   "response": {
     "status": "OK",
     "body": {
-      "currentTime": "<#= DateTime.Now.ToString() #>"
+      "currentYear": "<#= DateTime.Now.Year #>"
     }
   }
 }
 ```
 
-The code tag structure ressembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
+The code tag structure resembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
-### Example: Access request data
+### Example: Accessing request data
 ```json
 {
   "request": {
@@ -242,16 +249,16 @@ The code tag structure ressembles [T4 Text Template Engine](https://github.com/m
     "status": "OK",
     "body": {
       "url": "<#= Url #>",
-      "customerId": "<#= Route[\"id\"] #>",
-      "acceptHeader": "<#= Header[\"accept\"] #>",
-      "queryString": "<#= Query[\"dummy\"] #>",
-      "requestBodyAttribute": "<#= Body[\"address\"][0] #>"
+      "customerId": "<#= Route["id"] #>",
+      "acceptHeader": "<#= Header["accept"] #>",
+      "queryString": "<#= Query["dummy"] #>",
+      "requestBodyAttribute": "<#= Body["address"][0] #>"
     }
   }
 }
 ```
 
-### Example: Built-in [Bogus](https://github.com/bchavez/Bogus) integration, to generate fake data
+### Example: Generating fake data
 ```json
 {
   "request": {
@@ -261,11 +268,13 @@ The code tag structure ressembles [T4 Text Template Engine](https://github.com/m
     "status": "OK",
     "body": {
       "id": "<#= Faker.Random.Guid() #>",
-      "fruit": "<#= Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) #>",
+      "fruit": "<#= Faker.PickRandom(new[] { "apple", "banana", "orange", "strawberry", "kiwi" }) #>",
       "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
     }
   }
 }
 ```
+
+The built-in fake data is generated via [Bogus](https://github.com/bchavez/Bogus).
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
