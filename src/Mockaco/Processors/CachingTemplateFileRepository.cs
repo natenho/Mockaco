@@ -25,8 +25,10 @@ namespace Mockaco
 
             _fileSystemWatcher = new FileSystemWatcher("Mocks", "*.json");
             _fileSystemWatcher.Changed += MockChanged;
+            _fileSystemWatcher.Created += MockChanged;
+            _fileSystemWatcher.Deleted += MockChanged;
+            _fileSystemWatcher.Renamed += MockChanged;            
             _fileSystemWatcher.IncludeSubdirectories = true;
-
             _fileSystemWatcher.EnableRaisingEvents = true;
 
             _logger = logger;
