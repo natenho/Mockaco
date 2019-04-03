@@ -51,8 +51,7 @@ namespace Mockaco
 
             foreach (var template in transformedTemplates.OrderByDescending(t => t.Request.Condition?.Length)) // TODO Implement priority 
             {
-                if (await RequestMatchesTemplate(httpContext, template.Request, scriptContext)
-                    .ConfigureAwait(false))
+                if (RequestMatchesTemplate(httpContext, template.Request, scriptContext))
                 {
                     var mockacoContext = httpContext.RequestServices.GetRequiredService<MockacoContext>();
 
@@ -126,7 +125,7 @@ namespace Mockaco
 
                 _logger.LogDebug("Callback response {0}", response);
             }
-            catch(OperationCanceledException ex)
+            catch (OperationCanceledException ex)
             {
                 _logger.LogError(ex, "Callback request timeout");
             }
@@ -217,7 +216,7 @@ namespace Mockaco
         }
 
         // TODO Refactor SRP violation
-        private async Task<bool> RequestMatchesTemplate(HttpContext httpContext, RequestTemplate requestTemplate, ScriptContext scriptContext)
+        private bool RequestMatchesTemplate(HttpContext httpContext, RequestTemplate requestTemplate, ScriptContext scriptContext)
         {
             if (requestTemplate.Method != null)
             {
@@ -240,10 +239,9 @@ namespace Mockaco
 
             if (!string.IsNullOrWhiteSpace(requestTemplate.Condition))
             {
-                var conditionMatches = await Run(requestTemplate.Condition, scriptContext);
-                if (!(conditionMatches is bool) || !(bool)conditionMatches)
+                if (bool.TryParse(requestTemplate.Condition, out var conditionMatches))
                 {
-                    return false;
+                    return conditionMatches;
                 }
             }
 
