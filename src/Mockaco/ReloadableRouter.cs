@@ -1,30 +1,40 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Mockaco.Processors;
+using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Mockaco.Processors;
-using Mono.TextTemplating;
 
 namespace Mockaco
 {
     public class ReloadableRouter : IRouter
     {
         private static CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
+        private readonly IMemoryCache _memoryCache;
         private readonly ITemplateRepository _templateRepository;
         private readonly IApplicationBuilder _applicationBuilder;
-        private IMemoryCache _memoryCache = new MemoryCache(new MemoryCacheOptions());
-
-        public ReloadableRouter(ITemplateRepository templateRepository, IApplicationBuilder applicationBuilder)
+        private readonly ILogger<ReloadableRouter> _logger;
+        
+        public ReloadableRouter(IMemoryCache memoryCache, ITemplateRepository templateRepository, IApplicationBuilder applicationBuilder, ILogger<ReloadableRouter> logger)
         {
+            _memoryCache = memoryCache;
             _templateRepository = templateRepository;
+            _templateRepository.CacheInvalidated += _templateRepository_CacheInvalidated;
+
             _applicationBuilder = applicationBuilder;
+            _logger = logger;
+        }
+
+        private void _templateRepository_CacheInvalidated(object sender, EventArgs e)
+        {
+            FlushCache();
         }
 
         public VirtualPathData GetVirtualPath(VirtualPathContext context)
@@ -43,13 +53,18 @@ namespace Mockaco
 
         private Task<IRouter> GetRouter()
         {
-            return _memoryCache.GetOrCreateAsync(string.Empty, async e =>
+            return _memoryCache.GetOrCreateAsync(nameof(ReloadableRouter), async e =>
             {
                 e.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
                 var routeBuilder = new RouteBuilder(_applicationBuilder);
                 await ConfigureRoute(routeBuilder);
-                return routeBuilder.Build();
+
+                var router = routeBuilder.Build();
+
+                _logger.LogTrace("Router loaded");
+
+                return router;
             });
         }
 

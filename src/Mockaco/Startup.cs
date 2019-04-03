@@ -16,12 +16,15 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddRouting();
             services.AddHttpClient();
 
             services.AddScoped<MockacoContext>();
 
-            services.AddSingleton<ITemplateRepository, TemplateRepository>();
+            services.AddSingleton<ITemplateRepository, CachingTemplateFileRepository>();
+            services.AddSingleton<TemplateFileRepository>();
+
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
             services.AddTransient<ITemplateProcessor, TemplateProcessor>();
