@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace Mockaco
 {
@@ -11,6 +12,17 @@ namespace Mockaco
         public MockacoContext()
         {
             AvailableTemplates = new List<Template>();
+            ScriptContext = new ScriptContext();
+        }
+
+        public void AttachHttpContext(HttpContext httpContext)
+        {
+            if(httpContext == null)
+            {
+                return;
+            }
+
+            ScriptContext.AttachHttpContext(httpContext);
         }
     }
 }

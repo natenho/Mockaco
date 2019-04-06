@@ -29,6 +29,7 @@ namespace Mockaco
 
             services.AddTransient<ITemplateProcessor, TemplateProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();
+            services.AddScoped<TemplateTransformationService>();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -37,7 +38,7 @@ namespace Mockaco
             app.UseMiddleware<TemplateTransformationMiddleware>();
             app.UseMiddleware<RequestMatchingMiddleware>();
             app.UseMiddleware<ResponseMockingMiddleware>();
-            app.UseMiddleware<ResponseCallbackMiddleware>();
+            app.UseMiddleware<ResponseCallbackMiddleware>();       
         }
     }
 }

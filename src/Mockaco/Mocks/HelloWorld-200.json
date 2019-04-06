@@ -1,26 +1,34 @@
 {
+  "variables": {
+    "id": "<#= Faker.Random.Guid() #>"
+  },
   "request": {
     "method": "GET",
     "route": "hello/{message}",
     "condition": null
   },
   "response": {
-    "delay": 0, 
+    "delay": 0,
     "status": "OK",
     "body": {
-      "message": "<#= Route["message"] #>",
+      "id": "<#= Faker.Random.Guid() #>",
+      "message": "<#= Request.Route["message"] #>",
       "product": "<#= Faker.Commerce.ProductName() #>",
-      "inexistent header item": "<#= Header["inexistent"] #>",
+      "inexistent header item": "<#= Request.Header["inexistent"] #>",
+      "inexistent body item": "<#= Request.Body["inexistent"] #>",
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     }
   },
   "callback": {
-    "method": "GET",
+    "delay": 5000,
+    "method": "POST",
+    "url": "http://numbersapi.com/random/date?json",
     "timeout": 2000,
     "headers": {
       "X-Foo": "Bar"
     },
-    "url": "http://numbersapi.com/random/date?json",
-    "delay": 5000
+    "body": {
+      "message": "the response message was <#= Response.Body["id"] #>"
+    }
   }
-}
+} 

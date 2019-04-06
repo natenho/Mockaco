@@ -31,13 +31,15 @@ namespace Mockaco
             response.StatusCode = template.Response.Status == 0 ? (int)HttpStatusCode.OK : (int)template.Response.Status;
 
             await WriteResponseHeaders(response, scriptContext, template);
-
+            
             await WriteResponseBody(response, scriptContext, template);
+
+            _mockacoContext.ScriptContext.AttachResponse(response.Headers, template.Response.Body);
         }
 
         private async Task WriteResponseHeaders(HttpResponse response, ScriptContext scriptContext, Template template)
         {
-            var headers = await TransformHeaders(scriptContext, template.Response.Headers);
+            var headers = TransformHeaders(scriptContext, template.Response.Headers);
 
             foreach (var header in headers)
             {
@@ -47,10 +49,10 @@ namespace Mockaco
             if (string.IsNullOrEmpty(response.ContentType))
             {
                 response.ContentType = "application/json";
-            }
+            }            
         }
 
-        private async Task<IDictionary<string, string>> TransformHeaders(
+        private IDictionary<string, string> TransformHeaders(
             ScriptContext scriptContext,
             IDictionary<string, string> inputDictionary)
         {
