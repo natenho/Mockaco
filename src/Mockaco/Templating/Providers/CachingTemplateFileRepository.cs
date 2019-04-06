@@ -8,20 +8,20 @@ using System.Threading;
 
 namespace Mockaco
 {
-    public sealed class CachingTemplateFileRepository : ITemplateRepository, IDisposable
+    public sealed class CachingTemplateFileProvider : ITemplateProvider, IDisposable
     {
         public event EventHandler CacheInvalidated;
 
         private readonly IMemoryCache _memoryCache;
-        private readonly ITemplateRepository _templateRepository;
-        private readonly ILogger<CachingTemplateFileRepository> _logger;
+        private readonly ITemplateProvider _templateRepository;
+        private readonly ILogger<CachingTemplateFileProvider> _logger;
         private readonly FileSystemWatcher _fileSystemWatcher;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public CachingTemplateFileRepository(IMemoryCache memoryCache, TemplateFileRepository templateRepository, ILogger<CachingTemplateFileRepository> logger)
+        public CachingTemplateFileProvider(IMemoryCache memoryCache, TemplateFileProvider templateProvider, ILogger<CachingTemplateFileProvider> logger)
         {
             _memoryCache = memoryCache;
-            _templateRepository = templateRepository;
+            _templateRepository = templateProvider;
 
             _fileSystemWatcher = new FileSystemWatcher("Mocks", "*.json");
             _fileSystemWatcher.Changed += MockChanged;
@@ -41,14 +41,14 @@ namespace Mockaco
             FlushCache();
         }
 
-        public IEnumerable<TemplateFile> GetAll()
+        public IEnumerable<IRawTemplate> GetTemplates()
         {
             return _memoryCache.GetOrCreate(string.Empty, e =>
             {
                 e.RegisterPostEvictionCallback(PostEvictionCallback);
                 e.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-                return _templateRepository.GetAll();
+                return _templateRepository.GetTemplates();
             });
         }
 

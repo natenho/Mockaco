@@ -13,6 +13,6 @@ namespace Mockaco
         public int? Delay { get; set; }
         public int? Timeout { get; set; }
         public IDictionary<string, string> Headers { get; set; }
-        public JRaw Body { get; set; }
+        public JContainer Body { get; set; }
     }
 }

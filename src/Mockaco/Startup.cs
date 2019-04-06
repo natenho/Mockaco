@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mockaco.Middlewares;
 using Mockaco.Processors;
+using Mockaco.Routing;
+using Mockaco.Templating;
 
 namespace Mockaco
 {
@@ -20,25 +22,26 @@ namespace Mockaco
             services.AddMemoryCache();
             services.AddHttpClient();
 
-            services.AddScoped<MockacoContext>();
+            services.AddScoped<IMockacoContext, MockacoContext>();
+            services.AddScoped<IScriptContext, ScriptContext>();
 
-            services.AddSingleton<ITemplateRepository, CachingTemplateFileRepository>();
-            services.AddSingleton<TemplateFileRepository>();
+            services.AddSingleton<ITemplateProvider, CachingTemplateFileProvider>();
+            services.AddSingleton<TemplateFileProvider>();
+
+            services.AddSingleton<IRouteProvider, RouteProvider>();
 
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
-            services.AddTransient<ITemplateProcessor, TemplateProcessor>();
+            services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();
-            services.AddScoped<TemplateTransformationService>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<ResponseDelayMiddleware>();
-            app.UseMiddleware<TemplateTransformationMiddleware>();
-            app.UseMiddleware<RequestMatchingMiddleware>();
+            app.UseMiddleware<ResponseDelayMiddleware>();            
+            app.UseMiddleware<RequestMatchingMiddleware>();            
             app.UseMiddleware<ResponseMockingMiddleware>();
-            app.UseMiddleware<ResponseCallbackMiddleware>();       
+            app.UseMiddleware<CallbackMiddleware>();       
         }
     }
 }

@@ -1,15 +1,14 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.AspNetCore.Routing;
+using Mockaco.Routing;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Mockaco
 {
-
-    public class ScriptContext
+    public class ScriptContext : IScriptContext
     {
         public Faker Faker { get; }
 
@@ -26,42 +25,35 @@ namespace Mockaco
                 new PermissiveDictionary<string, string>(),
                 new PermissiveDictionary<string, string>(),
                 new PermissiveDictionary<string, string>(),
-                new PermissiveJraw(string.Empty));
+                new JObject());
 
             Response = new ScriptContextResponse(
                 new PermissiveDictionary<string, string>(),
-                new PermissiveJraw(string.Empty));
+                new JObject());
         }
 
-        public void AttachHttpContext(HttpContext httpContext)
+        public void AttachHttpContext(HttpContext httpContext, Route route)
         {
             Request = new ScriptContextRequest(
-                url: httpContext.Request.GetUri(),
-                route: httpContext.GetRouteData()?.Values.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()), //TODO Always null. How to resolve this?
-                query: httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                header: httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                body: ParseJsonBody(httpContext.Request));
+                 url: httpContext.Request.GetUri(),
+                 route: httpContext.Request.GetRouteData(route).ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
+                 query: httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
+                 header: httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
+                 body: ParseJsonBody(httpContext.Request));
         }
 
-        public void AttachResponse(IHeaderDictionary headers, JRaw body)
+        public void AttachResponse(IHeaderDictionary headers, JContainer body)
         {
-            var jsonBody = new PermissiveJraw(string.Empty);
-
-            if (headers.TryGetValue("Content-Type", out var contentType))
-            {
-                jsonBody = new PermissiveJraw(body);
-            }
-
             Response = new ScriptContextResponse(
                headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-               jsonBody);
+               body);
         }
 
-        private static PermissiveJraw ParseJsonBody(HttpRequest httpRequest)
+        private static JObject ParseJsonBody(HttpRequest httpRequest)
         {
             if (httpRequest.ContentType != "application/json")
             {
-                return new PermissiveJraw(string.Empty);
+                return new JObject();
             }
 
             httpRequest.EnableRewind();
@@ -72,13 +64,13 @@ namespace Mockaco
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
-                    return new PermissiveJraw(json);
+                    return JObject.Parse(json);
                 }
 
                 httpRequest.Body.Seek(0, SeekOrigin.Begin);
             }
 
-            return new PermissiveJraw(string.Empty);
+            return new JObject();
         }
     }
 }

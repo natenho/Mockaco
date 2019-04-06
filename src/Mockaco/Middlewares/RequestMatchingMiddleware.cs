@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Mockaco.Processors;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Mockaco.Processors;
+using Mockaco.Routing;
 
 namespace Mockaco.Middlewares
 {
@@ -14,40 +15,57 @@ namespace Mockaco.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext, MockacoContext mockacoContext, ITemplateRepository templateRepository, ITemplateTransformer _templateTransformer)
+        public async Task Invoke(
+            HttpContext httpContext,
+            IMockacoContext mockacoContext,
+            IScriptContext scriptContext, 
+            IRouteProvider routerProvider,            
+            ITemplateTransformer templateTransformer)
         {
-            foreach (var template in mockacoContext.AvailableTemplates)
+            foreach (var route in routerProvider.GetRoutes())
             {
-                if (RequestMatchesTemplate(httpContext, template.Request, mockacoContext.ScriptContext))
-                {
-                    mockacoContext.Template = template;
-                    await _next(httpContext);
+                if (RouteMatchesRequest(httpContext.Request, route))
+                {                    
+                    scriptContext.AttachHttpContext(httpContext, route);
+
+                    var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
+                    
+                    if (template.Request.Condition.GetValueOrDefault(true))
+                    {
+                        mockacoContext.Route = route;
+                        mockacoContext.TransformedTemplate = template;
+                        
+                        await _next(httpContext);
+                        return;
+                    }
                 }
             }
+
+            httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;            
         }
 
-        private bool RequestMatchesTemplate(HttpContext httpContext, RequestTemplate requestTemplate, ScriptContext scriptContext)
+        private bool RouteMatchesRequest(HttpRequest request, Route route)
         {
-            if (requestTemplate.Method != null)
+            if (!string.IsNullOrWhiteSpace(route.Method))
             {
-                var methodMatches = httpContext.Request.Method.Equals(requestTemplate.Method.ToString(), StringComparison.InvariantCultureIgnoreCase);
+                var methodMatches = request.Method.Equals(route.Method.ToString(), StringComparison.InvariantCultureIgnoreCase);
                 if (!methodMatches)
                 {
                     return false;
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(requestTemplate.Route))
+            if (!string.IsNullOrWhiteSpace(route.Path))
             {
                 var routeMatcher = new RouteMatcher();
-                var routeMatches = routeMatcher.IsMatch(requestTemplate.Route, httpContext.Request.Path);
+                var routeMatches = routeMatcher.IsMatch(route.Path, request.Path);
                 if (!routeMatches)
                 {
                     return false;
                 }
             }
 
-            return requestTemplate.Condition.GetValueOrDefault(true);
+            return true;
         }
     }
 }

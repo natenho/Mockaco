@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Mockaco.Middlewares;
+using Mockaco.Routing;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -14,9 +14,9 @@ namespace Mockaco
 
             using (var scope = webHost.Services.CreateScope())
             {
-                var templateTransformationService = scope.ServiceProvider.GetService<TemplateTransformationService>();
+                var routeProvider = scope.ServiceProvider.GetService<IRouteProvider>();
 
-                await templateTransformationService.WarmUp();
+                await routeProvider.WarmUp();
             }
 
             await webHost.RunAsync();

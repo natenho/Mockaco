@@ -7,9 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Mocks.Thundercats\**" />
+    <Content Remove="Mocks.Thundercats\**" />
+    <EmbeddedResource Remove="Mocks.Thundercats\**" />
+    <None Remove="Mocks.Thundercats\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Bogus" Version="26.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />    
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.10.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

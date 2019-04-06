@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Mockaco
 {
@@ -6,11 +7,11 @@ namespace Mockaco
     {
         public IReadOnlyDictionary<string, string> Header { get; }
 
-        public PermissiveJraw Body { get; }
+        public JContainer Body { get; }
 
         public ScriptContextResponse(
             PermissiveDictionary<string, string> header,
-            PermissiveJraw body)
+            JContainer body)
         {
             Header = header;
             Body = body;

@@ -14,13 +14,18 @@ namespace Mockaco
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext, MockacoContext mockacoContext, ILogger<ResponseDelayMiddleware> logger)
+        public async Task Invoke(HttpContext httpContext, IMockacoContext mockacoContext, ILogger<ResponseDelayMiddleware> logger)
         {
             var stopwatch = Stopwatch.StartNew();
 
             await _next(httpContext);
 
-            int responseDelay = mockacoContext.Template.Response.Delay.GetValueOrDefault();
+            if(mockacoContext.TransformedTemplate == null)
+            {
+                return;
+            }
+
+            int responseDelay = mockacoContext.TransformedTemplate.Response.Delay.GetValueOrDefault();
             var remainingDelay = responseDelay - (int)stopwatch.ElapsedMilliseconds;
             if (remainingDelay > 0)
             {

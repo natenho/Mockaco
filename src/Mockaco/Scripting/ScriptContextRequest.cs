@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace Mockaco
@@ -13,20 +14,20 @@ namespace Mockaco
 
         public IReadOnlyDictionary<string, string> Header { get; }
 
-        public PermissiveJraw Body { get; }
+        public JContainer Body { get; }
 
         public ScriptContextRequest(
             Uri url,
             IReadOnlyDictionary<string, string> route,
             IReadOnlyDictionary<string, string> query,
             IReadOnlyDictionary<string, string> header,
-            PermissiveJraw body)
+            JContainer body)
         {
             Url = url;
             Route = route;
             Query = query;
             Header = header;
             Body = body;
-        }        
+        }      
     }
 }
