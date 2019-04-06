@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Mockaco
 {
     public class MockacoContext
     {
-        public int ResponseDelay { get; set; }
+        public ScriptContext ScriptContext { get; set; }
+        public List<Template> AvailableTemplates { get; set; }
+        public Template Template { get; set; }
+
+        public MockacoContext()
+        {
+            AvailableTemplates = new List<Template>();
+        }
     }
 }

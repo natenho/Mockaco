@@ -6,7 +6,7 @@ namespace Mockaco
 {
     public class ResponseTemplate
     {        
-        public string Delay { get; set; }        
+        public int? Delay { get; set; }        
         public HttpStatusCode Status { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public JRaw Body { get; set; }

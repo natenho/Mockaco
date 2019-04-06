@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mockaco.Middlewares;
 using Mockaco.Processors;
 
 namespace Mockaco
@@ -17,7 +18,6 @@ namespace Mockaco
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddRouting();
             services.AddHttpClient();
 
             services.AddScoped<MockacoContext>();
@@ -33,10 +33,11 @@ namespace Mockaco
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<DelayMiddleware>();
-
-            var router = ActivatorUtilities.CreateInstance<ReloadableRouter>(app.ApplicationServices, app);
-            app.UseRouter(router);
+            app.UseMiddleware<ResponseDelayMiddleware>();
+            app.UseMiddleware<TemplateTransformationMiddleware>();
+            app.UseMiddleware<RequestMatchingMiddleware>();
+            app.UseMiddleware<ResponseMockingMiddleware>();
+            app.UseMiddleware<ResponseCallbackMiddleware>();
         }
     }
 }

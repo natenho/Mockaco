@@ -38,7 +38,7 @@ namespace Mockaco
             : this()
         {
             Url = httpContext.Request.GetUri();
-            Route = httpContext.GetRouteData().Values.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
+            Route = httpContext.GetRouteData()?.Values.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());//TODO Always null. How to resolve this?
             Query = httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
             Header = httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
             Body = ParseJsonBody(httpContext.Request);
