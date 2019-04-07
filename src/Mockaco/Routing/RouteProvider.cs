@@ -4,6 +4,7 @@ using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Mockaco.Routing
@@ -41,6 +42,8 @@ namespace Mockaco.Routing
 
             var blankScriptContext = new ScriptContext();
 
+            var stopwatch = Stopwatch.StartNew();
+
             foreach (var rawTemplate in _templateProvider.GetTemplates())
             {
                 try
@@ -66,6 +69,8 @@ namespace Mockaco.Routing
                     _logger.LogWarning("Skipping {0}: {1}", rawTemplate.Name, ex.Message);
                 }
             }
+
+            _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
         }
     }
 }

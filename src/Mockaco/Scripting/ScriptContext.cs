@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Mockaco.Routing;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Mockaco
 {
@@ -39,7 +41,7 @@ namespace Mockaco
                  route: httpContext.Request.GetRouteData(route).ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
                  query: httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
                  header: httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                 body: ParseJsonBody(httpContext.Request));
+                 body: ParseBody(httpContext.Request));
         }
 
         public void AttachResponse(IHeaderDictionary headers, JContainer body)
@@ -49,13 +51,33 @@ namespace Mockaco
                body);
         }
 
-        private static JObject ParseJsonBody(HttpRequest httpRequest)
+        private static JObject ParseBody(HttpRequest httpRequest)
         {
-            if (httpRequest.ContentType != "application/json")
+            if (httpRequest.ContentLength.GetValueOrDefault() == 0)
             {
                 return new JObject();
             }
 
+            if (httpRequest.ContentType.Equals("application/x-www-form-urlencoded", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ParseFormDataBody(httpRequest);
+            }
+
+            if(httpRequest.ContentType.Equals("application/json", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ParseJsonBody(httpRequest);
+            }
+
+            return new JObject();
+        }
+
+        private static JObject ParseFormDataBody(HttpRequest httpRequest)
+        {         
+            return JObject.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString()));
+        }
+
+        private static JObject ParseJsonBody(HttpRequest httpRequest)
+        {           
             httpRequest.EnableRewind();
 
             using (var reader = new StreamReader(httpRequest.Body))
