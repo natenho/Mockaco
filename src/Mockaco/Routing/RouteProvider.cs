@@ -19,8 +19,15 @@ namespace Mockaco.Routing
         {
             _routes = new List<Route>();
             _templateProvider = templateProvider;
+            _templateProvider.OnChange += TemplateProviderChange;
+
             _templateTransformer = templateTransformer;
             _logger = logger;
+        }
+
+        private async void TemplateProviderChange(object sender, EventArgs e)
+        {
+            await WarmUp();
         }
 
         public List<Route> GetRoutes()
@@ -30,6 +37,8 @@ namespace Mockaco.Routing
 
         public async Task WarmUp()
         {
+            _routes.Clear();
+
             var blankScriptContext = new ScriptContext();
 
             foreach (var rawTemplate in _templateProvider.GetTemplates())

@@ -25,13 +25,11 @@ namespace Mockaco
             services.AddScoped<IMockacoContext, MockacoContext>();
             services.AddScoped<IScriptContext, ScriptContext>();
 
-            services.AddSingleton<ITemplateProvider, CachingTemplateFileProvider>();
-            services.AddSingleton<TemplateFileProvider>();
-
-            services.AddSingleton<IRouteProvider, RouteProvider>();
-
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
-
+            
+            services.AddSingleton<IRouteProvider, RouteProvider>();
+            services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
+            
             services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();
         }

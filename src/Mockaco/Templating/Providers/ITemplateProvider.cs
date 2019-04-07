@@ -5,6 +5,8 @@ namespace Mockaco
 {
     public interface ITemplateProvider
     {
+        event EventHandler OnChange;
+
         IEnumerable<IRawTemplate> GetTemplates();
     }
 }
