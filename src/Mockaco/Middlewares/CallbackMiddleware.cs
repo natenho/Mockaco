@@ -96,7 +96,7 @@ namespace Mockaco
             {
                 httpRequest.Headers.Add(header.Key, header.Value);
             }
-
+            
             if (!httpRequest.Headers.Accept.Any())
             {
                 httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

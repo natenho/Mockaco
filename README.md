@@ -185,12 +185,15 @@ Calls another API whenever a request arrives.
     }
   },
   "callback": {
-	"method": "GET",
+	"method": "POST",
 	"timeout": 2000,
-	"headers": {
+	"headers": {		
 		"X-Foo": "Bar"
 	},
-	"url": "http://numbersapi.com/random/date?json",
+	"body": {
+		"message": "The response was <#= Response.Body["currentTime"]?.ToString() #>"
+	},
+	"url": "https://postman-echo.com/post",
 	"delay": 5000
   }
 }

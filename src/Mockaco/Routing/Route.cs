@@ -1,5 +1,8 @@
-﻿namespace Mockaco.Routing
+﻿using System.Diagnostics;
+
+namespace Mockaco.Routing
 {
+    [DebuggerDisplay("{Method} {Path} ({RawTemplate.Name})")]
     public class Route
     {
         public string Method { get; set; }

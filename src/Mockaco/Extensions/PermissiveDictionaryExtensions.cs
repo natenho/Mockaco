@@ -11,6 +11,11 @@ namespace System.Collections.Generic
         {
             var dictionary = new PermissiveDictionary<TKey, TElement>();
 
+            if(source == null)
+            {
+                return dictionary;
+            }
+
             foreach(var item in source)
             {                
                 dictionary.Add(keySelector(item), elementSelector(item));
