@@ -229,7 +229,7 @@ The template code and generation will run for each request.
 The code tag structure ressembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
 ### Example: Access request data
-```json
+```
 {
   "request": {
     "method": "PUT",
@@ -249,7 +249,7 @@ The code tag structure ressembles [T4 Text Template Engine](https://github.com/m
 ```
 
 ### Example: Built-in [Bogus](https://github.com/bchavez/Bogus) integration, to generate fake data
-```json
+```
 {
   "request": {
     "method": "GET"
