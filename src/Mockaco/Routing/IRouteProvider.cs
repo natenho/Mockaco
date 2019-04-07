@@ -6,6 +6,7 @@ namespace Mockaco.Routing
     public interface IRouteProvider
     {
         List<Route> GetRoutes();
+
         Task WarmUp();
     }
 }

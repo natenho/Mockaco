@@ -12,8 +12,12 @@ namespace Mockaco
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext,  ITemplateResponseProcessor templateProcessor)
-        {            
+        public async Task Invoke(
+            HttpContext httpContext, 
+            IMockacoContext mockacoContext, 
+            IScriptContext scriptContext, 
+            ITemplateResponseProcessor templateProcessor)
+        {
             await templateProcessor.PrepareResponse(httpContext.Response, scriptContext, mockacoContext.TransformedTemplate);
 
             await _next(httpContext);

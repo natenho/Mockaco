@@ -7,8 +7,11 @@ namespace Mockaco
     public class ResponseTemplate
     {        
         public int? Delay { get; set; }        
+
         public HttpStatusCode Status { get; set; }
+
         public IDictionary<string, string> Headers { get; set; }
+
         public JContainer Body { get; set; }
     }
 }

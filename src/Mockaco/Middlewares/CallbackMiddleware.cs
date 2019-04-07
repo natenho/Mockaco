@@ -70,8 +70,8 @@ namespace Mockaco
         private static async Task<CallbackTemplate> PrepareCallbackTemplate(IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
         {
             var template = await templateTransformer.Transform(mockacoContext.Route.RawTemplate, scriptContext);
-            var callbackTemplate = template.Callback;
-            return callbackTemplate;
+
+            return template.Callback;
         }
 
         private HttpRequestMessage PrepareHttpRequest(IScriptContext scriptContext, CallbackTemplate callbackTemplate)
@@ -80,12 +80,12 @@ namespace Mockaco
                 new HttpMethod(callbackTemplate.Method),
                 callbackTemplate.Url);
 
-            PrepareHeaders(scriptContext, callbackTemplate, request);
-
             if (callbackTemplate.Body != null)
             {
                 request.Content = new StringContent(callbackTemplate.Body.ToString());
             }
+
+            PrepareHeaders(scriptContext, callbackTemplate, request);
 
             return request;
         }
@@ -94,9 +94,14 @@ namespace Mockaco
         {
             foreach (var header in callBackTemplate.Headers)
             {
-                httpRequest.Headers.Add(header.Key, header.Value);
+                if (httpRequest.Content.Headers.Contains(header.Key))
+                {
+                    httpRequest.Content.Headers.Remove(header.Key);
+                }
+
+                httpRequest.Content.Headers.Add(header.Key, header.Value);
             }
-            
+
             if (!httpRequest.Headers.Accept.Any())
             {
                 httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -109,6 +114,7 @@ namespace Mockaco
             var httpClient = factory.CreateClient();
 
             httpClient.Timeout = TimeSpan.FromMilliseconds(callbackTemplate.Timeout.GetValueOrDefault());
+
             return httpClient;
         }
 

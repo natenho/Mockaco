@@ -6,6 +6,7 @@ namespace Mockaco
     public class RawTemplate : IRawTemplate
     {
         public string Name { get; }
+
         public string Content { get; }
 
         public RawTemplate(string name, string content)
