@@ -11,7 +11,7 @@ A [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples)-powered 
 ## Create a request/response template
 Create a file named `PingPong.json` under `Mocks` folder:
 
-```
+```json
 {
   "request": {
     "method": "GET",
@@ -62,7 +62,7 @@ Any request with the matching HTTP method will return the response. Supported HT
 If omitted, defaults to ```GET```.
 
 ### Example
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -80,7 +80,7 @@ Any request with the matching route will return the response. Any AspNet route t
 If omitted, empty or null, defaults to base route.
 
 ### Example
-```
+```json
 {
   "request": {
     "route": "customers/{id}/accounts/{account_id}"
@@ -98,7 +98,7 @@ Any condition that evaluates to ```true``` will return the response. The conditi
 If omitted, empty or null, defaults to ```true```.
 
 ### Example
-```
+```json
 {
   "request": {
     "condition": "<#= DateTime.Now.Second % 2 == 0 #>"
@@ -118,7 +118,7 @@ Define a minimum response time in milliseconds.
 If omitted, empty or null, defaults to ```0```.
 
 ### Example
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -137,7 +137,7 @@ Set the HTTP status code for the response. Can be a string or a number, as defin
 If omitted, empty or null, defaults to ```OK``` (200).
 
 ### Example
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -155,7 +155,7 @@ Set the HTTP response body. Supports only JSON.
 If omitted, empty or null, defaults to empty.
 
 ### Example
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -173,7 +173,7 @@ If omitted, empty or null, defaults to empty.
 
 Calls another API whenever a request arrives.
 
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -194,6 +194,7 @@ Calls another API whenever a request arrives.
 	"delay": 5000
   }
 }
+```
 
 ## Delay attribute
 
@@ -212,7 +213,7 @@ Use C# code surrounded by ```<#=``` and ```#>```.
 The template code and generation will run for each request.
 
 ### Example: Return current date and time
-```
+```json
 {
   "request": {
     "method": "GET"
@@ -229,7 +230,7 @@ The template code and generation will run for each request.
 The code tag structure ressembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
 ### Example: Access request data
-```
+```json
 {
   "request": {
     "method": "PUT",
@@ -249,7 +250,7 @@ The code tag structure ressembles [T4 Text Template Engine](https://github.com/m
 ```
 
 ### Example: Built-in [Bogus](https://github.com/bchavez/Bogus) integration, to generate fake data
-```
+```json
 {
   "request": {
     "method": "GET"
