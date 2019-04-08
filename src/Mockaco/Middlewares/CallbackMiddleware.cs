@@ -48,23 +48,30 @@ namespace Mockaco
             IScriptContext scriptContext,
             ITemplateTransformer templateTransformer)
         {
-            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var stopwatch = Stopwatch.StartNew();
 
-            var callbackTemplate = await PrepareCallbackTemplate(mockacoContext, scriptContext, templateTransformer);
+                var callbackTemplate = await PrepareCallbackTemplate(mockacoContext, scriptContext, templateTransformer);
 
-            var request = PrepareHttpRequest(scriptContext, callbackTemplate);
+                var request = PrepareHttpRequest(callbackTemplate);
 
-            var httpClient = PrepareHttpClient(httpContext, callbackTemplate);
+                var httpClient = PrepareHttpClient(httpContext, callbackTemplate);
 
-            await DelayRequest(callbackTemplate, stopwatch.ElapsedMilliseconds);
+                await DelayRequest(callbackTemplate, stopwatch.ElapsedMilliseconds);
 
-            stopwatch.Restart();
+                stopwatch.Restart();
 
-            _logger.LogDebug("Callback starting");
+                _logger.LogDebug("Callback starting");
 
-            await PerformRequest(request, httpClient);
+                await PerformRequest(request, httpClient);
 
-            _logger.LogDebug("Callback finished in {0} ms", stopwatch.ElapsedMilliseconds);
+                _logger.LogDebug("Callback finished in {0} ms", stopwatch.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Callback error");
+            }
         }
 
         private static async Task<CallbackTemplate> PrepareCallbackTemplate(IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
@@ -74,7 +81,7 @@ namespace Mockaco
             return template.Callback;
         }
 
-        private HttpRequestMessage PrepareHttpRequest(IScriptContext scriptContext, CallbackTemplate callbackTemplate)
+        private static HttpRequestMessage PrepareHttpRequest(CallbackTemplate callbackTemplate)
         {
             var request = new HttpRequestMessage(
                 new HttpMethod(callbackTemplate.Method),
@@ -85,21 +92,24 @@ namespace Mockaco
                 request.Content = new StringContent(callbackTemplate.Body.ToString());
             }
 
-            PrepareHeaders(scriptContext, callbackTemplate, request);
+            PrepareHeaders(callbackTemplate, request);
 
             return request;
         }
 
-        private void PrepareHeaders(IScriptContext scriptContext, CallbackTemplate callBackTemplate, HttpRequestMessage httpRequest)
+        private static void PrepareHeaders(CallbackTemplate callBackTemplate, HttpRequestMessage httpRequest)
         {
-            foreach (var header in callBackTemplate.Headers)
+            if (callBackTemplate.Headers != null)
             {
-                if (httpRequest.Content.Headers.Contains(header.Key))
+                foreach (var header in callBackTemplate.Headers)
                 {
-                    httpRequest.Content.Headers.Remove(header.Key);
-                }
+                    if (httpRequest.Content.Headers.Contains(header.Key))
+                    {
+                        httpRequest.Content.Headers.Remove(header.Key);
+                    }
 
-                httpRequest.Content.Headers.Add(header.Key, header.Value);
+                    httpRequest.Content.Headers.Add(header.Key, header.Value);
+                }
             }
 
             if (!httpRequest.Headers.Accept.Any())
