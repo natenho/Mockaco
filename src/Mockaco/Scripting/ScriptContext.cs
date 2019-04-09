@@ -58,12 +58,12 @@ namespace Mockaco
                 return new JObject();
             }
 
-            if (httpRequest.ContentType.Equals("application/x-www-form-urlencoded", StringComparison.InvariantCultureIgnoreCase))
+            if (httpRequest.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.InvariantCultureIgnoreCase))
             {
                 return ParseFormDataBody(httpRequest);
             }
 
-            if(httpRequest.ContentType.Equals("application/json", StringComparison.InvariantCultureIgnoreCase))
+            if(httpRequest.ContentType.StartsWith("application/json", StringComparison.InvariantCultureIgnoreCase))
             {
                 return ParseJsonBody(httpRequest);
             }

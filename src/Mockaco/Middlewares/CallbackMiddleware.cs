@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -22,31 +23,24 @@ namespace Mockaco
             _logger = logger;
         }
 
-        public Task Invoke(
-            HttpContext httpContext,
-            IMockacoContext mockacoContext,
-            IScriptContext scriptContext,
-            ITemplateTransformer templateTransformer)
+        public Task Invoke(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
         {
             if (mockacoContext.TransformedTemplate?.Callback == null)
             {
                 return Task.CompletedTask;
             }
 
-            httpContext.Response.OnCompleted(() =>
-            {
-                var fireAndForgetTask = PerformCallback(httpContext, mockacoContext, scriptContext, templateTransformer);
-                return Task.CompletedTask;
-            });
+            httpContext.Response.OnCompleted(
+                () =>
+                {
+                    var fireAndForgetTask = PerformCallback(httpContext, mockacoContext, scriptContext, templateTransformer);
+                    return Task.CompletedTask;
+                });
 
             return Task.CompletedTask;
         }
 
-        private async Task PerformCallback(
-            HttpContext httpContext,
-            IMockacoContext mockacoContext,
-            IScriptContext scriptContext,
-            ITemplateTransformer templateTransformer)
+        private async Task PerformCallback(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
         {
             try
             {
@@ -83,13 +77,13 @@ namespace Mockaco
 
         private static HttpRequestMessage PrepareHttpRequest(CallbackTemplate callbackTemplate)
         {
-            var request = new HttpRequestMessage(
-                new HttpMethod(callbackTemplate.Method),
-                callbackTemplate.Url);
+            var request = new HttpRequestMessage(new HttpMethod(callbackTemplate.Method), callbackTemplate.Url);
 
             if (callbackTemplate.Body != null)
             {
-                request.Content = new StringContent(callbackTemplate.Body.ToString());
+                request.Content = callbackTemplate.Headers.ContainsKey("Content-Type")
+                    ? new StringContent(callbackTemplate.Body.ToString(), Encoding.UTF8, callbackTemplate.Headers["Content-Type"])
+                    : new StringContent(callbackTemplate.Body.ToString());
             }
 
             PrepareHeaders(callbackTemplate, request);
@@ -101,14 +95,14 @@ namespace Mockaco
         {
             if (callBackTemplate.Headers != null)
             {
-                foreach (var header in callBackTemplate.Headers)
+                foreach (var header in callBackTemplate.Headers.Where(h => h.Key != "Content-Type"))
                 {
-                    if (httpRequest.Content.Headers.Contains(header.Key))
+                    if (httpRequest.Headers.Contains(header.Key))
                     {
-                        httpRequest.Content.Headers.Remove(header.Key);
+                        httpRequest.Headers.Remove(header.Key);
                     }
 
-                    httpRequest.Content.Headers.Add(header.Key, header.Value);
+                    httpRequest.Headers.Add(header.Key, header.Value);
                 }
             }
 

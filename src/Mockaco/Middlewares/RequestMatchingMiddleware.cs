@@ -1,8 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Extensions.Logging;
 using Mockaco.Processors;
 using Mockaco.Routing;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Mockaco.Middlewares
 {
@@ -18,30 +21,34 @@ namespace Mockaco.Middlewares
         public async Task Invoke(
             HttpContext httpContext,
             IMockacoContext mockacoContext,
-            IScriptContext scriptContext, 
-            IRouteProvider routerProvider,            
-            ITemplateTransformer templateTransformer)
+            IScriptContext scriptContext,
+            IRouteProvider routerProvider,
+            ITemplateTransformer templateTransformer,
+            ILogger<RequestMatchingMiddleware> logger)
         {
             foreach (var route in routerProvider.GetRoutes())
             {
                 if (RouteMatchesRequest(httpContext.Request, route))
-                {                    
+                {
                     scriptContext.AttachHttpContext(httpContext, route);
 
+                    logger.LogDebug("Incoming request from {remoteIp}, {@request}", httpContext.Connection.RemoteIpAddress, scriptContext.Request.ToJson());
+                    logger.LogInformation("Incoming request matches route {@route}", new { route.Method, route.Path, route.RawTemplate.Name });
+
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
-                    
+
                     if (template.Request.Condition.GetValueOrDefault(true))
                     {
                         mockacoContext.Route = route;
                         mockacoContext.TransformedTemplate = template;
-                        
+
                         await _next(httpContext);
                         return;
                     }
                 }
             }
 
-            httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;            
+            httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
         }
 
         private bool RouteMatchesRequest(HttpRequest request, Route route)
@@ -66,6 +73,20 @@ namespace Mockaco.Middlewares
             }
 
             return true;
+        }
+
+        private static string GetRawBody(HttpRequest httpRequest)
+        {
+            httpRequest.EnableRewind();
+
+            using (var reader = new StreamReader(httpRequest.Body))
+            {
+                var json = reader.ReadToEnd();
+                
+                httpRequest.Body.Seek(0, SeekOrigin.Begin);
+
+                return json;
+            }
         }
     }
 }
