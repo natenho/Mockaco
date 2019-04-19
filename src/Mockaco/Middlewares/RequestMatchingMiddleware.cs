@@ -26,13 +26,16 @@ namespace Mockaco.Middlewares
             ITemplateTransformer templateTransformer,
             ILogger<RequestMatchingMiddleware> logger)
         {
+            scriptContext.AttachHttpContext(httpContext);
+
+            logger.LogDebug("Incoming request from {remoteIp}, {@request}", httpContext.Connection.RemoteIpAddress, scriptContext.Request.ToJson());
+
             foreach (var route in routerProvider.GetRoutes())
             {
                 if (RouteMatchesRequest(httpContext.Request, route))
                 {
-                    scriptContext.AttachHttpContext(httpContext, route);
-
-                    logger.LogDebug("Incoming request from {remoteIp}, {@request}", httpContext.Connection.RemoteIpAddress, scriptContext.Request.ToJson());
+                    scriptContext.AttachRoute(httpContext, route);
+                    
                     logger.LogInformation("Incoming request matches route {@route}", new { route.Method, route.Path, route.RawTemplate.Name });
 
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);

@@ -12,6 +12,12 @@ namespace Mockaco
 {
     public class ScriptContext : IScriptContext
     {
+        private Uri _uri;
+        private PermissiveDictionary<string, string> _queryDictionary = new PermissiveDictionary<string, string>();
+        private PermissiveDictionary<string, string> _headersDictionary = new PermissiveDictionary<string, string>();
+        private PermissiveDictionary<string, string> _routeDictionary = new PermissiveDictionary<string, string>();
+        private JObject _parsedBody;
+
         public Faker Faker { get; }
 
         public ScriptContextRequest Request { get; set; }
@@ -29,26 +35,30 @@ namespace Mockaco
                 new PermissiveDictionary<string, string>(),
                 new JObject());
 
-            Response = new ScriptContextResponse(
-                new PermissiveDictionary<string, string>(),
-                new JObject());
+            Response = new ScriptContextResponse(new PermissiveDictionary<string, string>(), new JObject());
         }
 
-        public void AttachHttpContext(HttpContext httpContext, Route route)
+        public void AttachHttpContext(HttpContext httpContext)
         {
-            Request = new ScriptContextRequest(
-                 url: httpContext.Request.GetUri(),
-                 route: httpContext.Request.GetRouteData(route).ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                 query: httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                 header: httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-                 body: ParseBody(httpContext.Request));
+            _uri = httpContext.Request.GetUri();
+            _queryDictionary = httpContext.Request.Query.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
+            _headersDictionary = httpContext.Request.Headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
+            _parsedBody = ParseBody(httpContext.Request);
+
+            Request = new ScriptContextRequest(url:_uri, route:_routeDictionary, query:_queryDictionary, header:_headersDictionary, body:_parsedBody);
+        }
+
+        public void AttachRoute(HttpContext httpContext, Route route)
+        {
+            _routeDictionary = httpContext.Request.GetRouteData(route)
+                .ToPermissiveDictionary(k => k.Key, v => v.Value.ToString());
+
+            Request = new ScriptContextRequest(url:_uri, route:_routeDictionary, query:_queryDictionary, header:_headersDictionary, body:_parsedBody);
         }
 
         public void AttachResponse(IHeaderDictionary headers, JContainer body)
         {
-            Response = new ScriptContextResponse(
-               headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()),
-               body);
+            Response = new ScriptContextResponse(headers.ToPermissiveDictionary(k => k.Key, v => v.Value.ToString()), body);
         }
 
         private static JObject ParseBody(HttpRequest httpRequest)
@@ -63,7 +73,7 @@ namespace Mockaco
                 return ParseFormDataBody(httpRequest);
             }
 
-            if(httpRequest.ContentType.StartsWith("application/json", StringComparison.InvariantCultureIgnoreCase))
+            if (httpRequest.ContentType.StartsWith("application/json", StringComparison.InvariantCultureIgnoreCase))
             {
                 return ParseJsonBody(httpRequest);
             }
@@ -72,12 +82,12 @@ namespace Mockaco
         }
 
         private static JObject ParseFormDataBody(HttpRequest httpRequest)
-        {         
+        {
             return JObject.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString()));
         }
 
         private static JObject ParseJsonBody(HttpRequest httpRequest)
-        {           
+        {
             httpRequest.EnableRewind();
 
             using (var reader = new StreamReader(httpRequest.Body))

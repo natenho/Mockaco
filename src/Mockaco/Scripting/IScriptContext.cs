@@ -13,7 +13,9 @@ namespace Mockaco
 
         ScriptContextResponse Response { get; set; }
 
-        void AttachHttpContext(HttpContext httpContext, Route route);
+        void AttachHttpContext(HttpContext httpContext);
+
+        void AttachRoute(HttpContext httpContext, Route route);
 
         void AttachResponse(IHeaderDictionary headers, JContainer body);
     }
