@@ -46,13 +46,15 @@ namespace Mockaco
 
         public IEnumerable<IRawTemplate> GetTemplates()
         {
-            return _memoryCache.GetOrCreate(nameof(TemplateFileProvider), e =>
-            {
-                e.RegisterPostEvictionCallback(PostEvictionCallback);
-                e.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
+            return _memoryCache.GetOrCreate(
+                nameof(TemplateFileProvider),
+                e =>
+                {
+                    e.RegisterPostEvictionCallback(PostEvictionCallback);
+                    e.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
-                return LoadTemplatesFromDirectory();
-            });
+                    return LoadTemplatesFromDirectory();
+                });
         }
 
         private void PostEvictionCallback(object key, object value, EvictionReason reason, object state)
@@ -64,7 +66,8 @@ namespace Mockaco
         {
             var directory = new DirectoryInfo("Mocks");
 
-            foreach (var file in directory.GetFiles("*.json").OrderBy(f => f.Name))
+            foreach (var file in directory.GetFiles("*.json")
+                .OrderBy(f => f.Name))
             {
                 var rawContent = File.ReadAllText(file.FullName);
                 yield return new RawTemplate(file.Name, rawContent);
@@ -73,12 +76,12 @@ namespace Mockaco
 
         private void FlushCache()
         {
-            if (_resetCacheToken != null && !_resetCacheToken.IsCancellationRequested &&
-                _resetCacheToken.Token.CanBeCanceled)
+            if (_resetCacheToken?.IsCancellationRequested == false && _resetCacheToken.Token.CanBeCanceled)
             {
                 _resetCacheToken.Cancel();
                 _resetCacheToken.Dispose();
             }
+
             _resetCacheToken = new CancellationTokenSource();
         }
 

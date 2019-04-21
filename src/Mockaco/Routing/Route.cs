@@ -17,5 +17,10 @@ namespace Mockaco.Routing
             Path = path;
             RawTemplate = rawTemplate;
         }
+
+        public override string ToString()
+        {
+            return $"{Method} {Path} ({RawTemplate.Name})";
+        }
     }
 }
