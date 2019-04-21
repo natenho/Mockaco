@@ -253,11 +253,11 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
   "response": {
 	"status": "OK",
 	"body": {
-	  "url": "<#= Url #>",
-	  "customerId": "<#= Route["id"] #>",
-	  "acceptHeader": "<#= Header["accept"] #>",
-	  "queryString": "<#= Query["dummy"] #>",
-	  "requestBodyAttribute": "<#= Body["address"][0] #>"
+	  "url": "<#= Request.Url?.ToString() #>",
+	  "customerId": "<#= Request.Route["id"]?.ToString() #>",
+	  "acceptHeader": "<#= Request.Header["Content-Type"]?.ToString() #>",
+	  "queryString": "<#= Request.Query["dummy"]?.ToString() #>",
+	  "requestBodyAttribute": "<#= Request.Body["address"]?[0]?.ToString() #>"
 	}
   }
 }
@@ -274,7 +274,7 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 	"body": {
 	  "id": "<#= Faker.Random.Guid() #>",
 	  "fruit": "<#= Faker.PickRandom(new[] { "apple", "banana", "orange", "strawberry", "kiwi" }) #>",
-	  "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
+	  "recentDate": <#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>
 	}
   }
 }
