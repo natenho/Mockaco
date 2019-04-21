@@ -208,11 +208,11 @@ Calls another API whenever a request arrives.
 
 ## Delay attribute
 
-The time to wait after a response before calling the callback.
+The time to wait after a response before performing the callback.
 
 ## Timeout attribute
 
-Defines a time in milliseconds to wait the callback response before canceling the operation.
+Defines a time in milliseconds to wait the callback response before cancelling the operation.
 
 # Scripting
 
@@ -221,6 +221,8 @@ Every part of the template file is scriptable, so you can add code to programati
 Use C# code surrounded by ```<#=``` and ```#>```.
 
 The template code and generation will run for each request.
+
+No context is passed to the template processor at startup, so it's a good practice to script considering that the context (request/response) variables may be null or empty.
 
 The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples).
 
@@ -252,10 +254,10 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 	"status": "OK",
 	"body": {
 	  "url": "<#= Url #>",
-	  "customerId": "<#= Route[\"id\"] #>",
-	  "acceptHeader": "<#= Header[\"accept\"] #>",
-	  "queryString": "<#= Query[\"dummy\"] #>",
-	  "requestBodyAttribute": "<#= Body[\"address\"][0] #>"
+	  "customerId": "<#= Route["id"] #>",
+	  "acceptHeader": "<#= Header["accept"] #>",
+	  "queryString": "<#= Query["dummy"] #>",
+	  "requestBodyAttribute": "<#= Body["address"][0] #>"
 	}
   }
 }
@@ -271,7 +273,7 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 	"status": "OK",
 	"body": {
 	  "id": "<#= Faker.Random.Guid() #>",
-	  "fruit": "<#= Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) #>",
+	  "fruit": "<#= Faker.PickRandom(new[] { "apple", "banana", "orange", "strawberry", "kiwi" }) #>",
 	  "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
 	}
   }
