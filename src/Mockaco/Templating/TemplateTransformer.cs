@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mockaco.Processors;
 using Mono.TextTemplating;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mockaco.Processors
+namespace Mockaco.Templating
 {
     public class TemplateTransformer : ITemplateTransformer
     {
@@ -17,7 +19,14 @@ namespace Mockaco.Processors
             _logger = logger;
         }
 
-        public async Task<string> Transform(string input, ScriptContext scriptContext)
+        public async Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext)
+        {
+            var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
+
+            return JsonConvert.DeserializeObject<Template>(transformedTemplate);
+        }
+
+        private async Task<string> Transform(string input, IScriptContext scriptContext)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -74,13 +83,13 @@ namespace Mockaco.Processors
         }
 
         // TODO Remove repeated code
-        private async Task<object> Run(string code, ScriptContext scriptContext)
+        private async Task<object> Run(string code, IScriptContext scriptContext)
         {
             object result = null;
 
             try
             {
-                result = await _scriptRunnerFactory.Invoke<ScriptContext, object>(scriptContext, code);
+                result = await _scriptRunnerFactory.Invoke<IScriptContext, object>(scriptContext, code);
 
                 _logger.LogDebug($"Processed script {code} with result {result}");
             }

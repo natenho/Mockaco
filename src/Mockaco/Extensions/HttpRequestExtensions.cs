@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+using Mockaco.Routing;
 using System;
 using System.Text;
 
@@ -69,6 +71,13 @@ namespace Microsoft.AspNetCore.Http
             }
 
             return new Uri(builder.ToString());
+        }
+
+        public static Routing.RouteValueDictionary GetRouteData(this HttpRequest request, Route route)
+        {
+            var routeMatcher = new RouteMatcher();
+
+            return routeMatcher.Match(route.Path, request.Path);
         }
     }
 }

@@ -1,19 +1,14 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Mockaco.Middlewares;
 using Mockaco.Processors;
-using Mono.TextTemplating;
-using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+using Mockaco.Routing;
+using Mockaco.Templating;
 
 namespace Mockaco
 {
-    public class Startup
+    public partial class Startup
     {
         public Startup(IConfiguration configuration)
         {
@@ -24,80 +19,27 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRouting();
+            services.AddMemoryCache();
             services.AddHttpClient();
 
-            services.AddScoped<MockacoContext>();
+            services.AddScoped<IMockacoContext, MockacoContext>();
+            services.AddScoped<IScriptContext, ScriptContext>();
 
-            services.AddSingleton<ITemplateRepository, TemplateRepository>();
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
-
-            services.AddTransient<ITemplateProcessor, TemplateProcessor>();
+            
+            services.AddSingleton<IRouteProvider, RouteProvider>();
+            services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
+            
+            services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<DelayMiddleware>();
-
-            app.UseRouter(ConfigureRoute);
-        }
-
-        private static async void ConfigureRoute(IRouteBuilder routeBuilder)
-        {
-            var templateRepository = routeBuilder.ServiceProvider.GetService<ITemplateRepository>();
-
-            foreach (var templateFile in templateRepository.GetAll())
-            {
-                var template = await ProcessTemplate(routeBuilder.ServiceProvider, templateFile);
-
-                if (template == null)
-                {
-                    continue;
-                }
-
-                var httpMethod = template.Request.Method?.ToString() ?? HttpMethod.Get.ToString();
-                var route = template.Request.Route ?? string.Empty;
-
-                routeBuilder.MapVerb(httpMethod, route, RequestHandler);
-            }
-        }
-
-        private static Task RequestHandler(HttpContext httpContext)
-        {
-            var processor = httpContext.RequestServices.GetRequiredService<ITemplateProcessor>();
-
-            return processor.ProcessResponse(httpContext);
-        }
-
-        private static async Task<Template> ProcessTemplate(IServiceProvider serviceProvider, TemplateFile templateFile)
-        {
-            Template template = null;
-
-            var logger = serviceProvider.GetService<ILogger<Startup>>();
-
-            try
-            {
-                var templateTransformer = serviceProvider.GetService<ITemplateTransformer>();
-                var scriptContext = new ScriptContext();
-                var parsedTemplate = await templateTransformer.Transform(templateFile.Content, scriptContext);
-
-                template = JsonConvert.DeserializeObject<Template>(parsedTemplate);
-            }
-            catch (JsonReaderException ex)
-            {
-                logger.LogWarning("Skipping {0}: Generated JSON is invalid - {1}", templateFile.FileName, ex.Message);
-            }
-            catch (ParserException ex)
-            {
-                logger.LogWarning("Skipping {0}: Script parser error - {1} {2} ", templateFile.FileName, ex.Message, ex.Location);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning("Skipping {0}: {1}", templateFile.FileName, ex.Message);
-            }
-
-            return template;
+            app.UseMiddleware<ResponseDelayMiddleware>();            
+            app.UseMiddleware<RequestMatchingMiddleware>();            
+            app.UseMiddleware<ResponseMockingMiddleware>();
+            app.UseMiddleware<CallbackMiddleware>();       
         }
     }
 }

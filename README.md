@@ -21,21 +21,21 @@ Create a file named `PingPong.json` under `Mocks` folder:
 ```json
 {
   "request": {
-    "method": "GET",
-    "route": "ping"
+	"method": "GET",
+	"route": "ping"
   },
   "response": {
-    "status": "OK",
-    "body": {
-      "response": "pong"
-    }
+	"status": "OK",
+	"body": {
+	  "response": "pong"
+	}
   }
 }
 ```
 
 ## Run the project
 ```# dotnet run```
-    
+	
 ## Send a request and get the mocked response
 ```http
 # curl -iX GET http://localhost:5000/ping
@@ -46,7 +46,7 @@ Server: Kestrel
 Transfer-Encoding: chunked
 
 {
-    "response": "pong"
+	"response": "pong"
 }
 ```
 
@@ -72,10 +72,10 @@ If omitted, defaults to ```GET```.
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {
-    "status": "OK"
+	"status": "OK"
   }
 }
 ```
@@ -90,10 +90,10 @@ If omitted, empty or null, defaults to base route.
 ```json
 {
   "request": {
-    "route": "customers/{id}/accounts/{account_id}"
+	"route": "customers/{id}/accounts/{account_id}"
   },
   "response": {
-    "status": "OK"
+	"status": "OK"
   }
 }
 ```
@@ -108,10 +108,10 @@ If omitted, empty or null, defaults to ```true```.
 ```json
 {
   "request": {
-    "condition": "<#= DateTime.Now.Second % 2 == 0 #>"
+	"condition": "<#= DateTime.Now.Second % 2 == 0 #>"
   },
   "response": {
-    "status": "OK"
+	"status": "OK"
   }
 }
 ```
@@ -128,11 +128,11 @@ If omitted, empty or null, defaults to ```0```.
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {
-    "delay": 4000,
-    "status": "OK"
+	"delay": 4000,
+	"status": "OK"
   }
 }
 ```
@@ -147,10 +147,10 @@ If omitted, empty or null, defaults to ```OK``` (200).
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {    
-    "status": "Forbidden"
+	"status": "Forbidden"
   }
 }
 ```
@@ -165,13 +165,13 @@ If omitted, empty or null, defaults to empty.
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {    
-    "status": "OK",
-    "body": {
-      "foo": "Bar"
-    }
+	"status": "OK",
+	"body": {
+	  "foo": "Bar"
+	}
   }
 }
 ```
@@ -183,22 +183,25 @@ Calls another API whenever a request arrives.
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {
-    "status": "OK",
-    "body": {
-      "currentTime": "<#= DateTime.Now.ToString() #>"
-    }
+	"status": "OK",
+	"body": {
+	  "currentTime": "<#= DateTime.Now.ToString() #>"
+	}
   },
   "callback": {
-    "method": "GET",
-    "timeout": 2000,
-    "headers": {
-      "X-Foo": "Bar"
-    },
-    "url": "http://numbersapi.com/random/date?json",
-    "delay": 5000
+	"method": "POST",
+	"timeout": 2000,
+	"headers": {		
+		"X-Foo": "Bar"
+	},
+	"body": {
+		"message": "The response was <#= Response.Body["currentTime"]?.ToString() #>"
+	},
+	"url": "https://postman-echo.com/post",
+	"delay": 5000
   }
 }
 ```
@@ -225,13 +228,13 @@ The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/ros
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {
-    "status": "OK",
-    "body": {
-      "currentYear": "<#= DateTime.Now.Year #>"
-    }
+	"status": "OK",
+	"body": {
+	  "currentYear": "<#= DateTime.Now.Year #>"
+	}
   }
 }
 ```
@@ -242,18 +245,18 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 ```json
 {
   "request": {
-    "method": "PUT",
-    "route": "customers/{id}"
+	"method": "PUT",
+	"route": "customers/{id}"
   },
   "response": {
-    "status": "OK",
-    "body": {
-      "url": "<#= Url #>",
-      "customerId": "<#= Route["id"] #>",
-      "acceptHeader": "<#= Header["accept"] #>",
-      "queryString": "<#= Query["dummy"] #>",
-      "requestBodyAttribute": "<#= Body["address"][0] #>"
-    }
+	"status": "OK",
+	"body": {
+	  "url": "<#= Url #>",
+	  "customerId": "<#= Route[\"id\"] #>",
+	  "acceptHeader": "<#= Header[\"accept\"] #>",
+	  "queryString": "<#= Query[\"dummy\"] #>",
+	  "requestBodyAttribute": "<#= Body[\"address\"][0] #>"
+	}
   }
 }
 ```
@@ -262,15 +265,15 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 ```json
 {
   "request": {
-    "method": "GET"
+	"method": "GET"
   },
   "response": {
-    "status": "OK",
-    "body": {
-      "id": "<#= Faker.Random.Guid() #>",
-      "fruit": "<#= Faker.PickRandom(new[] { "apple", "banana", "orange", "strawberry", "kiwi" }) #>",
-      "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
-    }
+	"status": "OK",
+	"body": {
+	  "id": "<#= Faker.Random.Guid() #>",
+	  "fruit": "<#= Faker.PickRandom(new[] {\"apple\",\"banana\",\"orange\",\"strawberry\",\"kiwi\"}) #>",
+	  "recentDate": "<#= JsonConvert.SerializeObject(Faker.Date.Recent()) #>"
+	}
   }
 }
 ```

@@ -4,6 +4,6 @@ namespace Mockaco.Processors
 {
     public interface ITemplateTransformer
     {
-        Task<string> Transform(string input, ScriptContext scriptContext);
+        Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext);
     }
 }

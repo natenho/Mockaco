@@ -52,6 +52,7 @@ namespace Mockaco
                     typeof(Faker).Assembly,
                     typeof(ScriptRunnerFactory).Assembly)
                 .WithImports(
+                    "System",
                     "System.Linq",
                     "System.Collections.Generic",
                     typeof(Faker).Namespace,

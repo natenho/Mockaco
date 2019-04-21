@@ -1,13 +1,17 @@
-﻿namespace Mockaco
+﻿using System.Diagnostics;
+
+namespace Mockaco
 {
-    public class TemplateFile
+    [DebuggerDisplay("{Name}")]
+    public class RawTemplate : IRawTemplate
     {
-        public string FileName { get; }
+        public string Name { get; }
+
         public string Content { get; }
 
-        public TemplateFile(string fileName, string content)
+        public RawTemplate(string name, string content)
         {
-            FileName = fileName;
+            Name = name;
             Content = content;
         }
     }

@@ -1,26 +1,37 @@
 {
+  "variables": {
+    "id": "<#= Faker.Random.Guid() #>"
+  },
   "request": {
-    "method": "GET",
+    "method": "POST",
     "route": "hello/{message}",
     "condition": null
   },
   "response": {
-    "delay": 0, 
+    "delay": 0,
     "status": "OK",
     "body": {
-      "message": "<#= Route["message"] #>",
+      "id": "<#= Faker.Random.Guid() #>",
+      "message": "<#= Request.Route["message"] #>",
       "product": "<#= Faker.Commerce.ProductName() #>",
-      "inexistent header item": "<#= Header["inexistent"] #>",
+      "inexistent header item": "<#= Request.Header["inexistent"] #>",
+      "inexistent body item": "<#= Request.Body["inexistent"] #>",
+      "existent body item": "<#= Request.Body["message"] #>",
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     }
   },
   "callback": {
-    "method": "GET",
+    "delay": 5000,
+    "method": "POST",
+    "url": "https://postman-echo.com/post",
     "timeout": 2000,
     "headers": {
       "X-Foo": "Bar"
     },
-    "url": "http://numbersapi.com/random/date?json",
-    "delay": 5000
+    "body": {
+      "requestRoute": "The callback informs that Request.Route[\"message\"] was <#= Request.Route["message"] #>",
+      "requestBody": "The callback informs that Request.Body[\"message\"] was <#= Request.Body["message"] #>",
+      "responseBody": "The callback informs that Response.Body[\"id\"] was <#= Response.Body["id"] #>"
+    }
   }
 }
