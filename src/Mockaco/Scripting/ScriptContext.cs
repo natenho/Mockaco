@@ -89,17 +89,14 @@ namespace Mockaco
         private static JObject ParseJsonBody(HttpRequest httpRequest)
         {
             httpRequest.EnableRewind();
+            httpRequest.Body.Seek(0, SeekOrigin.Begin);
 
-            using (var reader = new StreamReader(httpRequest.Body))
+            var reader = new StreamReader(httpRequest.Body);
+            var json = reader.ReadToEnd();
+
+            if (!string.IsNullOrWhiteSpace(json))
             {
-                var json = reader.ReadToEnd();
-
-                if (!string.IsNullOrWhiteSpace(json))
-                {
-                    return JObject.Parse(json);
-                }
-
-                httpRequest.Body.Seek(0, SeekOrigin.Begin);
+                return JObject.Parse(json);
             }
 
             return new JObject();

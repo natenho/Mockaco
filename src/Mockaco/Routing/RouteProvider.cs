@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mockaco.Routing
@@ -44,6 +45,8 @@ namespace Mockaco.Routing
 
             var stopwatch = Stopwatch.StartNew();
 
+            var routes = new Dictionary<Template, Route>();
+
             foreach (var rawTemplate in _templateProvider.GetTemplates())
             {
                 try
@@ -52,7 +55,7 @@ namespace Mockaco.Routing
 
                     var template = await _templateTransformer.Transform(rawTemplate, blankScriptContext);
 
-                    _routes.Add(new Route(template.Request.Method, template.Request.Route, rawTemplate));
+                    routes[template] = new Route(template.Request.Method, template.Request.Route, rawTemplate);
 
                     _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request.Method, template.Request.Route);
                 }
@@ -69,6 +72,10 @@ namespace Mockaco.Routing
                     _logger.LogWarning("Skipping {0}: {1}", rawTemplate.Name, ex.Message);
                 }
             }
+
+            _routes = routes.Keys.OrderByDescending(r => r.Request.Condition)
+                .Select(t => routes[t])
+                .ToList();
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
         }
