@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.Net.Http.Headers;
 using Mockaco.Routing;
 using System;
 using System.Text;
@@ -78,6 +79,13 @@ namespace Microsoft.AspNetCore.Http
             var routeMatcher = new RouteMatcher();
 
             return routeMatcher.Match(route.Path, request.Path);
+        }
+
+        public static bool HasJsonContentType(this HttpRequest request)
+        {
+            MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
+
+            return parsedValue?.MediaType.Equals("application/json", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }

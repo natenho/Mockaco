@@ -63,17 +63,22 @@ namespace Mockaco
 
         private static JObject ParseBody(HttpRequest httpRequest)
         {
-            if (httpRequest.ContentLength.GetValueOrDefault() == 0)
+            if (httpRequest.Body?.CanRead == false)
             {
                 return new JObject();
             }
 
-            if (httpRequest.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.InvariantCultureIgnoreCase))
+            if (string.IsNullOrEmpty(httpRequest.ContentType))
+            {
+                return new JObject();
+            }
+            
+            if (httpRequest.HasFormContentType)
             {
                 return ParseFormDataBody(httpRequest);
             }
 
-            if (httpRequest.ContentType.StartsWith("application/json", StringComparison.InvariantCultureIgnoreCase))
+            if (httpRequest.HasJsonContentType())
             {
                 return ParseJsonBody(httpRequest);
             }
@@ -89,7 +94,7 @@ namespace Mockaco
         private static JObject ParseJsonBody(HttpRequest httpRequest)
         {
             httpRequest.EnableRewind();
-            
+
             var reader = new StreamReader(httpRequest.Body);
 
             var json = reader.ReadToEnd();
