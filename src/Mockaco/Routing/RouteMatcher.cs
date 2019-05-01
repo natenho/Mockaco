@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 
-namespace Mockaco
+namespace Mockaco.Routing
 {
     public class RouteMatcher
     {

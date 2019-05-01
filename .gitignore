@@ -261,4 +261,4 @@ __pycache__/
 *.pyc
 
 # Mock Files
-src/Mockaco/Mocks/*.json
+src/Mockaco/Mocks*/*.json
