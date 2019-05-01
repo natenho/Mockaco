@@ -37,7 +37,7 @@ namespace Mockaco.Middlewares
                     scriptContext.AttachRoute(httpContext, route);
 
                     logger.LogInformation("Incoming request matches route {route}", route);
-                    
+
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
 
                     if (template.Request.Condition ?? true)

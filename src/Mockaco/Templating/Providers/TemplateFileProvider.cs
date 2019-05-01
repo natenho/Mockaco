@@ -66,11 +66,11 @@ namespace Mockaco
         {
             var directory = new DirectoryInfo("Mocks");
 
-            foreach (var file in directory.GetFiles("*.json")
+            foreach (var file in directory.GetFiles("*.json", SearchOption.AllDirectories)
                 .OrderBy(f => f.Name))
             {
                 var rawContent = File.ReadAllText(file.FullName);
-                yield return new RawTemplate(file.Name, rawContent);
+                yield return new RawTemplate(file.RelativePath(directory), rawContent);
             }
         }
 
