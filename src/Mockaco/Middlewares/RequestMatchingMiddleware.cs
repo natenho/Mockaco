@@ -27,6 +27,8 @@ namespace Mockaco.Middlewares
             scriptContext.AttachHttpContext(httpContext);
 
             logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
+            logger.LogDebug("Headers: {headers}", scriptContext.Request.Header.ToJson());
+            logger.LogDebug("Body: {body}", scriptContext.Request.Body);
 
             foreach (var route in routerProvider.GetRoutes())
             {
@@ -35,7 +37,7 @@ namespace Mockaco.Middlewares
                     scriptContext.AttachRoute(httpContext, route);
 
                     logger.LogInformation("Incoming request matches route {route}", route);
-
+                    
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
 
                     if (template.Request.Condition ?? true)
