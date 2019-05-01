@@ -15,8 +15,12 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="26.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />    
+    <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.0.0" />
+    <PackageReference Include="Unclassified.NetRevisionTask" Version="0.2.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
