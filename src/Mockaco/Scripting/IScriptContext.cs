@@ -17,6 +17,6 @@ namespace Mockaco
 
         void AttachRoute(HttpContext httpContext, Route route);
 
-        void AttachResponse(IHeaderDictionary headers, JContainer body);
+        void AttachResponse(IHeaderDictionary headers, JToken body);
     }
 }

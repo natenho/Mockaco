@@ -7,11 +7,11 @@ namespace Mockaco
     {
         public IReadOnlyDictionary<string, string> Header { get; }
 
-        public JContainer Body { get; }
+        public JToken Body { get; }
 
         public ScriptContextResponse(
             PermissiveDictionary<string, string> header,
-            JContainer body)
+            JToken body)
         {
             Header = header;
             Body = body;

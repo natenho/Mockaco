@@ -12,6 +12,6 @@ namespace Mockaco
 
         public IDictionary<string, string> Headers { get; set; }
 
-        public JContainer Body { get; set; }
+        public JToken Body { get; set; }
     }
 }
