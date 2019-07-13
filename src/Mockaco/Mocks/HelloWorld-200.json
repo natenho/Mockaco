@@ -1,9 +1,9 @@
 {
   "variables": {
-    "id": "<#= Faker.Random.Guid() #>"
+    "id": "<#= Faker.Random.Guid()  #>"
   },
   "request": {
-    "method": "POST",
+    "method": "GET",
     "route": "hello/{message}",
     "condition": null
   },
