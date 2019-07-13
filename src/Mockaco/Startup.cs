@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Mockaco.Logging;
 using Mockaco.Middlewares;
 using Mockaco.Processors;
 using Mockaco.Routing;
@@ -19,6 +22,8 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Replace(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TimedLogger<>)));
+
             services.AddMemoryCache();
             services.AddHttpClient();
 
