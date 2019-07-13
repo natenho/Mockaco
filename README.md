@@ -1,11 +1,11 @@
 <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
 
-# Mockaco
+# Mockaco [![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master)
 Mockaco is an HTTP-based API mock server with quick setup, featuring:
 
 - Simple JSON-based configuration
 - Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
-- Fake data generation - hassle-free fake data generation
+- Fake data generation - built-in hassle-free fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
 
 # Quick Start
@@ -69,7 +69,7 @@ Any request with the matching HTTP method will return the response. Supported HT
 If omitted, defaults to ```GET```.
 
 ### Example
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -87,7 +87,7 @@ Any request with the matching route will return the response. Any AspNet route t
 If omitted, empty or null, defaults to base route.
 
 ### Example
-```json
+```
 {
   "request": {
 	"route": "customers/{id}/accounts/{account_id}"
@@ -105,7 +105,7 @@ Any condition that evaluates to ```true``` will return the response. The conditi
 If omitted, empty or null, defaults to ```true```.
 
 ### Example
-```json
+```
 {
   "request": {
 	"condition": "<#= DateTime.Now.Second % 2 == 0 #>"
@@ -125,7 +125,7 @@ Define a minimum response time in milliseconds.
 If omitted, empty or null, defaults to ```0```.
 
 ### Example
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -144,7 +144,7 @@ Set the HTTP status code for the response. Can be a string or a number, as defin
 If omitted, empty or null, defaults to ```OK``` (200).
 
 ### Example
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -162,7 +162,7 @@ Set the HTTP response body. Supports only JSON.
 If omitted, empty or null, defaults to empty.
 
 ### Example
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -180,7 +180,7 @@ If omitted, empty or null, defaults to empty.
 
 Calls another API whenever a request arrives.
 
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -227,7 +227,7 @@ No context is passed to the template processor at startup, so it's a good practi
 The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples).
 
 ### Example
-```json
+```
 {
   "request": {
 	"method": "GET"
@@ -244,7 +244,7 @@ The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/ros
 The code tag structure resembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
 ### Example: Accessing request data
-```json
+```
 {
   "request": {
 	"method": "PUT",
@@ -264,7 +264,7 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 ```
 
 ### Example: Generating fake data
-```json
+```
 {
   "request": {
 	"method": "GET"
