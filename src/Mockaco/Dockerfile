@@ -13,6 +13,7 @@ FROM build AS publish
 RUN dotnet publish "Mockaco.csproj" -c Release -o /app
 
 FROM base AS final
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 WORKDIR /app
 COPY --from=publish /app .
 COPY Mocks /app/Mocks 
