@@ -141,9 +141,9 @@ namespace Mockaco
                 _logger.LogDebug("Callback response\n\n{0}\n", response);
                 _logger.LogDebug("Callback response content\n\n{0}\n", await response.Content.ReadAsStringAsync());
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                _logger.LogError(ex, "Callback request timeout");
+                _logger.LogError("Callback request timeout");
             }
             catch (Exception ex)
             {
