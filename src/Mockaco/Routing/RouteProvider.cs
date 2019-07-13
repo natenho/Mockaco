@@ -12,14 +12,14 @@ namespace Mockaco.Routing
 {
     public class RouteProvider : IRouteProvider
     {
-        private List<Route> _routes;
+        private List<Route> _cache;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<RouteProvider> _logger;
 
         public RouteProvider(ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
         {
-            _routes = new List<Route>();
+            _cache = new List<Route>();
             _templateProvider = templateProvider;
             _templateProvider.OnChange += TemplateProviderChange;
 
@@ -34,28 +34,37 @@ namespace Mockaco.Routing
 
         public List<Route> GetRoutes()
         {
-            return _routes;
+            return _cache;
         }
 
         public async Task WarmUp()
         {
-            _routes.Clear();
-
             var blankScriptContext = new ScriptContext();
 
             var stopwatch = Stopwatch.StartNew();
 
-            var routes = new Dictionary<Template, Route>();
+            var routes = new List<Route>();
 
             foreach (var rawTemplate in _templateProvider.GetTemplates())
             {
                 try
                 {
-                    _logger.LogInformation("Loading {0}", rawTemplate.Name);
+                    var cachedRoute = _cache.FirstOrDefault(r => r.RawTemplate.Hash == rawTemplate.Hash);
+
+                    if (cachedRoute != null)
+                    {
+                        _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                        
+                        routes.Add(cachedRoute);
+
+                        continue;
+                    }
+
+                    _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
                     var template = await _templateTransformer.Transform(rawTemplate, blankScriptContext);
 
-                    routes[template] = new Route(template.Request.Method, template.Request.Route, rawTemplate);
+                    routes.Add(new Route(template.Request.Method, template.Request.Route, rawTemplate, template.Request.Condition.HasValue));
 
                     _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request.Method, template.Request.Route);
                 }
@@ -73,9 +82,9 @@ namespace Mockaco.Routing
                 }
             }
 
-            _routes = routes.Keys.OrderByDescending(r => r.Request.Condition)
-                .Select(t => routes[t])
-                .ToList();
+            _cache.Clear();
+
+            _cache = routes.OrderByDescending(r => r.HasCondition).ToList();
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
         }

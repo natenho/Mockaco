@@ -11,11 +11,14 @@ namespace Mockaco.Routing
 
         public IRawTemplate RawTemplate { get; set; }
 
-        public Route(string method, string path, IRawTemplate rawTemplate)
+        public bool HasCondition { get; set; }
+
+        public Route(string method, string path, IRawTemplate rawTemplate, bool hasCondition)
         {
             Method = method;
             Path = path;
             RawTemplate = rawTemplate;
+            HasCondition = hasCondition;
         }
 
         public override string ToString()
