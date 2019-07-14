@@ -10,9 +10,20 @@ Mockaco is an HTTP-based API mock server with quick setup, featuring:
 
 # Quick Start
 
+## Running the application
+
+You can run Mockaco as a [Docker](https://www.docker.com/get-started) container:
+
 ```
-# git clone https://github.com/natenho/Mockaco.git
-# cd Mockaco\src\Mockaco
+docker run -it --rm -p 5000:80 /home/Mocks:/app/Mocks natenho/mockaco
+```
+
+Or your can run it directly from sources using [.NET Core](https://dotnet.microsoft.com/download):
+
+```
+git clone https://github.com/natenho/Mockaco.git
+cd Mockaco\src\Mockaco
+dotnet run
 ```
 
 ## Create a request/response template
@@ -32,13 +43,10 @@ Create a file named `PingPong.json` under `Mocks` folder:
   }
 }
 ```
-
-## Run the project
-```# dotnet run```
 	
 ## Send a request and get the mocked response
 ```http
-# curl -iX GET http://localhost:5000/ping
+curl -iX GET http://localhost:5000/ping
 HTTP/1.1 200 OK
 Date: Wed, 13 Mar 2019 00:22:49 GMT
 Content-Type: application/json
