@@ -15,10 +15,14 @@ dotnet_csproj:
 build_script:
 - cmd: >-
     dotnet --version
+
     dotnet restore ./src/Mockaco/Mockaco.csproj --verbosity m
+
     dotnet publish ./src/Mockaco/Mockaco.csproj
 deploy:
 - provider: GitHub
   tag: v$(appveyor_build_version)
+  auth_token:
+    secure: WfhJkLdU9cicGr6Ar8OP0k3X4enUDmP1PmyAsbzcAEjrQ3JQzu3bWC3BTldO5DXn
   artifact: Mockaco Web Site
   draft: false
