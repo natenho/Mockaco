@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -14,34 +15,39 @@ namespace Mockaco
         public event EventHandler OnChange;
 
         private readonly ILogger<TemplateFileProvider> _logger;
-        private readonly FileSystemWatcher _fileSystemWatcher;
+        private readonly PhysicalFileProvider _fileProvider;
         private readonly IMemoryCache _memoryCache;
+        private IChangeToken _fileChangeToken;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
         {
             _memoryCache = memoryCache;
 
-            _fileSystemWatcher = new FileSystemWatcher("Mocks", "*.json");
-            _fileSystemWatcher.Changed += TemplateFileModified;
-            _fileSystemWatcher.Created += TemplateFileModified;
-            _fileSystemWatcher.Deleted += TemplateFileModified;
-            _fileSystemWatcher.Renamed += TemplateFileModified;
-            _fileSystemWatcher.IncludeSubdirectories = true;
-            _fileSystemWatcher.EnableRaisingEvents = true;
+            _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
+
+            WatchForFileChanges();
 
             _logger = logger;
         }
 
-        private void TemplateFileModified(object sender, FileSystemEventArgs e)
+        private void WatchForFileChanges()
         {
-            _logger.LogInformation($"{e.FullPath} {e.ChangeType}");
+            _fileChangeToken = _fileProvider.Watch("Mocks/**/*.json");
+            _fileChangeToken.RegisterChangeCallback(TemplateFileModified, default);
+        }
+
+        private void TemplateFileModified(object state)
+        {
+            _logger.LogInformation("File change detected");
 
             FlushCache();
 
             GetTemplates();
 
             OnChange?.Invoke(this, EventArgs.Empty);
+
+            WatchForFileChanges();
         }
 
         public IEnumerable<IRawTemplate> GetTemplates()
@@ -90,7 +96,7 @@ namespace Mockaco
 
         public void Dispose()
         {
-            _fileSystemWatcher.Dispose();
+            _fileProvider.Dispose();
         }
     }
 }
