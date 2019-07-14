@@ -1,6 +1,7 @@
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
+skip_non_tags: true
 image: Visual Studio 2019
 configuration: Release
 dotnet_csproj:
@@ -14,10 +15,10 @@ dotnet_csproj:
 build_script:
 - cmd: >-
     dotnet --version
-
     dotnet restore ./src/Mockaco/Mockaco.csproj --verbosity m
-
     dotnet publish ./src/Mockaco/Mockaco.csproj
-artifacts:
-- path: src\Mockaco\bin\Release\netcoreapp2.2\publish\
-  name: Mockaco Web Site
+deploy:
+- provider: GitHub
+  tag: v$(appveyor_build_version)
+  artifact: Mockaco Web Site
+  draft: false
