@@ -16,5 +16,8 @@ FROM base AS final
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 WORKDIR /app
 COPY --from=publish /app .
-COPY Mocks /app/Mocks 
+COPY Mocks /app/Mocks
+COPY Settings /app/Settings
+VOLUME /app/Mocks
+VOLUME /app/Settings
 ENTRYPOINT ["dotnet", "Mockaco.dll"]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mockaco.Routing;
 using System.Threading.Tasks;
@@ -23,6 +24,10 @@ namespace Mockaco
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(delegate (WebHostBuilderContext hostingContext, IConfigurationBuilder config)
+            {
+                config.AddJsonFile(@"Settings\appsettings.json", optional: true, reloadOnChange: true);                
+            })
             .UseStartup<Startup>();
     }
 }
