@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Mockaco.Logging;
 using Mockaco.Middlewares;
 using Mockaco.Processors;
 using Mockaco.Routing;
@@ -22,8 +19,6 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Replace(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TimedLogger<>)));
-
             services.AddMemoryCache();
             services.AddHttpClient();
 
@@ -31,20 +26,20 @@ namespace Mockaco
             services.AddScoped<IScriptContext, ScriptContext>();
 
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
-            
+
             services.AddSingleton<IRouteProvider, RouteProvider>();
             services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
-            
+
             services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<ResponseDelayMiddleware>();            
-            app.UseMiddleware<RequestMatchingMiddleware>();            
+            app.UseMiddleware<ResponseDelayMiddleware>();
+            app.UseMiddleware<RequestMatchingMiddleware>();
             app.UseMiddleware<ResponseMockingMiddleware>();
-            app.UseMiddleware<CallbackMiddleware>();       
+            app.UseMiddleware<CallbackMiddleware>();
         }
     }
 }

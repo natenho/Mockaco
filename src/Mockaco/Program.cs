@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mockaco.Routing;
+using Serilog;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -24,10 +25,8 @@ namespace Mockaco
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(delegate (WebHostBuilderContext hostingContext, IConfigurationBuilder config)
-            {
-                config.AddJsonFile(@"Settings\appsettings.json", optional: true, reloadOnChange: true);                
-            })
+            .ConfigureAppConfiguration((_, config) => config.AddJsonFile(@"Settings\appsettings.json", optional: true, reloadOnChange: true))
+            .UseSerilog((_, builder) => builder.WriteTo.Console())
             .UseStartup<Startup>();
     }
 }
