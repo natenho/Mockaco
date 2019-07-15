@@ -26,7 +26,7 @@ namespace Mockaco
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile(@"Settings\appsettings.json", optional: true, reloadOnChange: true))
+            .ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile(@"Settings/appsettings.json", optional: true, reloadOnChange: true))
             .UseSerilog((context, serilog) => 
                 serilog.WriteTo.Console()
                 .ReadFrom.Configuration(context.Configuration))
