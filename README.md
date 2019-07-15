@@ -15,7 +15,7 @@ Mockaco is an HTTP-based API mock server with quick setup, featuring:
 You can run Mockaco as a [Docker](https://www.docker.com/get-started) container:
 
 ```
-docker run -it --rm -p 5000:80 -v C:\Shared:/app/Mocks natenho/mockaco
+docker run -it --rm -p 5000:80 -v C:\Mocks:/app/Mocks natenho/mockaco
 ```
 
 Or your can run it directly from sources using [.NET Core](https://dotnet.microsoft.com/download):
