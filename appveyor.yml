@@ -29,3 +29,6 @@ deploy:
     secure: /I2jw4WdsgmkOPWZ/Xaoht8/eQ4W+dOP+H8jwMnzO7tNt3AsDoDhuJg4ClZuQT9v
   artifact: Mockaco Web Site
   draft: false
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true
