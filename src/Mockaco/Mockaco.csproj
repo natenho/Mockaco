@@ -3,17 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>latest</LangVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Mocks.Thundercats\**" />
-    <Content Remove="Mocks.Thundercats\**" />
-    <EmbeddedResource Remove="Mocks.Thundercats\**" />
-    <None Remove="Mocks.Thundercats\**" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Bogus" Version="28.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
