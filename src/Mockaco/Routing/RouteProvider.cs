@@ -43,7 +43,8 @@ namespace Mockaco.Routing
 
             var stopwatch = Stopwatch.StartNew();
 
-            var routes = new List<Route>();
+            const int defaultCapacity = 16;
+            var routes = new List<Route>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
 
             foreach (var rawTemplate in _templateProvider.GetTemplates())
             {
