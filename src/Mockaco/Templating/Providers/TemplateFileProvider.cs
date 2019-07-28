@@ -23,15 +23,13 @@ namespace Mockaco
         public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
         {
             _memoryCache = memoryCache;
-
             _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
-
-            WatchForFileChanges();
-
             _logger = logger;
+
+            KeepWatchingForFileChanges();            
         }
 
-        private void WatchForFileChanges()
+        private void KeepWatchingForFileChanges()
         {
             _fileChangeToken = _fileProvider.Watch("Mocks/**/*.json");
             _fileChangeToken.RegisterChangeCallback(TemplateFileModified, default);
@@ -42,12 +40,11 @@ namespace Mockaco
             _logger.LogInformation("File change detected");
 
             FlushCache();
-
             GetTemplates();
 
             OnChange?.Invoke(this, EventArgs.Empty);
 
-            WatchForFileChanges();
+            KeepWatchingForFileChanges();
         }
 
         public IEnumerable<IRawTemplate> GetTemplates()
