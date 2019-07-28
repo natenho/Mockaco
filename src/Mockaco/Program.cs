@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mockaco.Routing;
 using Serilog;
-using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -27,8 +27,8 @@ namespace Mockaco
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile(@"Settings/appsettings.json", optional: true, reloadOnChange: true))
-            .UseSerilog((context, serilog) => 
-                serilog.WriteTo.Console()
+            .UseSerilog((context, serilog) =>
+                serilog.WriteTo.Console(theme: AnsiConsoleTheme.Literate)
                 .ReadFrom.Configuration(context.Configuration))
             .UseStartup<Startup>();
     }
