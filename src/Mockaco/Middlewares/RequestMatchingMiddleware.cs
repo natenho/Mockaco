@@ -28,20 +28,22 @@ namespace Mockaco.Middlewares
 
             logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
             logger.LogDebug("Headers: {headers}", scriptContext.Request.Header.ToJson());
-            logger.LogDebug("Body: {body}", scriptContext.Request.Body);
+            logger.LogDebug("Body: {body}", scriptContext.Request.Body.ToString());
 
             foreach (var route in routerProvider.GetRoutes())
             {
                 if (RouteMatchesRequest(httpContext.Request, route))
                 {
                     scriptContext.AttachRoute(httpContext, route);
-
-                    logger.LogInformation("Incoming request matches route {route}", route);
-
+                    
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
 
-                    if (template.Request.Condition ?? true)
+                    var evaluatedCondition = template.Request.Condition ?? true;
+                                        
+                    if (evaluatedCondition)
                     {
+                        logger.LogInformation("Incoming request matches route {route}", route);
+
                         mockacoContext.Route = route;
                         mockacoContext.TransformedTemplate = template;
 
@@ -49,6 +51,14 @@ namespace Mockaco.Middlewares
 
                         return;
                     }
+                    else
+                    {
+                        logger.LogInformation("Incoming request didn't match condition for route {route}", route);
+                    }
+                }
+                else
+                {
+                    logger.LogDebug("Incoming request didn't match route {route}", route);
                 }
             }
 
