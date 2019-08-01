@@ -7,10 +7,13 @@ namespace Mockaco
 {
     public class TemplateResponseProcessor : ITemplateResponseProcessor
     {
+        private const string JsonContentType = "application/json";
+        private const HttpStatusCode DefaultHttpStatusCode = HttpStatusCode.OK;
+
         public async Task PrepareResponse(HttpResponse httpResponse, IScriptContext scriptContext, Template template)
         {
             httpResponse.StatusCode = template.Response.Status == default
-                ? (int)HttpStatusCode.OK
+                ? (int)DefaultHttpStatusCode
                 : (int)template.Response.Status;
 
             WriteResponseHeaders(httpResponse, template.Response);
@@ -32,25 +35,33 @@ namespace Mockaco
 
             if (string.IsNullOrEmpty(response.ContentType))
             {
-                response.ContentType = "application/json";
+                response.ContentType = JsonContentType;
             }
         }
 
         private async Task WriteResponseBody(HttpResponse response, ResponseTemplate responseTemplate)
         {
-            var formatting = responseTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
-
-            var responseBody = responseTemplate.Body?.ToString(formatting);
-
-            if (response.ContentType != "application/json")
+            if(responseTemplate.Body == null)
             {
-                responseBody = JsonConvert.DeserializeObject<string>(responseBody);
+                return;
             }
 
-            if (responseBody != null)
+            string responseBody;
+
+            //TODO Move to a factory
+            if (response.ContentType == JsonContentType)
             {
-                await response.WriteAsync(responseBody);
+                var formatting = responseTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
+
+                responseBody = responseTemplate.Body?.ToString(formatting);
             }
+            else
+            {
+                //Deserializes the JSON string to unescape the body into its raw value
+                responseBody = JsonConvert.DeserializeObject<string>(responseTemplate.Body?.ToString());
+            }
+
+            await response.WriteAsync(responseBody);
         }
     }
 }
