@@ -9,9 +9,7 @@ namespace Mockaco
 
         public JToken Body { get; }
 
-        public ScriptContextResponse(
-            PermissiveDictionary<string, string> header,
-            JToken body)
+        public ScriptContextResponse(StringDictionary header, JToken body)
         {
             Header = header;
             Body = body;

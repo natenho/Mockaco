@@ -2,19 +2,19 @@
 
 namespace Mockaco
 {
-    public class PermissiveDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
+    public class StringDictionary : Dictionary<string, string>, IReadOnlyDictionary<string, string>
     {
-        public new TValue this[TKey key]
+        public new string this[string key]
         {
             get
             {
-                if (TryGetValue(key, out TValue value))
+                if (TryGetValue(key, out string value))
                 {
                     return value;
                 }
                 else
                 {
-                    return default(TValue);
+                    return default;
                 }
             }
             set
@@ -23,12 +23,12 @@ namespace Mockaco
             }
         }
 
-        public new void Add(TKey key, TValue value)
+        public new void Add(string key, string value)
         {
             Replace(key, value);
         }
 
-        public void Replace(TKey key, TValue value)
+        public void Replace(string key, string value)
         {
             if (ContainsKey(key))
             {
