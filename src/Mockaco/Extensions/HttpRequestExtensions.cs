@@ -22,10 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Net.Http.Headers;
 using Mockaco.Routing;
 using System;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Http
 {
@@ -86,6 +89,22 @@ namespace Microsoft.AspNetCore.Http
             MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
 
             return parsedValue?.MediaType.Equals("application/json", StringComparison.OrdinalIgnoreCase) == true;
+        }
+
+        public static string ReadBodyStream(this HttpRequest httpRequest)
+        {
+            httpRequest.EnableRewind();
+
+            var reader = new StreamReader(httpRequest.Body);
+
+            var body = reader.ReadToEnd();
+
+            if (httpRequest.Body.CanSeek)
+            {
+                httpRequest.Body.Seek(0, SeekOrigin.Begin);
+            }
+
+            return body;
         }
     }
 }

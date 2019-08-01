@@ -76,7 +76,7 @@ namespace Mockaco
 
         private void PostEvictionCallback(object key, object value, EvictionReason reason, object state)
         {
-            _logger.LogDebug($"Cache invalidated because of {reason}");
+            _logger.LogDebug("Cache invalidated because of {reason}", reason);
         }
 
         private static IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()

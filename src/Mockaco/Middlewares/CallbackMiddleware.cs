@@ -57,7 +57,7 @@ namespace Mockaco
 
                 stopwatch.Restart();
 
-                _logger.LogDebug("Callback starting");
+                _logger.LogDebug("Callback started");
 
                 await PerformRequest(request, httpClient);
 
@@ -130,7 +130,7 @@ namespace Mockaco
             var remainingDelay = TimeSpan.FromMilliseconds(callbackTemplate.Delay.GetValueOrDefault() - elapsedMilliseconds);
             if (elapsedMilliseconds < remainingDelay.TotalMilliseconds)
             {
-                _logger.LogDebug("Waiting {0} ms to perform callback on time", remainingDelay.TotalMilliseconds);
+                _logger.LogDebug("Callback delay: {0} milliseconds", remainingDelay.TotalMilliseconds);
                 await Task.Delay(remainingDelay);
             }
         }

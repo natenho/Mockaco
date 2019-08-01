@@ -1,13 +1,38 @@
 {
+  "variables": {
+    "id": "<#= Faker.Random.Guid()  #>"
+  },
   "request": {
     "method": "GET",
     "route": "hello/{message}",
+    "condition": null
   },
   "response": {
+    "delay": <#= Faker.Random.Number(1, 5000) #>,
+    "status": "OK",
     "body": {
       "id": "<#= Faker.Random.Guid() #>",
-      "message": "Hello <#= Request.Route["message"] #>!",
+      "message": "<#= Request.Route["message"] #>",
+      "product": "<#= Faker.Commerce.ProductName() #>",
+      "inexistent header item": "<#= Request.Header["inexistent"] #>",
+      "inexistent body item": "<#= Request.Body["inexistent"] #>",
+      "existent body item": "<#= Request.Body["message"] #>",
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
+    },
+	"indented": true
+  },
+  "callback": {
+    "delay": 5000,
+    "method": "POST",
+    "url": "https://postman-echo.com/post",
+    "timeout": 2000,
+    "headers": {
+      "X-Foo": "Bar"
+    },
+    "body": {
+      "requestRoute": "The callback informs that Request.Route[\"message\"] was <#= Request.Route["message"] #>",
+      "requestBody": "The callback informs that Request.Body[\"message\"] was <#= Request.Body["message"] #>",
+      "responseBody": "The callback informs that Response.Body[\"id\"] was <#= Response.Body["id"] #>"
     }
   }
 }

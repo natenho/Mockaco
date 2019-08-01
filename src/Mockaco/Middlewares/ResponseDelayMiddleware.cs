@@ -29,7 +29,7 @@ namespace Mockaco
             var remainingDelay = responseDelay - (int)stopwatch.ElapsedMilliseconds;
             if (remainingDelay > 0)
             {
-                logger.LogDebug($"Delaying the response for at least {responseDelay} milliseconds");
+                logger.LogDebug("Response delay: {responseDelay} milliseconds", responseDelay);
 
                 await Task.Delay(remainingDelay);
             }

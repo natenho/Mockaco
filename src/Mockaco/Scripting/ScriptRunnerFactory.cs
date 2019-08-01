@@ -67,7 +67,7 @@ namespace Mockaco
 
             runner = script.CreateDelegate();
 
-            _logger.LogTrace($"Created runner in {stopWatch.ElapsedMilliseconds}ms");
+            _logger.LogTrace("Created runner in {elapsedTime} milliseconds", stopWatch.ElapsedMilliseconds);
 
             return runner;
         }

@@ -10,10 +10,12 @@ namespace Mockaco.Middlewares
     public class RequestMatchingMiddleware
     {
         private readonly RequestDelegate _next;
-                
-        public RequestMatchingMiddleware(RequestDelegate next)
+        private readonly ILogger<RequestMatchingMiddleware> _logger;
+
+        public RequestMatchingMiddleware(RequestDelegate next, ILogger<RequestMatchingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(
@@ -21,28 +23,26 @@ namespace Mockaco.Middlewares
             IMockacoContext mockacoContext,
             IScriptContext scriptContext,
             IRouteProvider routerProvider,
-            ITemplateTransformer templateTransformer,
-            ILogger<RequestMatchingMiddleware> logger)
+            ITemplateTransformer templateTransformer
+            )
         {
             scriptContext.AttachHttpContext(httpContext);
 
-            logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
-            logger.LogDebug("Headers: {headers}", scriptContext.Request.Header.ToJson());
-            logger.LogDebug("Body: {body}", scriptContext.Request.Body.ToString());
+            LogRequest(httpContext);
 
             foreach (var route in routerProvider.GetRoutes())
             {
                 if (RouteMatchesRequest(httpContext.Request, route))
                 {
                     scriptContext.AttachRoute(httpContext, route);
-                    
+
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
 
-                    var evaluatedCondition = template.Request.Condition ?? true;
-                                        
-                    if (evaluatedCondition)
+                    var matchesCondition = template.Request.Condition ?? true;
+
+                    if (matchesCondition)
                     {
-                        logger.LogInformation("Incoming request matches route {route}", route);
+                        _logger.LogInformation("Incoming request matched route {route}", route);
 
                         mockacoContext.Route = route;
                         mockacoContext.TransformedTemplate = template;
@@ -53,18 +53,36 @@ namespace Mockaco.Middlewares
                     }
                     else
                     {
-                        logger.LogInformation("Incoming request didn't match condition for route {route}", route);
+                        _logger.LogInformation("Incoming request didn't match condition for route {route}", route);
                     }
                 }
                 else
                 {
-                    logger.LogDebug("Incoming request didn't match route {route}", route);
+                    _logger.LogDebug("Incoming request didn't match route {route}", route);
                 }
             }
 
-            logger.LogInformation("Incoming request didn't match any route");
+            _logger.LogInformation("Incoming request didn't match any route");
 
             httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
+        }
+
+        private void LogRequest(HttpContext httpContext)
+        {
+            _logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
+
+            _logger.LogDebug("Headers: {headers}", httpContext.Request.Headers.ToJson());
+
+            var body = httpContext.Request.ReadBodyStream();
+
+            if (string.IsNullOrEmpty(body))
+            {
+                _logger.LogDebug("Body is not present", body);
+            }
+            else
+            {
+                _logger.LogDebug("Body: {body}", body);
+            }
         }
 
         private static bool RouteMatchesRequest(HttpRequest request, Route route)
