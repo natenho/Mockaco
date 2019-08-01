@@ -1,7 +1,4 @@
 {
-  "variables": {
-    "id": "<#= Faker.Random.Guid()  #>"
-  },
   "request": {
     "method": "GET",
     "route": "hello/{message}",
@@ -10,6 +7,9 @@
   "response": {
     "delay": <#= Faker.Random.Number(1, 5000) #>,
     "status": "OK",
+	"headers": {
+		"X-Foo": "Bar"
+	},
     "body": {
       "id": "<#= Faker.Random.Guid() #>",
       "message": "<#= Request.Route["message"] #>",
@@ -19,7 +19,7 @@
       "existent body item": "<#= Request.Body["message"] #>",
       "createdAt": <#= JsonConvert.SerializeObject(System.DateTime.Now) #>
     },
-	"indented": true
+    "indented": false
   },
   "callback": {
     "delay": 5000,
