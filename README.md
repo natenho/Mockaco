@@ -1,7 +1,7 @@
 <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
 
 # Mockaco [![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master)
-Mockaco is an HTTP-based API mock server with quick setup, featuring:
+Mockaco is an HTTP-based API mock server with fast setup, featuring:
 
 - Simple JSON-based configuration
 - Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
@@ -12,10 +12,16 @@ Mockaco is an HTTP-based API mock server with quick setup, featuring:
 
 ## Running the application
 
-You can run Mockaco as a [Docker](https://www.docker.com/get-started) container:
+You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco):
 
 ```
 docker run -it --rm -p 5000:80 -v C:\Mocks:/app/Mocks natenho/mockaco
+```
+
+Or you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
+
+```
+dotnet Mockaco.dll
 ```
 
 Or your can run it directly from sources using [.NET Core](https://dotnet.microsoft.com/download):
@@ -47,6 +53,7 @@ Create a file named `PingPong.json` under `Mocks` folder:
 ## Send a request and get the mocked response
 ```http
 curl -iX GET http://localhost:5000/ping
+
 HTTP/1.1 200 OK
 Date: Wed, 13 Mar 2019 00:22:49 GMT
 Content-Type: application/json
@@ -92,7 +99,7 @@ If omitted, defaults to ```GET```.
 
 Any request with the matching route will return the response. Any AspNet route template is supported.
 
-If omitted, empty or null, defaults to base route.
+If omitted, empty or null, defaults to base route (/).
 
 ### Example
 ```
@@ -108,7 +115,7 @@ If omitted, empty or null, defaults to base route.
 
 ## Condition attribute
 
-Any condition that evaluates to ```true``` will return the response. The condition is any C# expression.
+Any condition that evaluates to ```true``` will return the response. The condition is suitable to be used with C# scripting.
 
 If omitted, empty or null, defaults to ```true```.
 
@@ -128,7 +135,7 @@ If omitted, empty or null, defaults to ```true```.
 
 ## Delay attribute
 
-Define a minimum response time in milliseconds.
+Defines a minimum response time in milliseconds.
 
 If omitted, empty or null, defaults to ```0```.
 
@@ -147,7 +154,7 @@ If omitted, empty or null, defaults to ```0```.
 
 ## Status attribute
 
-Set the HTTP status code for the response. Can be a string or a number, as defined in [System.Net.HttpStatusCode](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netcore-2.2) enumeration.
+Sets the HTTP status code for the response. Can be a string or a number, as defined in [System.Net.HttpStatusCode](https://docs.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netcore-2.2) enumeration.
 
 If omitted, empty or null, defaults to ```OK``` (200).
 
@@ -163,11 +170,32 @@ If omitted, empty or null, defaults to ```OK``` (200).
 }
 ```
 
+## Headers attribute
+
+Sets any HTTP response headers.
+
+### Example
+```
+{
+  "request": {
+	"method": "GET"
+  },
+  "response": {    
+	"status": "OK",
+	"headers": {
+		"X-Foo": "Bar"
+	}
+  }
+}
+```
+
 ## Body attribute
 
-Set the HTTP response body. Supports only JSON.
+Sets the HTTP response body.
 
 If omitted, empty or null, defaults to empty.
+
+The ```Content-Type``` header is used to process output formatting for certain MIME types. If omitted, defaults to ```application/json```.
 
 ### Example
 ```
@@ -182,6 +210,42 @@ If omitted, empty or null, defaults to empty.
 	}
   }
 }
+```
+
+## Indented attribute
+
+Sets the response body indentation for some structured content-types. If ommited, defaults to ```true```.
+
+### Example
+```
+{
+  "request": {
+	"method": "GET"
+  },
+  "response": {    
+	"status": "OK",
+	"body": {
+	  "this": "json content",
+	  "is": "supposed to be",
+	  "in": "the same line"
+	},
+	"indented": false
+  }
+}
+```
+
+Result:
+
+```http
+curl -iX GET http://localhost:5000
+
+HTTP/1.1 200 OK
+Date: Wed, 31 Jul 2019 02:57:30 GMT
+Content-Type: application/json
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{"this":"json content","is":"supposed to be","in":"the same line"}
 ```
 
 # Callback Template
@@ -214,6 +278,18 @@ Calls another API whenever a request arrives.
 }
 ```
 
+## Headers attribute
+
+Sets any HTTP callback request headers.
+
+## Body attribute
+
+Sets the HTTP callback request body.
+
+If omitted, empty or null, defaults to empty.
+
+The ```Content-Type``` header is used to process output formatting for certain MIME types. If omitted, defaults to ```application/json```.
+
 ## Delay attribute
 
 The time to wait after a response before performing the callback.
@@ -221,6 +297,10 @@ The time to wait after a response before performing the callback.
 ## Timeout attribute
 
 Defines a time in milliseconds to wait the callback response before cancelling the operation.
+
+## Indented attribute
+
+Sets the callback body indentation for some structured content-types. If ommited, defaults to ```true```.
 
 # Scripting
 
@@ -230,7 +310,7 @@ Use C# code surrounded by ```<#=``` and ```#>```.
 
 The template code and generation will run for each request.
 
-No context is passed to the template processor at startup, so it's a good practice to script considering that the context (request/response) variables may be null or empty.
+It's possible to access request data within the response template. In the same way, response data can be used within the callback request template.
 
 The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples).
 
