@@ -10,7 +10,7 @@ namespace Mockaco.Middlewares
     public class RequestMatchingMiddleware
     {
         private readonly RequestDelegate _next;
-
+                
         public RequestMatchingMiddleware(RequestDelegate next)
         {
             _next = next;

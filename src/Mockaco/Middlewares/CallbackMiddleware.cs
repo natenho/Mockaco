@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mockaco.Processors;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -79,11 +80,13 @@ namespace Mockaco
         {
             var request = new HttpRequestMessage(new HttpMethod(callbackTemplate.Method), callbackTemplate.Url);
 
+            var formatting = callbackTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
+
             if (callbackTemplate.Body != null)
             {
                 request.Content = callbackTemplate.Headers.ContainsKey("Content-Type")
                     ? new StringContent(callbackTemplate.Body.ToString(), Encoding.UTF8, callbackTemplate.Headers["Content-Type"])
-                    : new StringContent(callbackTemplate.Body.ToString());
+                    : new StringContent(callbackTemplate.Body.ToString(formatting));
             }
 
             PrepareHeaders(callbackTemplate, request);

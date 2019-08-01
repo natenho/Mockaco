@@ -81,8 +81,7 @@ namespace Mockaco.Templating
 
             return output.ToString();
         }
-
-        // TODO Remove repeated code
+                
         private async Task<object> Run(string code, IScriptContext scriptContext)
         {
             object result = null;
@@ -91,11 +90,11 @@ namespace Mockaco.Templating
             {
                 result = await _scriptRunnerFactory.Invoke<IScriptContext, object>(scriptContext, code);
 
-                _logger.LogDebug($"Processed script {code} with result {result}");
+                _logger.LogDebug("Processed script {code} with result {result}", code, result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Processed script {code} with result {ex}");
+                _logger.LogError(ex, "Processed script {code} with error", code);
             }
 
             return result;

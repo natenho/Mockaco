@@ -1,12 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net;
 
 namespace Mockaco
 {
     public class ResponseTemplate
-    {        
-        public int? Delay { get; set; }        
+    {
+        public int? Delay { get; set; }
+
+        public bool? Indented { get; set; }
 
         public HttpStatusCode Status { get; set; }
 

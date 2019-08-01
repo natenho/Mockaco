@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -9,33 +7,24 @@ namespace Mockaco
 {
     public class TemplateResponseProcessor : ITemplateResponseProcessor
     {
-        private readonly ILogger<TemplateResponseProcessor> _logger;
-
-        public TemplateResponseProcessor(
-            IMockacoContext mockacoContext,
-            ILogger<TemplateResponseProcessor> logger)
-        {
-            _logger = logger;
-        }
-
         public async Task PrepareResponse(HttpResponse httpResponse, IScriptContext scriptContext, Template template)
         {
-            httpResponse.StatusCode = template.Response.Status == 0
+            httpResponse.StatusCode = template.Response.Status == default
                 ? (int)HttpStatusCode.OK
                 : (int)template.Response.Status;
 
-            WriteResponseHeaders(httpResponse, template);
+            WriteResponseHeaders(httpResponse, template.Response);
 
-            await WriteResponseBody(httpResponse, template);
+            await WriteResponseBody(httpResponse, template.Response);
 
             scriptContext.AttachResponse(httpResponse.Headers, template.Response.Body);
         }
 
-        private void WriteResponseHeaders(HttpResponse response, Template template)
+        private void WriteResponseHeaders(HttpResponse response, ResponseTemplate responseTemplate)
         {
-            if (template.Response.Headers != null)
+            if (responseTemplate.Headers != null)
             {
-                foreach (var header in template.Response.Headers)
+                foreach (var header in responseTemplate.Headers)
                 {
                     response.Headers.Add(header.Key, header.Value);
                 }
@@ -47,9 +36,11 @@ namespace Mockaco
             }
         }
 
-        private async Task WriteResponseBody(HttpResponse response, Template template)
+        private async Task WriteResponseBody(HttpResponse response, ResponseTemplate responseTemplate)
         {
-            var responseBody = template.Response.Body?.ToString();
+            var formatting = responseTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
+
+            var responseBody = responseTemplate.Body?.ToString(formatting);
 
             if (response.ContentType != "application/json")
             {
@@ -58,10 +49,8 @@ namespace Mockaco
 
             if (responseBody != null)
             {
-                await response.WriteAsync(responseBody)
-                    .ConfigureAwait(false);
+                await response.WriteAsync(responseBody);
             }
         }
-
     }
 }
