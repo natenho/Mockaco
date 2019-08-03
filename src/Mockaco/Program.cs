@@ -28,7 +28,9 @@ namespace Mockaco
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile(@"Settings/appsettings.json", optional: true, reloadOnChange: true))
             .UseSerilog((context, serilog) =>
-                serilog.WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+                serilog.WriteTo.Console(
+                    theme: AnsiConsoleTheme.Literate, 
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {RequestId} {Message:lj}{NewLine}{Exception}")
                 .ReadFrom.Configuration(context.Configuration))
             .UseStartup<Startup>();
     }
