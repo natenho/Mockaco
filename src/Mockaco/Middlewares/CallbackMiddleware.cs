@@ -80,7 +80,7 @@ namespace Mockaco
         {
             var request = new HttpRequestMessage(new HttpMethod(callbackTemplate.Method), callbackTemplate.Url);
 
-            var formatting = callbackTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
+            var formatting = callbackTemplate.Indented.GetValueOrDefault(true) ? Formatting.Indented : default;
 
             if (callbackTemplate.Body != null)
             {

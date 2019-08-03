@@ -51,7 +51,7 @@ namespace Mockaco
             //TODO Move to a factory
             if (response.ContentType == JsonContentType)
             {
-                var formatting = responseTemplate.Indented.GetValueOrDefault() ? Formatting.Indented : default;
+                var formatting = responseTemplate.Indented.GetValueOrDefault(true) ? Formatting.Indented : default;
 
                 responseBody = responseTemplate.Body?.ToString(formatting);
             }
