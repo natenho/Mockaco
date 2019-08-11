@@ -4,9 +4,9 @@ EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
 WORKDIR /src
-COPY ./Mockaco.csproj .
+COPY ./Mockaco.csproj ./
 RUN dotnet restore
-COPY . .
+COPY ./ ./
 RUN dotnet build "Mockaco.csproj" -c Release -o /app
 
 FROM build AS publish
@@ -16,7 +16,7 @@ FROM base AS final
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 WORKDIR /app
 COPY --from=publish /app .
-COPY Mocks /app/Mocks
+COPY ./Mocks/hello.json /app/Mocks/
 COPY Settings /app/Settings
 VOLUME /app/Mocks
 VOLUME /app/Settings

@@ -18,3 +18,5 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/.toolstarget
+/Mocks/*.json
+!/Mocks/hello.json
