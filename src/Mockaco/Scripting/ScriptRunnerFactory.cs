@@ -55,6 +55,7 @@ namespace Mockaco
                     "System",
                     "System.Linq",
                     "System.Collections.Generic",
+                    "System.Text.RegularExpressions",
                     typeof(Faker).Namespace,
                     typeof(ScriptRunnerFactory).Namespace,
                     "Newtonsoft.Json",
