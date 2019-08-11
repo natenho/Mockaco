@@ -56,9 +56,8 @@ namespace Mockaco
                 responseBody = responseTemplate.Body?.ToString(formatting);
             }
             else
-            {
-                //Deserializes the JSON string to unescape the body into its raw value
-                responseBody = JsonConvert.DeserializeObject<string>(responseTemplate.Body?.ToString());
+            {                
+                responseBody = responseTemplate.Body?.ToString();
             }
 
             await response.WriteAsync(responseBody);
