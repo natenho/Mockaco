@@ -369,5 +369,6 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 ```
 
 The built-in fake data is generated via [Bogus](https://github.com/bchavez/Bogus).
+The faker can also generate localized data using ```Accept-Language``` HTTP header. Defaults to ```en``` (english) fake data.
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")

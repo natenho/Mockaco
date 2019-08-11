@@ -27,7 +27,9 @@ using Microsoft.Net.Http.Headers;
 using Mockaco;
 using Mockaco.Routing;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -114,6 +116,18 @@ namespace Microsoft.AspNetCore.Http
             }
 
             return body;
+        }
+
+        public static IEnumerable<string> GetAcceptLanguageValues(this HttpRequest httpRequest)
+        {
+            var acceptLanguages = httpRequest.GetTypedHeaders().AcceptLanguage;
+
+            if(acceptLanguages == default)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return acceptLanguages?.Select(l => l.Value.ToString());
         }
     }
 }

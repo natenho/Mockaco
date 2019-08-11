@@ -17,17 +17,20 @@ namespace Mockaco
         private StringDictionary _headersDictionary = new StringDictionary();
         private StringDictionary _routeDictionary = new StringDictionary();
         private JObject _parsedBody;
-
-        public Faker Faker { get; }
+        private readonly IFakerFactory _fakerFactory;
+        
+        public Faker Faker { get; private set; }
 
         public ScriptContextRequest Request { get; set; }
 
         public ScriptContextResponse Response { get; set; }
-
-        public ScriptContext()
+                
+        public ScriptContext(IFakerFactory fakerFactory)
         {
-            Faker = new Faker("pt_BR"); // TODO Localize based on the request
-
+            _fakerFactory = fakerFactory;
+            
+            Faker = fakerFactory?.GetDefaultFaker();
+            
             Request = new ScriptContextRequest(
                 default,
                 new StringDictionary(),
@@ -35,7 +38,7 @@ namespace Mockaco
                 new StringDictionary(),
                 new JObject());
 
-            Response = new ScriptContextResponse(new StringDictionary(), new JObject());
+            Response = new ScriptContextResponse(new StringDictionary(), new JObject());            
         }
 
         public void AttachRequest(HttpRequest httpRequest)
@@ -44,6 +47,8 @@ namespace Mockaco
             _queryDictionary = httpRequest.Query.ToStringDictionary(k => k.Key, v => v.Value.ToString());
             _headersDictionary = httpRequest.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString());
             _parsedBody = ParseBody(httpRequest);
+
+            Faker = _fakerFactory?.GetFaker(httpRequest.GetAcceptLanguageValues());
 
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _parsedBody);
         }

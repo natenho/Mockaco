@@ -14,11 +14,12 @@ namespace Mockaco
             services.AddMemoryCache();
             services.AddHttpClient();
 
-            services.AddScoped<IMockacoContext, MockacoContext>();
-            services.AddScoped<IScriptContext, ScriptContext>();
-            
+            services.AddScoped<IMockacoContext, MockacoContext>();            
+            services.AddScoped<IScriptContext, ScriptContext>();            
+
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
+            services.AddSingleton<IFakerFactory, HttpRequestFakerFactory>();
             services.AddSingleton<IRouteProvider, RouteProvider>();
             services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
 

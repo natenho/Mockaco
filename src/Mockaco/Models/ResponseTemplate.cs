@@ -20,7 +20,6 @@ namespace Mockaco
         public ResponseTemplate()
         {
             Headers = new StringDictionary();
-            Body = JToken.Parse(string.Empty);
         }
     }
 }

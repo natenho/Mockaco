@@ -1,10 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Bogus;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Mockaco.Processors;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,19 +18,22 @@ namespace Mockaco.Routing
     public class RouteProvider : IRouteProvider
     {
         private List<Route> _cache;
-        private readonly IScriptContext _scriptContext;
+        private readonly IFakerFactory _fakerFactory;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<RouteProvider> _logger;
 
-        public RouteProvider(IScriptContext scriptContext, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
+        public RouteProvider(IFakerFactory fakerFactory, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
         {
             _cache = new List<Route>();
-            _scriptContext = scriptContext;
+
+            _fakerFactory = fakerFactory;
+
             _templateProvider = templateProvider;
             _templateProvider.OnChange += TemplateProviderChange;
 
             _templateTransformer = templateTransformer;
+
             _logger = logger;
         }
 
@@ -41,9 +49,9 @@ namespace Mockaco.Routing
 
         public async Task WarmUp()
         {
-            var blankScriptContext = _scriptContext;
-
             var stopwatch = Stopwatch.StartNew();
+
+            var nullScriptContext = new ScriptContext(_fakerFactory);
 
             const int defaultCapacity = 16;
             var routes = new List<Route>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
@@ -57,7 +65,7 @@ namespace Mockaco.Routing
                     if (cachedRoute != null)
                     {
                         _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
-                        
+
                         routes.Add(cachedRoute);
 
                         continue;
@@ -65,7 +73,7 @@ namespace Mockaco.Routing
 
                     _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
-                    var template = await _templateTransformer.Transform(rawTemplate, blankScriptContext);
+                    var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
 
                     routes.Add(new Route(template.Request.Method, template.Request.Route, rawTemplate, template.Request.Condition.HasValue));
 
