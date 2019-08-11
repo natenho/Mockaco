@@ -1,10 +1,12 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Http;
 using Mockaco.Routing;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 
 namespace Mockaco
 {
@@ -36,22 +38,22 @@ namespace Mockaco
             Response = new ScriptContextResponse(new StringDictionary(), new JObject());
         }
 
-        public void AttachHttpContext(HttpContext httpContext)
+        public void AttachRequest(HttpRequest httpRequest)
         {
-            _uri = httpContext.Request.GetUri();
-            _queryDictionary = httpContext.Request.Query.ToStringDictionary(k => k.Key, v => v.Value.ToString());
-            _headersDictionary = httpContext.Request.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString());
-            _parsedBody = ParseBody(httpContext.Request);
+            _uri = httpRequest.GetUri();
+            _queryDictionary = httpRequest.Query.ToStringDictionary(k => k.Key, v => v.Value.ToString());
+            _headersDictionary = httpRequest.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString());
+            _parsedBody = ParseBody(httpRequest);
 
-            Request = new ScriptContextRequest(url:_uri, route:_routeDictionary, query:_queryDictionary, header:_headersDictionary, body:_parsedBody);
+            Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _parsedBody);
         }
 
-        public void AttachRoute(HttpContext httpContext, Route route)
+        public void AttachRoute(HttpRequest httpRequest, Route route)
         {
-            _routeDictionary = httpContext.Request.GetRouteData(route)
+            _routeDictionary = httpRequest.GetRouteData(route)
                 .ToStringDictionary(k => k.Key, v => v.Value.ToString());
 
-            Request = new ScriptContextRequest(url:_uri, route:_routeDictionary, query:_queryDictionary, header:_headersDictionary, body:_parsedBody);
+            Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _parsedBody);
         }
 
         public void AttachResponse(IHeaderDictionary headers, JToken body)
@@ -70,7 +72,7 @@ namespace Mockaco
             {
                 return new JObject();
             }
-            
+
             if (httpRequest.HasFormContentType)
             {
                 return ParseFormDataBody(httpRequest);
@@ -81,7 +83,29 @@ namespace Mockaco
                 return ParseJsonBody(httpRequest);
             }
 
+            if (httpRequest.HasXmlContentType())
+            {
+                return ParseXmlBody(httpRequest);
+            }
+
             return new JObject();
+        }
+
+        private static JObject ParseXmlBody(HttpRequest httpRequest)
+        {
+            var body = httpRequest.ReadBodyStream();
+
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return new JObject();
+            }
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(body);
+
+            var json = JsonConvert.SerializeXmlNode(xmlDocument);
+
+            return JObject.Parse(json);
         }
 
         private static JObject ParseFormDataBody(HttpRequest httpRequest)
@@ -90,10 +114,15 @@ namespace Mockaco
         }
 
         private static JObject ParseJsonBody(HttpRequest httpRequest)
-        {      
+        {
             var body = httpRequest.ReadBodyStream();
-   
-            return !string.IsNullOrWhiteSpace(body) ? JObject.Parse(body) : new JObject();
+
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return new JObject();
+            }
+
+            return JObject.Parse(body);
         }
     }
 }

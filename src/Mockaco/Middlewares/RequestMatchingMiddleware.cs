@@ -26,15 +26,28 @@ namespace Mockaco.Middlewares
             ITemplateTransformer templateTransformer
             )
         {
-            scriptContext.AttachHttpContext(httpContext);
+            try
+            {
+                scriptContext.AttachRequest(httpContext.Request);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred reading request");
 
-            LogRequest(httpContext);
+                httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
+
+                await httpContext.Response.WriteAsync(ex.ToJson());
+
+                return;
+            }
+
+            LogHttpContext(httpContext);
 
             foreach (var route in routerProvider.GetRoutes())
             {
                 if (RouteMatchesRequest(httpContext.Request, route))
                 {
-                    scriptContext.AttachRoute(httpContext, route);
+                    scriptContext.AttachRoute(httpContext.Request, route);
 
                     var template = await templateTransformer.Transform(route.RawTemplate, scriptContext);
 
@@ -53,7 +66,7 @@ namespace Mockaco.Middlewares
                     }
                     else
                     {
-                        _logger.LogInformation("Incoming request didn't match condition for route {route}", route);
+                        _logger.LogDebug("Incoming request didn't match condition for route {route}", route);
                     }
                 }
                 else
@@ -67,7 +80,7 @@ namespace Mockaco.Middlewares
             httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
         }
 
-        private void LogRequest(HttpContext httpContext)
+        private void LogHttpContext(HttpContext httpContext)
         {
             _logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
 

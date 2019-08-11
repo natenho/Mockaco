@@ -16,5 +16,11 @@ namespace Mockaco
         public IDictionary<string, string> Headers { get; set; }
 
         public JToken Body { get; set; }
+
+        public ResponseTemplate()
+        {
+            Headers = new StringDictionary();
+            Body = JToken.Parse(string.Empty);
+        }
     }
 }

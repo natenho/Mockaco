@@ -24,6 +24,7 @@ SOFTWARE.
 
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Net.Http.Headers;
+using Mockaco;
 using Mockaco.Routing;
 using System;
 using System.IO;
@@ -88,7 +89,15 @@ namespace Microsoft.AspNetCore.Http
         {
             MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
 
-            return parsedValue?.MediaType.Equals("application/json", StringComparison.OrdinalIgnoreCase) == true;
+            return parsedValue?.MediaType.Equals(HttpContentTypes.ApplicationJson, StringComparison.OrdinalIgnoreCase) == true;
+        }
+
+        public static bool HasXmlContentType(this HttpRequest request)
+        {
+            MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
+
+            return parsedValue?.MediaType.Equals(HttpContentTypes.ApplicationXml, StringComparison.OrdinalIgnoreCase) == true
+                || parsedValue?.MediaType.Equals(HttpContentTypes.TextXml, StringComparison.OrdinalIgnoreCase) == true;
         }
 
         public static string ReadBodyStream(this HttpRequest httpRequest)

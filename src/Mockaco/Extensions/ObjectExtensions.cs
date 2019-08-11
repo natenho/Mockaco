@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Linq;
 
 namespace System
 {
@@ -27,6 +28,11 @@ namespace System
             {
                 return string.Empty;
             }
+        }
+
+        public static bool IsAnyOf<T>(this T item, params T[] possibleItems)
+        {
+            return possibleItems.Contains(item);
         }
     }
 }

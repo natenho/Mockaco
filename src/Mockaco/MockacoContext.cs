@@ -10,9 +10,9 @@ namespace Mockaco
 
         public Route Route { get; set; }
 
-        public MockacoContext()
+        public MockacoContext(IScriptContext scriptContext)
         {
-            ScriptContext = new ScriptContext();
+            ScriptContext = scriptContext;
         }
     }
 }

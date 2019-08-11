@@ -16,11 +16,17 @@ namespace Mockaco
 
             services.AddScoped<IMockacoContext, MockacoContext>();
             services.AddScoped<IScriptContext, ScriptContext>();
-
+            
             services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
 
             services.AddSingleton<IRouteProvider, RouteProvider>();
             services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
+
+            services.AddTransient<IResponseBodyStrategyFactory, ResponseBodyStrategyFactory>();
+
+            services.AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>();
+            services.AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>();
+            services.AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>();
 
             services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
             services.AddTransient<ITemplateTransformer, TemplateTransformer>();

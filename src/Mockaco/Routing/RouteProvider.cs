@@ -13,13 +13,15 @@ namespace Mockaco.Routing
     public class RouteProvider : IRouteProvider
     {
         private List<Route> _cache;
+        private readonly IScriptContext _scriptContext;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<RouteProvider> _logger;
 
-        public RouteProvider(ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
+        public RouteProvider(IScriptContext scriptContext, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
         {
             _cache = new List<Route>();
+            _scriptContext = scriptContext;
             _templateProvider = templateProvider;
             _templateProvider.OnChange += TemplateProviderChange;
 
@@ -39,7 +41,7 @@ namespace Mockaco.Routing
 
         public async Task WarmUp()
         {
-            var blankScriptContext = new ScriptContext();
+            var blankScriptContext = _scriptContext;
 
             var stopwatch = Stopwatch.StartNew();
 

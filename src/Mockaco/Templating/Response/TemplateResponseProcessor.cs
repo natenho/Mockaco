@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Mockaco
 {
     public class TemplateResponseProcessor : ITemplateResponseProcessor
-    {
-        private const string JsonContentType = "application/json";
+    {        
         private const HttpStatusCode DefaultHttpStatusCode = HttpStatusCode.OK;
+
+        private readonly IResponseBodyStrategyFactory _responseBodyFactory;
+
+        public TemplateResponseProcessor(IResponseBodyStrategyFactory responseBodyFactory)
+        {
+            _responseBodyFactory = responseBodyFactory;
+        }
 
         public async Task PrepareResponse(HttpResponse httpResponse, IScriptContext scriptContext, Template template)
         {
@@ -32,33 +37,17 @@ namespace Mockaco
                     response.Headers.Add(header.Key, header.Value);
                 }
             }
-
+            
+            //TODO Move default content type to a global setting
             if (string.IsNullOrEmpty(response.ContentType))
             {
-                response.ContentType = JsonContentType;
+                response.ContentType = HttpContentTypes.ApplicationJson;
             }
         }
 
         private async Task WriteResponseBody(HttpResponse response, ResponseTemplate responseTemplate)
         {
-            if(responseTemplate.Body == null)
-            {
-                return;
-            }
-
-            string responseBody;
-
-            //TODO Move to a factory
-            if (response.ContentType == JsonContentType)
-            {
-                var formatting = responseTemplate.Indented.GetValueOrDefault(true) ? Formatting.Indented : default;
-
-                responseBody = responseTemplate.Body?.ToString(formatting);
-            }
-            else
-            {                
-                responseBody = responseTemplate.Body?.ToString();
-            }
+            var responseBody = _responseBodyFactory.GetResponseBody(responseTemplate);
 
             await response.WriteAsync(responseBody);
         }
