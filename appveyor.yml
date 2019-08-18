@@ -19,6 +19,8 @@ build_script:
     dotnet restore ./src/Mockaco/Mockaco.csproj --verbosity m
 
     dotnet publish ./src/Mockaco/Mockaco.csproj
+test_script:
+- cmd: dotnet test .\test\Mockaco.Tests\Mockaco.Tests.csproj
 artifacts:
 - path: src\Mockaco\bin\Release\netcoreapp2.2\publish\
   name: Mockaco Web Site

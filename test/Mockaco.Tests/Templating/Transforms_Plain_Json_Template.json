@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "route": "this/is/the/{parameter1}/route/{parameter2}",
+    "condition": true
+  },
+  "response": {
+    "delay": 1000,
+    "indented": true,
+    "status": "201",
+    "headers": {
+      "X-Header-1": "1",
+      "X-Header-2": "2"
+    },
+    "body": {
+      "id": "1",
+      "message": "Hello world",
+      "createdAt": "2012-04-23T18:25:43.511Z"
+    }
+  },
+  "callback": {
+    "method": "PUT",
+    "url": "http://callback-address/route/to/call",
+    "delay": 2000,
+    "timeout": 10000,
+    "indented": false,
+    "headers": {
+      "Callback-Header-Foo": "Foo",
+      "Callback-Header-Bar": "Bar"
+    },
+    "body": {
+      "key": 2,
+      "topic": "Hello callback",
+      "updatedAt": "2003-02-01T19:00:00.000Z"
+    }
+  }
+}

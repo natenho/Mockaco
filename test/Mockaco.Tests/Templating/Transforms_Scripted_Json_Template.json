@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "route": "this/is/the/{parameter1}/route/{parameter2}",
+    "condition": "<#=Request.Route["parameter1"] == "firstParameter"#>"
+  },
+  "response": {
+    "delay": "<#=Faker.Random.Number(1,7)#>",
+    "indented": true,
+    "status": "201",
+    "headers": {
+      "X-Header-1": "1",
+      "X-Header-2": "2"
+    },
+    "body": {
+      "id": "1",
+      "message": "Hello world",
+      "createdAt": <#=JsonConvert.SerializeObject(new DateTime(2012, 04, 23, 18, 25, 43, 511, DateTimeKind.Utc))#>
+    }
+  },
+  "callback": {
+    "method": "PUT",
+    "url": "http://callback-address/route/to/call",
+    "delay": 2000,
+    "timeout": 10000,
+    "indented": false,
+    "headers": {
+      "Callback-Header-Foo": "Foo",
+      "Callback-Header-Bar": "Bar"
+    },
+    "body": {
+      "key": 2,
+      "topic": "Hello callback",
+      "updatedAt": "2003-02-01T19:00:00.000Z"
+    }
+  }
+}
