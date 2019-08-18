@@ -16,6 +16,6 @@ namespace Mockaco
 
         void AttachRouteParameters(HttpRequest httpRequest, Mock route);
 
-        void AttachResponse(IHeaderDictionary headers, JToken body);
+        void AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate);
     }
 }

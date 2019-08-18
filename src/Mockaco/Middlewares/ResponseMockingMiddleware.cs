@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -13,14 +14,55 @@ namespace Mockaco
         }
 
         public async Task Invoke(
-            HttpContext httpContext, 
-            IMockacoContext mockacoContext, 
-            IScriptContext scriptContext, 
-            ITemplateResponseProcessor templateProcessor)
+            HttpContext httpContext,
+            IMockacoContext mockacoContext,
+            IScriptContext scriptContext,
+            IResponseBodyFactory responseBodyFactory,
+            IOptionsSnapshot<MockacoOptions> options)
         {
-            await templateProcessor.PrepareResponse(httpContext.Response, scriptContext, mockacoContext.TransformedTemplate);
+            await PrepareResponse(httpContext.Response, mockacoContext.TransformedTemplate, responseBodyFactory, options.Value);
+
+            scriptContext.AttachResponse(httpContext.Response, mockacoContext.TransformedTemplate.Response);
 
             await _next(httpContext);
+        }
+
+        private async Task PrepareResponse(
+            HttpResponse httpResponse, 
+            Template transformedTemplate, 
+            IResponseBodyFactory responseBodyFactory, 
+            MockacoOptions options)
+        {
+            httpResponse.StatusCode = GetResponseStatusFromTemplate(transformedTemplate.Response, options);
+
+            AddHeadersFromTemplate(httpResponse, transformedTemplate.Response, options);
+
+            var body = responseBodyFactory.GetResponseBodyFromTemplate(transformedTemplate.Response);
+
+            await httpResponse.WriteAsync(body);
+        }
+
+        private int GetResponseStatusFromTemplate(ResponseTemplate responseTemplate, MockacoOptions options)
+        {
+            return responseTemplate.Status == default
+                            ? (int)options.DefaultHttpStatusCode
+                            : (int)responseTemplate.Status;
+        }
+
+        private void AddHeadersFromTemplate(HttpResponse response, ResponseTemplate responseTemplate, MockacoOptions options)
+        {
+            if (responseTemplate.Headers != null)
+            {
+                foreach (var header in responseTemplate.Headers)
+                {
+                    response.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            if (string.IsNullOrEmpty(response.ContentType))
+            {
+                response.ContentType = options.DefaultHttpContentType;
+            }
         }
     }
 }

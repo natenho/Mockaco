@@ -2,6 +2,6 @@
 {
     public interface IResponseBodyFactory
     {
-        string GetResponseBody(ResponseTemplate responseTemplate);        
+        string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate);        
     }
 }

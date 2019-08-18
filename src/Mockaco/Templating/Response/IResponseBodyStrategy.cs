@@ -4,6 +4,6 @@
     {
         bool CanHandle(ResponseTemplate responseTemplate);
 
-        string GetResponse(ResponseTemplate responseTemplate);
+        string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate);
     }
 }

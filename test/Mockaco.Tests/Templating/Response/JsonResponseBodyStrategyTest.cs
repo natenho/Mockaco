@@ -56,7 +56,7 @@ namespace Mockaco.Tests.Templating
         {
             _validJsonResponseTemplate.Indented = false;
 
-            var response = _strategy.GetResponse(_validJsonResponseTemplate);
+            var response = _strategy.GetResponseBodyFromTemplate(_validJsonResponseTemplate);
 
             response
                 .Should().Be(UnindentedValidJson);
@@ -67,7 +67,7 @@ namespace Mockaco.Tests.Templating
         {
             _validJsonResponseTemplate.Indented = true;
 
-            var response = _strategy.GetResponse(_validJsonResponseTemplate);
+            var response = _strategy.GetResponseBodyFromTemplate(_validJsonResponseTemplate);
 
             response
                 .Should().Be(IndentedValidJson);
@@ -76,7 +76,7 @@ namespace Mockaco.Tests.Templating
         [Fact]
         public void Returns_Response_With_Indented_Valid_Json_By_Default()
         {
-            var response = _strategy.GetResponse(_validJsonResponseTemplate);
+            var response = _strategy.GetResponseBodyFromTemplate(_validJsonResponseTemplate);
 
             response
                 .Should().Be(IndentedValidJson);

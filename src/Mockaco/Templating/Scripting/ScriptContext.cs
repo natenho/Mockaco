@@ -58,9 +58,9 @@ namespace Mockaco
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _bodyAsJson);
         }
 
-        public void AttachResponse(IHeaderDictionary headers, JToken body)
+        public void AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate)
         {
-            Response = new ScriptContextResponse(headers.ToStringDictionary(k => k.Key, v => v.Value.ToString()), body);
+            Response = new ScriptContextResponse(httpResponse.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString()), responseTemplate.Body);
         }
     }
 }

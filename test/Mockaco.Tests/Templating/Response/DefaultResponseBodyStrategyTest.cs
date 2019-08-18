@@ -36,7 +36,7 @@ namespace Mockaco.Tests.Templating
         [Fact]
         public void Returns_Response_For_Any_Response_Template_By_Default()
         {
-            var response = _strategy.GetResponse(_defaulResponseTemplate);
+            var response = _strategy.GetResponseBodyFromTemplate(_defaulResponseTemplate);
 
             response
                 .Should().BeNull();

@@ -12,11 +12,11 @@ namespace Mockaco
             _strategies = strategies;
         }
 
-        public string GetResponseBody(ResponseTemplate responseTemplate)
+        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
         {
             var selectedStrategy = _strategies.FirstOrDefault(_ => _.CanHandle(responseTemplate));
 
-            return selectedStrategy.GetResponse(responseTemplate);
+            return selectedStrategy.GetResponseBodyFromTemplate(responseTemplate);
         }
     }
 }

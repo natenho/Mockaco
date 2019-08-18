@@ -11,7 +11,7 @@ namespace Mockaco
             return contentType == null || contentType == HttpContentTypes.ApplicationJson;
         }
 
-        public string GetResponse(ResponseTemplate responseTemplate)
+        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
         {
             var formatting = responseTemplate.Indented.GetValueOrDefault(true) ? Formatting.Indented : default;
 

@@ -7,7 +7,7 @@
             return true;
         }
 
-        public string GetResponse(ResponseTemplate responseTemplate)
+        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
         {
             return responseTemplate.Body?.ToString();
         }

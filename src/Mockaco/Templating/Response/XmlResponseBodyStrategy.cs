@@ -13,7 +13,7 @@ namespace Mockaco
             return contentType.IsAnyOf(HttpContentTypes.ApplicationXml, HttpContentTypes.TextXml);
         }
 
-        public string GetResponse(ResponseTemplate responseTemplate)
+        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
         {
             var settings = new XmlWriterSettings
             {
