@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -28,18 +29,18 @@ namespace Mockaco
         }
 
         private async Task PrepareResponse(
-            HttpResponse httpResponse, 
-            Template transformedTemplate, 
-            IResponseBodyFactory responseBodyFactory, 
+            HttpResponse httpResponse,
+            Template transformedTemplate,
+            IResponseBodyFactory responseBodyFactory,
             MockacoOptions options)
         {
             httpResponse.StatusCode = GetResponseStatusFromTemplate(transformedTemplate.Response, options);
 
             AddHeadersFromTemplate(httpResponse, transformedTemplate.Response, options);
 
-            var body = responseBodyFactory.GetResponseBodyFromTemplate(transformedTemplate.Response);
+            var bodyBytes = await responseBodyFactory.GetResponseBodyBytesFromTemplate(transformedTemplate.Response);
 
-            await httpResponse.WriteAsync(body);
+            await httpResponse.Body.WriteAsync(bodyBytes, 0, bodyBytes.Length, default);
         }
 
         private int GetResponseStatusFromTemplate(ResponseTemplate responseTemplate, MockacoOptions options)

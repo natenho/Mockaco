@@ -16,15 +16,21 @@ namespace Mockaco.Routing
         private List<Mock> _cache;
         private readonly List<(string TemplateName, string ErrorMessage)> _errors = new List<(string TemplateName, string Error)>();        
         private readonly IFakerFactory _fakerFactory;
+        private readonly IRequestBodyFactory _requestBodyFactory;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<MockProvider> _logger;
 
-        public MockProvider(IFakerFactory fakerFactory, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<MockProvider> logger)
+        public MockProvider
+            (IFakerFactory fakerFactory, 
+            IRequestBodyFactory requestBodyFactory, 
+            ITemplateProvider templateProvider, 
+            ITemplateTransformer templateTransformer, 
+            ILogger<MockProvider> logger)
         {
             _cache = new List<Mock>();
             _fakerFactory = fakerFactory;
-
+            _requestBodyFactory = requestBodyFactory;
             _templateProvider = templateProvider;
             _templateProvider.OnChange += TemplateProviderChange;
 
@@ -53,7 +59,7 @@ namespace Mockaco.Routing
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var nullScriptContext = new ScriptContext(_fakerFactory);
+            var nullScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory);
 
             const int defaultCapacity = 16;
             var mocks = new List<Mock>(_cache.Count > 0 ? _cache.Count : defaultCapacity);

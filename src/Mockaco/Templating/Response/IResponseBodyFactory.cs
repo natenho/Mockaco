@@ -1,7 +1,9 @@
-﻿namespace Mockaco
+﻿using System.Threading.Tasks;
+
+namespace Mockaco
 {
     public interface IResponseBodyFactory
     {
-        string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate);        
+        Task<byte[]> GetResponseBodyBytesFromTemplate(ResponseTemplate responseTemplate);
     }
 }

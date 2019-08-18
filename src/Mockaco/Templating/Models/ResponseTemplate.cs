@@ -17,6 +17,8 @@ namespace Mockaco
 
         public JToken Body { get; set; }
 
+        public string File { get; set; }
+
         public ResponseTemplate()
         {
             Headers = new StringDictionary();

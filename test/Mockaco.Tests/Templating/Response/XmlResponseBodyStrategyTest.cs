@@ -66,7 +66,7 @@ namespace Mockaco.Tests.Templating
             responseTemplate.Body = JToken.FromObject(IndentedValidXml);
             responseTemplate.Indented = false;
 
-            var response = _strategy.GetResponseBodyFromTemplate(responseTemplate);
+            var response = _strategy.GetResponseBodyStringFromTemplate(responseTemplate);
 
             response
                 .Should().Be(UnindentedValidXml);
@@ -80,7 +80,7 @@ namespace Mockaco.Tests.Templating
             responseTemplate.Body = JToken.FromObject(UnindentedValidXml);
             responseTemplate.Indented = true;
 
-            var response = _strategy.GetResponseBodyFromTemplate(responseTemplate);
+            var response = _strategy.GetResponseBodyStringFromTemplate(responseTemplate);
 
             response
                 .Should().Be(IndentedValidXml);
@@ -93,7 +93,7 @@ namespace Mockaco.Tests.Templating
             responseTemplate.Headers.Add(HttpHeaders.ContentType, HttpContentTypes.ApplicationXml);
             responseTemplate.Body = JToken.FromObject(UnindentedValidXml);
             
-            var response = _strategy.GetResponseBodyFromTemplate(responseTemplate);
+            var response = _strategy.GetResponseBodyStringFromTemplate(responseTemplate);
 
             response
                 .Should().Be(IndentedValidXml);

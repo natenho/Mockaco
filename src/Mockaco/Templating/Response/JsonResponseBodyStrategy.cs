@@ -1,17 +1,19 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Mockaco
 {
-    public class JsonResponseBodyStrategy : IResponseBodyStrategy 
+    public class JsonResponseBodyStrategy : StringResponseBodyStrategy
     {
-        public bool CanHandle(ResponseTemplate responseTemplate)
+        public override bool CanHandle(ResponseTemplate responseTemplate)
         {
             responseTemplate.Headers.TryGetValue(HttpHeaders.ContentType, out var contentType);
 
             return contentType == null || contentType == HttpContentTypes.ApplicationJson;
         }
 
-        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
+        public override string GetResponseBodyStringFromTemplate(ResponseTemplate responseTemplate)
         {
             var formatting = responseTemplate.Indented.GetValueOrDefault(true) ? Formatting.Indented : default;
 

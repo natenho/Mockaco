@@ -42,11 +42,11 @@ namespace Mockaco
 
                 .AddTransient<IResponseBodyFactory, ResponseBodyFactory>()
 
+                .AddTransient<IResponseBodyStrategy, BinaryResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
-
-                .AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>()
+                
                 .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 

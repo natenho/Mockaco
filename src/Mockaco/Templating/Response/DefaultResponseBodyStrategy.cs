@@ -1,13 +1,16 @@
-﻿namespace Mockaco
+﻿using System.Text;
+using System.Threading.Tasks;
+
+namespace Mockaco
 {
-    public class DefaultResponseBodyStrategy : IResponseBodyStrategy
+    public class DefaultResponseBodyStrategy : StringResponseBodyStrategy
     {
-        public bool CanHandle(ResponseTemplate responseTemplate)
+        public override bool CanHandle(ResponseTemplate responseTemplate)
         {
             return true;
         }
 
-        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
+        public override string GetResponseBodyStringFromTemplate(ResponseTemplate responseTemplate)
         {
             return responseTemplate.Body?.ToString();
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -12,11 +13,11 @@ namespace Mockaco
             _strategies = strategies;
         }
 
-        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
+        public Task<byte[]> GetResponseBodyBytesFromTemplate(ResponseTemplate responseTemplate)
         {
             var selectedStrategy = _strategies.FirstOrDefault(_ => _.CanHandle(responseTemplate));
 
-            return selectedStrategy.GetResponseBodyFromTemplate(responseTemplate);
+            return selectedStrategy.GetResponseBodyBytesFromTemplate(responseTemplate);
         }
     }
 }

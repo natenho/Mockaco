@@ -18,6 +18,16 @@ namespace System
                 }
                 return sb.ToString();
             }
-        }        
+        }
+        
+        public static bool IsRemoteAbsolutePath(this string input)
+        {
+            if (Uri.TryCreate(input, UriKind.Absolute, out var uri))
+            {
+                return !uri.IsFile;
+            }
+
+            return false;
+        }
     }
 }

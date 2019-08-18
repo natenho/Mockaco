@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Mockaco
 {
-    public class XmlResponseBodyStrategy : IResponseBodyStrategy
+    public class XmlResponseBodyStrategy : StringResponseBodyStrategy
     {
-        public bool CanHandle(ResponseTemplate responseTemplate)
+        public override bool CanHandle(ResponseTemplate responseTemplate)
         {
             responseTemplate.Headers.TryGetValue(HttpHeaders.ContentType, out var contentType);
 
             return contentType.IsAnyOf(HttpContentTypes.ApplicationXml, HttpContentTypes.TextXml);
         }
 
-        public string GetResponseBodyFromTemplate(ResponseTemplate responseTemplate)
+        public override string GetResponseBodyStringFromTemplate(ResponseTemplate responseTemplate)
         {
             var settings = new XmlWriterSettings
             {
