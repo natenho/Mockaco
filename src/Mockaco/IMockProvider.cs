@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Mockaco.Routing
 {
-    public interface IRouteProvider
+    public interface IMockProvider
     {
-        List<Route> GetRoutes();
+        List<Mock> GetMocks();
 
         IEnumerable<(string TemplateName, string ErrorMessage)> GetErrors();
 

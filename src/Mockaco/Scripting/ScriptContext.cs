@@ -53,7 +53,7 @@ namespace Mockaco
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _parsedBody);
         }
 
-        public void AttachRoute(HttpRequest httpRequest, Route route)
+        public void AttachRouteParameters(HttpRequest httpRequest, Mock route)
         {
             _routeDictionary = httpRequest.GetRouteData(route)
                 .ToStringDictionary(k => k.Key, v => v.Value.ToString());

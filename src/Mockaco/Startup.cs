@@ -28,11 +28,11 @@ namespace Mockaco
 
                 .AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>()
 
-                .AddSingleton<IFakerFactory, HttpRequestFakerFactory>()
-                .AddSingleton<IRouteProvider, RouteProvider>()
+                .AddSingleton<IFakerFactory, LocalizedFakerFactory>()
+                .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
 
-                .AddTransient<IResponseBodyStrategyFactory, ResponseBodyStrategyFactory>()
+                .AddTransient<IResponseBodyFactory, ResponseBodyFactory>()
 
                 .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()

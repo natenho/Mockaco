@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace Mockaco
 {
-    public class HttpRequestFakerFactory : IFakerFactory
+    public class LocalizedFakerFactory : IFakerFactory
     {
-        private readonly ILogger<HttpRequestFakerFactory> _logger;
+        private readonly ILogger<LocalizedFakerFactory> _logger;
 
-        public HttpRequestFakerFactory(ILogger<HttpRequestFakerFactory> logger)
+        public LocalizedFakerFactory(ILogger<LocalizedFakerFactory> logger)
         {
             _logger = logger;
         }

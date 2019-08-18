@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace Mockaco.Routing
 {
-    public class RouteProvider : IRouteProvider
+    public class MockProvider : IMockProvider
     {
-        private List<Route> _cache;
+        private List<Mock> _cache;
         private readonly List<(string TemplateName, string ErrorMessage)> _errors = new List<(string TemplateName, string Error)>();        
         private readonly IFakerFactory _fakerFactory;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
-        private readonly ILogger<RouteProvider> _logger;
+        private readonly ILogger<MockProvider> _logger;
 
-        public RouteProvider(IFakerFactory fakerFactory, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<RouteProvider> logger)
+        public MockProvider(IFakerFactory fakerFactory, ITemplateProvider templateProvider, ITemplateTransformer templateTransformer, ILogger<MockProvider> logger)
         {
-            _cache = new List<Route>();
+            _cache = new List<Mock>();
             _fakerFactory = fakerFactory;
 
             _templateProvider = templateProvider;
@@ -39,7 +39,7 @@ namespace Mockaco.Routing
         }
 
         //TODO: Fix potential thread-unsafe method
-        public List<Route> GetRoutes()
+        public List<Mock> GetMocks()
         {
             return _cache;
         }
@@ -56,7 +56,7 @@ namespace Mockaco.Routing
             var nullScriptContext = new ScriptContext(_fakerFactory);
 
             const int defaultCapacity = 16;
-            var routes = new List<Route>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
+            var mocks = new List<Mock>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
 
             _errors.Clear();
 
@@ -70,7 +70,7 @@ namespace Mockaco.Routing
                     {
                         _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
-                        routes.Add(existentCachedRoute);
+                        mocks.Add(existentCachedRoute);
 
                         continue;
                     }
@@ -79,7 +79,7 @@ namespace Mockaco.Routing
 
                     var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
 
-                    routes.Add(new Route(template.Request.Method, template.Request.Route, rawTemplate, template.Request.Condition.HasValue));
+                    mocks.Add(new Mock(template.Request.Method, template.Request.Route, rawTemplate, template.Request.Condition.HasValue));
 
                     _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request.Method, template.Request.Route);
                 }
@@ -105,7 +105,7 @@ namespace Mockaco.Routing
 
             _cache.Clear();
 
-            _cache = routes.OrderByDescending(r => r.HasCondition).ToList();
+            _cache = mocks.OrderByDescending(r => r.HasCondition).ToList();
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
         }

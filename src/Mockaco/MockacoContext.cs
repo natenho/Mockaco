@@ -9,7 +9,7 @@ namespace Mockaco
 
         public Template TransformedTemplate { get; set; }
 
-        public Route Route { get; set; }
+        public Mock Mock { get; set; }
 
         public List<Error> Errors { get; set; }
                 

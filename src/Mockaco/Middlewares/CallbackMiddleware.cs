@@ -71,7 +71,7 @@ namespace Mockaco
 
         private static async Task<CallbackTemplate> PrepareCallbackTemplate(IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
         {
-            var template = await templateTransformer.Transform(mockacoContext.Route.RawTemplate, scriptContext);
+            var template = await templateTransformer.Transform(mockacoContext.Mock.RawTemplate, scriptContext);
 
             return template.Callback;
         }

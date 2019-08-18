@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Http;
-using Mockaco.Routing;
 using Newtonsoft.Json.Linq;
 
 namespace Mockaco
@@ -15,7 +14,7 @@ namespace Mockaco
 
         void AttachRequest(HttpRequest httpRequest);
 
-        void AttachRoute(HttpRequest httpRequest, Route route);
+        void AttachRouteParameters(HttpRequest httpRequest, Mock route);
 
         void AttachResponse(IHeaderDictionary headers, JToken body);
     }

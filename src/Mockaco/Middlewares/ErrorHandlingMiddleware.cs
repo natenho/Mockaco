@@ -21,7 +21,7 @@ namespace Mockaco
             HttpContext httpContext,
             IMockacoContext mockacoContext,
             IOptionsSnapshot<StatusCodesOptions> statusCodeOptions,
-            IRouteProvider routeProvider,
+            IMockProvider mockProvider,
             ILogger<ErrorHandlingMiddleware> logger)
         {
             try
@@ -41,17 +41,17 @@ namespace Mockaco
                     httpContext.Response.StatusCode = (int)statusCodeOptions.Value.Error;
                     httpContext.Response.ContentType = HttpContentTypes.ApplicationJson;
 
-                    IncludeRouteProviderErrors(mockacoContext, routeProvider);
+                    IncludeMockProviderErrors(mockacoContext, mockProvider);
 
                     await httpContext.Response.WriteAsync(mockacoContext.Errors.ToJson());
                 }
             }
         }
 
-        private static void IncludeRouteProviderErrors(IMockacoContext mockacoContext, IRouteProvider routeProvider)
+        private static void IncludeMockProviderErrors(IMockacoContext mockacoContext, IMockProvider mockProvider)
         {
             mockacoContext.Errors
-                .AddRange(routeProvider.GetErrors()
+                .AddRange(mockProvider.GetErrors()
                     .Select(_ => new Error($"{_.TemplateName} - {_.ErrorMessage}")));
         }
     }

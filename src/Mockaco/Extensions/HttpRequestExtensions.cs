@@ -80,11 +80,11 @@ namespace Microsoft.AspNetCore.Http
             return new Uri(builder.ToString());
         }
 
-        public static Routing.RouteValueDictionary GetRouteData(this HttpRequest request, Route route)
+        public static Routing.RouteValueDictionary GetRouteData(this HttpRequest request, Mock mock)
         {
             var routeMatcher = new RouteMatcher();
 
-            return routeMatcher.Match(route.Path, request.Path);
+            return routeMatcher.Match(mock.Route, request.Path);
         }
 
         public static bool HasJsonContentType(this HttpRequest request)

@@ -1,29 +1,29 @@
 ﻿using System.Diagnostics;
 
-namespace Mockaco.Routing
+namespace Mockaco
 {
-    [DebuggerDisplay("{Method} {Path} ({RawTemplate.Name})")]
-    public class Route
+    [DebuggerDisplay("{Method} {Route} ({RawTemplate.Name})")]
+    public class Mock
     {
         public string Method { get; set; }
 
-        public string Path { get; set; }
+        public string Route { get; set; }
 
         public IRawTemplate RawTemplate { get; set; }
 
         public bool HasCondition { get; set; }
 
-        public Route(string method, string path, IRawTemplate rawTemplate, bool hasCondition)
+        public Mock(string method, string route, IRawTemplate rawTemplate, bool hasCondition)
         {
             Method = method;
-            Path = path;
+            Route = route;
             RawTemplate = rawTemplate;
             HasCondition = hasCondition;
         }
 
         public override string ToString()
         {
-            return $"{Method} {Path} ({RawTemplate.Name})";
+            return $"{Method} {Route} ({RawTemplate.Name})";
         }
     }
 }

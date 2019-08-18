@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace Mockaco
 {
-    public class ResponseBodyStrategyFactory : IResponseBodyStrategyFactory
+    public class ResponseBodyFactory : IResponseBodyFactory
     {
         private readonly IEnumerable<IResponseBodyStrategy> _strategies;
 
-        public ResponseBodyStrategyFactory(IEnumerable<IResponseBodyStrategy> strategies)
+        public ResponseBodyFactory(IEnumerable<IResponseBodyStrategy> strategies)
         {
             _strategies = strategies;
         }

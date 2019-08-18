@@ -17,9 +17,9 @@ namespace Mockaco
 
             using (var scope = webHost.Services.CreateScope())
             {
-                var routeProvider = scope.ServiceProvider.GetService<IRouteProvider>();
+                var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
 
-                await routeProvider.WarmUp();
+                await mockProvider.WarmUp();
             }
 
             await webHost.RunAsync();

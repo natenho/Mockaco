@@ -8,9 +8,9 @@ namespace Mockaco
     {        
         private const HttpStatusCode DefaultHttpStatusCode = HttpStatusCode.OK;
 
-        private readonly IResponseBodyStrategyFactory _responseBodyFactory;
+        private readonly IResponseBodyFactory _responseBodyFactory;
 
-        public TemplateResponseProcessor(IResponseBodyStrategyFactory responseBodyFactory)
+        public TemplateResponseProcessor(IResponseBodyFactory responseBodyFactory)
         {
             _responseBodyFactory = responseBodyFactory;
         }
@@ -21,14 +21,16 @@ namespace Mockaco
                 ? (int)DefaultHttpStatusCode
                 : (int)template.Response.Status;
 
-            WriteResponseHeaders(httpResponse, template.Response);
+            AddHeaders(httpResponse, template.Response);
 
-            await WriteResponseBody(httpResponse, template.Response);
+            var body = _responseBodyFactory.GetResponseBody(template.Response);
 
+            await httpResponse.WriteAsync(body);
+                      
             scriptContext.AttachResponse(httpResponse.Headers, template.Response.Body);
         }
 
-        private void WriteResponseHeaders(HttpResponse response, ResponseTemplate responseTemplate)
+        private void AddHeaders(HttpResponse response, ResponseTemplate responseTemplate)
         {
             if (responseTemplate.Headers != null)
             {
@@ -43,13 +45,6 @@ namespace Mockaco
             {
                 response.ContentType = HttpContentTypes.ApplicationJson;
             }
-        }
-
-        private async Task WriteResponseBody(HttpResponse response, ResponseTemplate responseTemplate)
-        {
-            var responseBody = _responseBodyFactory.GetResponseBody(responseTemplate);
-
-            await response.WriteAsync(responseBody);
         }
     }
 }
