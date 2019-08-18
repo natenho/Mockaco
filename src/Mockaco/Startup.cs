@@ -19,9 +19,11 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddMemoryCache()
+            services.AddMemoryCache()
                 .AddHttpClient()
+                .AddOptions()
+
+                .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
 
                 .AddScoped<IMockacoContext, MockacoContext>()
                 .AddScoped<IScriptContext, ScriptContext>()
@@ -32,6 +34,12 @@ namespace Mockaco
                 .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
 
+                .AddTransient<IRequestBodyFactory, RequestBodyFactory>()
+
+                .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
+                .AddTransient<IRequestBodyStrategy, JsonRequestBodyStrategy>()
+                .AddTransient<IRequestBodyStrategy, XmlRequestBodyStrategy>()
+
                 .AddTransient<IResponseBodyFactory, ResponseBodyFactory>()
 
                 .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
@@ -39,19 +47,16 @@ namespace Mockaco
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
 
                 .AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>()
-                .AddTransient<ITemplateTransformer, TemplateTransformer>()
-
-                .AddOptions()
-                .Configure<StatusCodesOptions>(_configuration.GetSection("StatusCodes"));
+                .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseMiddleware<ErrorHandlingMiddleware>()
-               .UseMiddleware<ResponseDelayMiddleware>()
-               .UseMiddleware<RequestMatchingMiddleware>()
-               .UseMiddleware<ResponseMockingMiddleware>()
-               .UseMiddleware<CallbackMiddleware>();
+                .UseMiddleware<ResponseDelayMiddleware>()
+                .UseMiddleware<RequestMatchingMiddleware>()
+                .UseMiddleware<ResponseMockingMiddleware>()
+                .UseMiddleware<CallbackMiddleware>();
         }
     }
 }

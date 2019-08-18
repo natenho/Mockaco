@@ -20,7 +20,7 @@ namespace Mockaco
         public async Task Invoke(
             HttpContext httpContext,
             IMockacoContext mockacoContext,
-            IOptionsSnapshot<StatusCodesOptions> statusCodeOptions,
+            IOptionsSnapshot<MockacoOptions> statusCodeOptions,
             IMockProvider mockProvider,
             ILogger<ErrorHandlingMiddleware> logger)
         {
@@ -38,7 +38,7 @@ namespace Mockaco
             {
                 if (mockacoContext.Errors.Any() && !httpContext.Response.HasStarted)
                 {
-                    httpContext.Response.StatusCode = (int)statusCodeOptions.Value.Error;
+                    httpContext.Response.StatusCode = (int)statusCodeOptions.Value.ErrorHttpStatusCode;
                     httpContext.Response.ContentType = HttpContentTypes.ApplicationJson;
 
                     IncludeMockProviderErrors(mockacoContext, mockProvider);

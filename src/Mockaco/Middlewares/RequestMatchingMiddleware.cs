@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Mockaco.Processors;
 using Mockaco.Routing;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mockaco.Middlewares
@@ -28,19 +29,24 @@ namespace Mockaco.Middlewares
         {
             AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
 
+            if(mockacoContext.Errors.Any())
+            {
+                return;
+            }
+
             LogHttpContext(httpContext);
 
             foreach (var mock in mockProvider.GetMocks())
             {
-                if (MockMatchesRequest(httpContext.Request, mock))
+                if (RequestMatchesMock(httpContext.Request, mock))
                 {
                     scriptContext.AttachRouteParameters(httpContext.Request, mock);
 
                     var template = await templateTransformer.Transform(mock.RawTemplate, scriptContext);
 
-                    var matchesCondition = template.Request.Condition ?? true;
+                    var conditionIsMatch = template.Request.Condition ?? true;
 
-                    if (matchesCondition)
+                    if (conditionIsMatch)
                     {
                         _logger.LogInformation("Incoming request matched {mock}", mock);
 
@@ -67,7 +73,7 @@ namespace Mockaco.Middlewares
             mockacoContext.Errors.Add(new Error("Incoming request didn't match any mock"));
         }
 
-        private static void AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
+        private void AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
         {
             try
             {
@@ -76,6 +82,8 @@ namespace Mockaco.Middlewares
             catch (Exception ex)
             {
                 mockacoContext.Errors.Add(new Error("An error occurred while reading request", ex));
+
+                _logger.LogWarning(ex, "An error occurred while reading request");
 
                 return;
             }
@@ -99,12 +107,12 @@ namespace Mockaco.Middlewares
             }
         }
 
-        private static bool MockMatchesRequest(HttpRequest request, Mock mock)
+        private static bool RequestMatchesMock(HttpRequest request, Mock mock)
         {
             if (!string.IsNullOrWhiteSpace(mock.Method))
             {
-                var methodMatches = request.Method.Equals(mock.Method, StringComparison.InvariantCultureIgnoreCase);
-                if (!methodMatches)
+                var methodIsMatch = request.Method.Equals(mock.Method, StringComparison.InvariantCultureIgnoreCase);
+                if (!methodIsMatch)
                 {
                     return false;
                 }
@@ -113,8 +121,8 @@ namespace Mockaco.Middlewares
             if (!string.IsNullOrWhiteSpace(mock.Route))
             {
                 var routeMatcher = new RouteMatcher();
-                var routeMatches = routeMatcher.IsMatch(mock.Route, request.Path);
-                if (!routeMatches)
+                var routeIsMatch = routeMatcher.IsMatch(mock.Route, request.Path);
+                if (!routeIsMatch)
                 {
                     return false;
                 }

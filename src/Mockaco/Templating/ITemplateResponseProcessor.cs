@@ -5,6 +5,6 @@ namespace Mockaco
 {
     public interface ITemplateResponseProcessor
     {
-        Task PrepareResponse(HttpResponse httpResponse, IScriptContext scriptContext, Template template);
+        Task PrepareResponse(HttpResponse httpResponse, IScriptContext scriptContext, ResponseTemplate template);
     }
 }
