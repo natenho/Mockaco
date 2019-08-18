@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.Linq;
 
 namespace System
@@ -9,7 +10,8 @@ namespace System
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
-            Converters = new JsonConverter[] { new StringEnumConverter { CamelCaseText = true } }
+            Converters = new JsonConverter[] { new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()} },
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         public static string ToJson<T>(this T param)

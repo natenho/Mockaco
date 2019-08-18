@@ -1,4 +1,5 @@
 ﻿using Mockaco.Routing;
+using System.Collections.Generic;
 
 namespace Mockaco
 {
@@ -10,9 +11,12 @@ namespace Mockaco
 
         public Route Route { get; set; }
 
+        public List<Error> Errors { get; set; }
+                
         public MockacoContext(IScriptContext scriptContext)
         {
             ScriptContext = scriptContext;
+            Errors = new List<Error>();
         }
     }
 }

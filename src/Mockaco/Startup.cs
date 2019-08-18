@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mockaco.Middlewares;
 using Mockaco.Processors;
@@ -9,36 +10,48 @@ namespace Mockaco
 {
     public partial class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();
-            services.AddHttpClient();
+            services
+                .AddMemoryCache()
+                .AddHttpClient()
 
-            services.AddScoped<IMockacoContext, MockacoContext>();            
-            services.AddScoped<IScriptContext, ScriptContext>();            
+                .AddScoped<IMockacoContext, MockacoContext>()
+                .AddScoped<IScriptContext, ScriptContext>()
 
-            services.AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>();
+                .AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>()
 
-            services.AddSingleton<IFakerFactory, HttpRequestFakerFactory>();
-            services.AddSingleton<IRouteProvider, RouteProvider>();
-            services.AddSingleton<ITemplateProvider, TemplateFileProvider>();
+                .AddSingleton<IFakerFactory, HttpRequestFakerFactory>()
+                .AddSingleton<IRouteProvider, RouteProvider>()
+                .AddSingleton<ITemplateProvider, TemplateFileProvider>()
 
-            services.AddTransient<IResponseBodyStrategyFactory, ResponseBodyStrategyFactory>();
+                .AddTransient<IResponseBodyStrategyFactory, ResponseBodyStrategyFactory>()
 
-            services.AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>();
-            services.AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>();
-            services.AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>();
+                .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
+                .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
+                .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
 
-            services.AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>();
-            services.AddTransient<ITemplateTransformer, TemplateTransformer>();
+                .AddTransient<ITemplateResponseProcessor, TemplateResponseProcessor>()
+                .AddTransient<ITemplateTransformer, TemplateTransformer>()
+
+                .AddOptions()
+                .Configure<StatusCodesOptions>(_configuration.GetSection("StatusCodes"));
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<ResponseDelayMiddleware>();
-            app.UseMiddleware<RequestMatchingMiddleware>();
-            app.UseMiddleware<ResponseMockingMiddleware>();
-            app.UseMiddleware<CallbackMiddleware>();
+            app.UseMiddleware<ErrorHandlingMiddleware>()
+               .UseMiddleware<ResponseDelayMiddleware>()
+               .UseMiddleware<RequestMatchingMiddleware>()
+               .UseMiddleware<ResponseMockingMiddleware>()
+               .UseMiddleware<CallbackMiddleware>();
         }
     }
 }

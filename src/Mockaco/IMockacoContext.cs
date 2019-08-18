@@ -1,4 +1,5 @@
 ﻿using Mockaco.Routing;
+using System.Collections.Generic;
 
 namespace Mockaco
 {
@@ -9,5 +10,7 @@ namespace Mockaco
         Template TransformedTemplate { get; set; }
 
         Route Route { get; set; }
+
+        List<Error> Errors { get; set; }
     }
 }

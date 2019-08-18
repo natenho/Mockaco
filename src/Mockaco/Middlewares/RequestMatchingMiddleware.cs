@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Mockaco.Processors;
 using Mockaco.Routing;
 using System;
@@ -23,7 +24,8 @@ namespace Mockaco.Middlewares
             IMockacoContext mockacoContext,
             IScriptContext scriptContext,
             IRouteProvider routerProvider,
-            ITemplateTransformer templateTransformer
+            ITemplateTransformer templateTransformer,
+            IOptionsSnapshot<StatusCodesOptions> statusCodesOptions
             )
         {
             try
@@ -32,11 +34,7 @@ namespace Mockaco.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred reading request");
-
-                httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
-
-                await httpContext.Response.WriteAsync(ex.ToJson());
+                mockacoContext.Errors.Add(new Error("An error occurred while reading request", ex));
 
                 return;
             }
@@ -77,7 +75,7 @@ namespace Mockaco.Middlewares
 
             _logger.LogInformation("Incoming request didn't match any route");
 
-            httpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
+            mockacoContext.Errors.Add(new Error("Incoming request didn't match any route"));
         }
 
         private void LogHttpContext(HttpContext httpContext)

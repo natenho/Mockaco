@@ -7,6 +7,8 @@ namespace Mockaco.Routing
     {
         List<Route> GetRoutes();
 
+        IEnumerable<(string TemplateName, string ErrorMessage)> GetErrors();
+
         Task WarmUp();
     }
 }
