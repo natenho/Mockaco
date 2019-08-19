@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Mockaco.Processors;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +25,12 @@ namespace Mockaco
             _logger = logger;
         }
 
-        public Task Invoke(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
+        public Task Invoke(
+            HttpContext httpContext, 
+            IMockacoContext mockacoContext, 
+            IScriptContext scriptContext, 
+            ITemplateTransformer templateTransformer, 
+            IOptionsSnapshot<MockacoOptions> options)
         {
             if (mockacoContext.TransformedTemplate?.Callback == null)
             {
@@ -34,14 +40,19 @@ namespace Mockaco
             httpContext.Response.OnCompleted(
                 () =>
                 {
-                    var fireAndForgetTask = PerformCallback(httpContext, mockacoContext, scriptContext, templateTransformer);
+                    var fireAndForgetTask = PerformCallback(httpContext, mockacoContext, scriptContext, templateTransformer, options.Value);
                     return Task.CompletedTask;
                 });
 
             return Task.CompletedTask;
         }
 
-        private async Task PerformCallback(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
+        private async Task PerformCallback(
+            HttpContext httpContext, 
+            IMockacoContext mockacoContext, 
+            IScriptContext scriptContext, 
+            ITemplateTransformer templateTransformer,
+            MockacoOptions options)
         {
             try
             {
@@ -49,7 +60,7 @@ namespace Mockaco
 
                 var callbackTemplate = await PrepareCallbackTemplate(mockacoContext, scriptContext, templateTransformer);
 
-                var request = PrepareHttpRequest(callbackTemplate);
+                var request = PrepareHttpRequest(callbackTemplate, options);
 
                 var httpClient = PrepareHttpClient(httpContext, callbackTemplate);
 
@@ -76,7 +87,7 @@ namespace Mockaco
             return template.Callback;
         }
 
-        private static HttpRequestMessage PrepareHttpRequest(CallbackTemplate callbackTemplate)
+        private static HttpRequestMessage PrepareHttpRequest(CallbackTemplate callbackTemplate, MockacoOptions options)
         {
             var request = new HttpRequestMessage(new HttpMethod(callbackTemplate.Method), callbackTemplate.Url);
 
@@ -84,21 +95,21 @@ namespace Mockaco
 
             if (callbackTemplate.Body != null)
             {
-                request.Content = callbackTemplate.Headers.ContainsKey("Content-Type")
-                    ? new StringContent(callbackTemplate.Body.ToString(), Encoding.UTF8, callbackTemplate.Headers["Content-Type"])
+                request.Content = callbackTemplate.Headers.ContainsKey(HttpHeaders.ContentType)
+                    ? new StringContent(callbackTemplate.Body.ToString(), Encoding.UTF8, callbackTemplate.Headers[HttpHeaders.ContentType])
                     : new StringContent(callbackTemplate.Body.ToString(formatting));
             }
 
-            PrepareHeaders(callbackTemplate, request);
+            PrepareHeaders(callbackTemplate, request, options);
 
             return request;
         }
 
-        private static void PrepareHeaders(CallbackTemplate callBackTemplate, HttpRequestMessage httpRequest)
+        private static void PrepareHeaders(CallbackTemplate callBackTemplate, HttpRequestMessage httpRequest, MockacoOptions options)
         {
             if (callBackTemplate.Headers != null)
             {
-                foreach (var header in callBackTemplate.Headers.Where(h => h.Key != "Content-Type"))
+                foreach (var header in callBackTemplate.Headers.Where(h => h.Key != HttpHeaders.ContentType))
                 {
                     if (httpRequest.Headers.Contains(header.Key))
                     {
@@ -111,7 +122,7 @@ namespace Mockaco
 
             if (!httpRequest.Headers.Accept.Any())
             {
-                httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(options.DefaultHttpContentType));
             }
         }
 
