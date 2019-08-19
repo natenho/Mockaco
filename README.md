@@ -7,32 +7,33 @@ Mockaco is an HTTP-based API mock server with fast setup, featuring:
 - Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
 - Fake data generation - built-in hassle-free fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
+- Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
 
-# Quick Start
+# Get Started
 
 ## Running the application
 
-You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco):
+You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco) (replace ```/your/folder``` with an existing directory of your preference):
 
-```
-docker run -it --rm -p 5000:80 -v C:\Mocks:/app/Mocks natenho/mockaco
-```
-
-Or you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
-
-```
-dotnet Mockaco.dll
+```console
+$ docker run -it --rm -p 5000:80 -v /your/folder:/app/Mocks natenho/mockaco
 ```
 
-Or your can run it directly from sources using [.NET Core](https://dotnet.microsoft.com/download):
+Or using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
 
-```
-git clone https://github.com/natenho/Mockaco.git
-cd Mockaco\src\Mockaco
-dotnet run
+```console
+$ dotnet Mockaco.dll
 ```
 
-## Create a request/response template
+Or your can run it directly from sources:
+
+```console
+$ git clone https://github.com/natenho/Mockaco.git
+$ cd Mockaco\src\Mockaco
+$ dotnet run
+```
+
+## Creating a request/response template
 Create a file named `PingPong.json` under `Mocks` folder:
 
 ```json
@@ -49,6 +50,8 @@ Create a file named `PingPong.json` under `Mocks` folder:
   }
 }
 ```
+
+This example contains a request/response template, meaning "Whenever you receive a ```GET``` request in the route ```/ping```, respond with status ```OK``` and the body ```{ "response": "pong" }```"
 	
 ## Send a request and get the mocked response
 ```http
@@ -70,21 +73,11 @@ Use the ```request``` attribute to provide the necessary information for the eng
 
 ## Method attribute
 
-Any request with the matching HTTP method will return the response. Supported HTTP methods: 
-- GET
-- PUT
-- DELETE
-- POST
-- HEAD
-- TRACE
-- PATCH
-- CONNECT
-- OPTIONS
-
+Any request with the matching HTTP method will return the response. Supported HTTP methods: GET, PUT, DELETE, POST, HEAD, TRACE, PATCH, CONNECT, OPTIONS.
 If omitted, defaults to ```GET```.
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -102,7 +95,7 @@ Any request with the matching route will return the response. Any AspNet route t
 If omitted, empty or null, defaults to base route (/).
 
 ### Example
-```
+```json
 {
   "request": {
 	"route": "customers/{id}/accounts/{account_id}"
@@ -140,7 +133,7 @@ Defines a minimum response time in milliseconds.
 If omitted, empty or null, defaults to ```0```.
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -159,7 +152,7 @@ Sets the HTTP status code for the response. Can be a string or a number, as defi
 If omitted, empty or null, defaults to ```OK``` (200).
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -175,7 +168,7 @@ If omitted, empty or null, defaults to ```OK``` (200).
 Sets any HTTP response headers.
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -198,7 +191,7 @@ If omitted, empty or null, defaults to empty.
 The ```Content-Type``` header is used to process output formatting for certain MIME types. If omitted, defaults to ```application/json```.
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -212,12 +205,17 @@ The ```Content-Type``` header is used to process output formatting for certain M
 }
 ```
 
+See also:
+
+ - [Mocking XML responses](https://github.com/natenho/Mockaco/blob/master/docs/Mocking-XML.md)
+ - [Mocking Binary/Raw responses](https://github.com/natenho/Mockaco/blob/master/docs/Mocking-RAW.md)
+
 ## Indented attribute
 
 Sets the response body indentation for some structured content-types. If ommited, defaults to ```true```.
 
 ### Example
-```
+```json
 {
   "request": {
 	"method": "GET"
@@ -332,6 +330,9 @@ The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/ros
 The code tag structure resembles [T4 Text Template Engine](https://github.com/mono/t4). In fact, this project leverages parts of T4 engine code to parse mock templates.
 
 ### Example: Accessing request data
+
+There is a ```Request``` object available to access request data.
+
 ```
 {
   "request": {
@@ -352,6 +353,9 @@ The code tag structure resembles [T4 Text Template Engine](https://github.com/mo
 ```
 
 ### Example: Generating fake data
+
+There is a ```Faker``` object available to generate fake data.
+
 ```
 {
   "request": {
