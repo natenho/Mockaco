@@ -207,8 +207,8 @@ The ```Content-Type``` header is used to process output formatting for certain M
 
 See also:
 
- - [Mocking XML responses](https://github.com/natenho/Mockaco/blob/master/docs/Mocking-XML.md)
- - [Mocking Binary/Raw responses](https://github.com/natenho/Mockaco/blob/master/docs/Mocking-RAW.md)
+ - [Mocking XML responses](https://github.com/natenho/Mockaco/blob/master/doc/Mocking-XML.md)
+ - [Mocking Binary/Raw responses](https://github.com/natenho/Mockaco/blob/master/doc/Mocking-RAW.md)
 
 ## Indented attribute
 
