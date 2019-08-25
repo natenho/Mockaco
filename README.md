@@ -9,6 +9,32 @@ Mockaco is an HTTP-based API mock server with fast setup, featuring:
 - Callback support - trigger another service call when a request hits your mocked API
 - Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
 
+# Table of Contents
+
+- [Get Started](#get-started)
+  * [Running the application](#running-the-application)
+  * [Creating a request/response template](#creating-a-requestresponse-template)
+  * [Send a request and get the mocked response](#send-a-request-and-get-the-mocked-response)
+- [Request Template Matching](#request-template-matching)
+  * [Method attribute](#method-attribute)
+  * [Route attribute](#route-attribute)
+  * [Condition attribute](#condition-attribute)
+- [Response Template](#response-template)
+  * [Delay attribute](#delay-attribute)
+  * [Status attribute](#status-attribute)
+  * [Headers attribute](#headers-attribute)
+  * [Body attribute](#body-attribute)
+  * [Indented attribute](#indented-attribute)
+- [Callback Template](#callback-template)
+  * [Headers attribute](#headers-attribute-1)
+  * [Body attribute](#body-attribute-1)
+  * [Delay attribute](#delay-attribute-1)
+  * [Timeout attribute](#timeout-attribute)
+  * [Indented attribute](#indented-attribute-1)
+- [Scripting](#scripting)
+    + [Example: Accessing request data](#example-accessing-request-data)
+    + [Example: Generating fake data](#example-generating-fake-data)
+
 # Get Started
 
 ## Running the application
