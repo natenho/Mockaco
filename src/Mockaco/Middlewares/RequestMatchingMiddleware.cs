@@ -27,14 +27,14 @@ namespace Mockaco.Middlewares
             ITemplateTransformer templateTransformer
             )
         {
+            LogHttpContext(httpContext);
+
             AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
 
             if(mockacoContext.Errors.Any())
             {
                 return;
-            }
-
-            LogHttpContext(httpContext);
+            }                       
 
             foreach (var mock in mockProvider.GetMocks())
             {
