@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Mockaco.Processors;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mockaco.Templating
+namespace Mockaco
 {
     public class TemplateTransformer : ITemplateTransformer
     {

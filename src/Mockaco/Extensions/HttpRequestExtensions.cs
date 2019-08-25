@@ -25,13 +25,11 @@ SOFTWARE.
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Net.Http.Headers;
 using Mockaco;
-using Mockaco.Routing;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Http
 {

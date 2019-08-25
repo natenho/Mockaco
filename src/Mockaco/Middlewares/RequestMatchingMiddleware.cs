@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Mockaco.Processors;
-using Mockaco.Routing;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mockaco.Middlewares
+namespace Mockaco
 {
     public class RequestMatchingMiddleware
     {

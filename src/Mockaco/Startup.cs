@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Mockaco.Middlewares;
-using Mockaco.Processors;
-using Mockaco.Routing;
-using Mockaco.Templating;
 
 namespace Mockaco
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using Mockaco.Processors;
+﻿using Microsoft.Extensions.Logging;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
