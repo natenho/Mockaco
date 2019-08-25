@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mockaco.Routing
+namespace Mockaco
 {
     public class MockProvider : IMockProvider
     {

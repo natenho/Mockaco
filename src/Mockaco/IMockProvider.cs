@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Mockaco.Routing
+namespace Mockaco
 {
     public interface IMockProvider
     {
