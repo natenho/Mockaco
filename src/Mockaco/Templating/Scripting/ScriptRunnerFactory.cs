@@ -1,8 +1,10 @@
 ﻿using Bogus;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -12,11 +14,13 @@ namespace Mockaco
     {
         private readonly IMemoryCache _cache;
         private readonly ILogger<ScriptRunnerFactory> _logger;
+        private readonly IOptionsMonitor<MockacoOptions> _options;
 
-        public ScriptRunnerFactory(ILogger<ScriptRunnerFactory> logger)
+        public ScriptRunnerFactory(ILogger<ScriptRunnerFactory> logger, IOptionsMonitor<MockacoOptions> options)
         {
             _cache = new MemoryCache(new MemoryCacheOptions());
             _logger = logger;
+            _options = options;
         }
 
         public Task<TResult> Invoke<TContext, TResult>(TContext context, string code)
@@ -48,10 +52,11 @@ namespace Mockaco
 
             var scriptOptions = ScriptOptions
                 .Default
-                .WithReferences(
+                .AddReferences(
                     typeof(Faker).Assembly,
                     typeof(ScriptRunnerFactory).Assembly)
-                .WithImports(
+                .AddReferences(_options.CurrentValue.References)
+                .AddImports(
                     "System",
                     "System.Linq",
                     "System.Collections.Generic",
@@ -59,8 +64,10 @@ namespace Mockaco
                     typeof(Faker).Namespace,
                     typeof(ScriptRunnerFactory).Namespace,
                     "Newtonsoft.Json",
-                    "Newtonsoft.Json.Linq");
-
+                    "Newtonsoft.Json.Linq")
+                .AddImports(_options.CurrentValue.Imports)
+                .WithOptimizationLevel(OptimizationLevel.Release);
+            
             var script = CSharpScript.Create<TResult>(
                 code,
                 globalsType: typeof(TContext),

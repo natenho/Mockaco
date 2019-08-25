@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace Mockaco
 {
@@ -10,11 +12,17 @@ namespace Mockaco
 
         public string DefaultHttpContentType { get; set; }
 
+        public List<string> References { get; set; }
+
+        public List<string> Imports { get; set; }
+
         public MockacoOptions()
         {
             DefaultHttpStatusCode = HttpStatusCode.OK;
             ErrorHttpStatusCode = HttpStatusCode.NotImplemented;
             DefaultHttpContentType = HttpContentTypes.ApplicationJson;
+            References = new List<string>();
+            Imports = new List<string>();
         }
     }
 }
