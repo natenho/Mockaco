@@ -26,6 +26,9 @@ namespace Mockaco
             }
 
             int responseDelay = mockacoContext.TransformedTemplate.Response.Delay.GetValueOrDefault();
+
+            stopwatch.Stop();
+
             var remainingDelay = responseDelay - (int)stopwatch.ElapsedMilliseconds;
             if (remainingDelay > 0)
             {

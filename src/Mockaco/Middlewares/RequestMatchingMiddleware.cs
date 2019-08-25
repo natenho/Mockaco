@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,21 +23,22 @@ namespace Mockaco
             IMockacoContext mockacoContext,
             IScriptContext scriptContext,
             IMockProvider mockProvider,
-            ITemplateTransformer templateTransformer
+            ITemplateTransformer templateTransformer,
+            IEnumerable<IRequestMatcher> requestMatchers
             )
         {
             LogHttpContext(httpContext);
 
             AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
 
-            if(mockacoContext.Errors.Any())
+            if (mockacoContext.Errors.Any())
             {
                 return;
-            }                       
+            }
 
             foreach (var mock in mockProvider.GetMocks())
             {
-                if (RequestMatchesMock(httpContext.Request, mock))
+                if (requestMatchers.All(_ => _.IsMatch(httpContext.Request, mock)))
                 {
                     scriptContext.AttachRouteParameters(httpContext.Request, mock);
 
@@ -103,30 +105,6 @@ namespace Mockaco
             {
                 _logger.LogDebug("Body: {body}", body);
             }
-        }
-
-        private static bool RequestMatchesMock(HttpRequest request, Mock mock)
-        {
-            if (!string.IsNullOrWhiteSpace(mock.Method))
-            {
-                var methodIsMatch = request.Method.Equals(mock.Method, StringComparison.InvariantCultureIgnoreCase);
-                if (!methodIsMatch)
-                {
-                    return false;
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(mock.Route))
-            {
-                var routeMatcher = new RouteMatcher();
-                var routeIsMatch = routeMatcher.IsMatch(mock.Route, request.Path);
-                if (!routeIsMatch)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

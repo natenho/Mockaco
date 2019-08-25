@@ -50,9 +50,9 @@ namespace Mockaco
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _bodyAsJson);
         }
 
-        public void AttachRouteParameters(HttpRequest httpRequest, Mock route)
+        public void AttachRouteParameters(HttpRequest httpRequest, Mock mock)
         {
-            _routeDictionary = httpRequest.GetRouteData(route)
+            _routeDictionary = httpRequest.GetRouteData(mock)
                 .ToStringDictionary(k => k.Key, v => v.Value.ToString());
 
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _bodyAsJson);

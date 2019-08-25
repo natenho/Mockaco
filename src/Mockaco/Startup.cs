@@ -30,6 +30,9 @@ namespace Mockaco
                 .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
 
+                .AddTransient<IRequestMatcher, RequestMethodMatcher>()
+                .AddTransient<IRequestMatcher, RequestRouteMatcher>()
+
                 .AddTransient<IRequestBodyFactory, RequestBodyFactory>()
 
                 .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
