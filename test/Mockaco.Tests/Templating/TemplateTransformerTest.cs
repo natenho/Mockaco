@@ -1,7 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Mockaco.Templating;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
