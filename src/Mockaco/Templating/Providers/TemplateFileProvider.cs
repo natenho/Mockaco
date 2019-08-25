@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using MAB.DotIgnore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Polly;
@@ -16,6 +18,7 @@ namespace Mockaco
     {
         public event EventHandler OnChange;
 
+        private const string MockIgnoreFileName = ".mockignore";
         private const string DefaultTemplateFolder = "Mocks";
         private const string DefaultTemplateSearchPattern = "*.json";
 
@@ -30,14 +33,13 @@ namespace Mockaco
 
         private readonly ILogger<TemplateFileProvider> _logger;
         private readonly PhysicalFileProvider _fileProvider;
-        private readonly IMemoryCache _memoryCache;
-        private IChangeToken _fileChangeToken;
+        private readonly IMemoryCache _memoryCache;        
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
         {
             _memoryCache = memoryCache;
-            _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
+            _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory(), ExclusionFilters.Hidden | ExclusionFilters.System);
             _logger = logger;
 
             KeepWatchingForFileChanges();
@@ -45,8 +47,11 @@ namespace Mockaco
 
         private void KeepWatchingForFileChanges()
         {
-            _fileChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");
-            _fileChangeToken.RegisterChangeCallback(TemplateFileModified, default);
+            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");            
+            jsonChangeToken.RegisterChangeCallback(TemplateFileModified, default);
+
+            var mockIgnoreChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/*{MockIgnoreFileName}");
+            mockIgnoreChangeToken.RegisterChangeCallback(TemplateFileModified, default);
         }
 
         private void TemplateFileModified(object state)
@@ -79,13 +84,19 @@ namespace Mockaco
             _logger.LogDebug("Cache invalidated because of {reason}", reason);
         }
 
-        private static IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
+        private IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
         {
             var directory = new DirectoryInfo(DefaultTemplateFolder);
 
             foreach (var file in directory.GetFiles(DefaultTemplateSearchPattern, SearchOption.AllDirectories)
-                .OrderBy(f => f.FullName))
-            {
+                                .OrderBy(f => f.FullName))
+            {                
+                if(ShouldIgnoreFile(file))
+                {
+                    _logger.LogDebug("{filePath} ignored using a {MockIgnoreFileName} file", Path.GetRelativePath(DefaultTemplateFolder, file.FullName), MockIgnoreFileName);
+                    continue;
+                }
+
                 var name = Path.GetRelativePath(directory.FullName, file.FullName);
                 var rawContent = string.Empty;
 
@@ -102,6 +113,25 @@ namespace Mockaco
             }
         }
 
+        private static bool ShouldIgnoreFile(FileInfo file)
+        {
+            var mockIgnorePath = Path.Combine(file.DirectoryName, MockIgnoreFileName);
+
+            if (!File.Exists(mockIgnorePath))
+            {
+                return false;
+            }
+
+            IgnoreList ignores = default;
+
+            _retryPolicy.Execute(() =>
+            {
+                ignores = new IgnoreList(mockIgnorePath);
+            });
+                        
+            return ignores.IsIgnored(file);
+        }
+
         private void FlushCache()
         {
             if (_resetCacheToken?.IsCancellationRequested == false && _resetCacheToken.Token.CanBeCanceled)
@@ -115,7 +145,7 @@ namespace Mockaco
 
         public void Dispose()
         {
-            _fileProvider.Dispose();
+            _fileProvider.Dispose();            
         }
     }
 }
