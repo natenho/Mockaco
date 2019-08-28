@@ -5,9 +5,9 @@ namespace Mockaco.Tests.Templating
 {
     public class DefaultResponseBodyStrategyTest
     {
-        private DefaultResponseBodyStrategy _strategy;
-        private ResponseTemplate _defaulResponseTemplate;
-        private ResponseTemplate _responseTemplateWithContentType;
+        private readonly DefaultResponseBodyStrategy _strategy;
+        private readonly ResponseTemplate _defaulResponseTemplate;
+        private readonly ResponseTemplate _responseTemplateWithContentType;
 
         public DefaultResponseBodyStrategyTest()
         {
@@ -23,14 +23,16 @@ namespace Mockaco.Tests.Templating
         public void Can_Handle_Response_Template_With_Default_Properties()
         {
             _strategy.CanHandle(_defaulResponseTemplate)
-                .Should().BeTrue();
+                .Should()
+                .BeTrue();
         }
 
         [Fact]
         public void Can_Handle_Response_Template_With_Content_Type()
         {
             _strategy.CanHandle(_responseTemplateWithContentType)
-                .Should().BeTrue();
+                .Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -38,8 +40,19 @@ namespace Mockaco.Tests.Templating
         {
             var response = _strategy.GetResponseBodyStringFromTemplate(_defaulResponseTemplate);
 
-            response
-                .Should().BeNull();
+            response.Should()
+                .BeNull();
+        }
+
+        [Fact]
+        public void Returns_Null_For_Null_Body()
+        {
+            var nullBodyResponseTemplate = new ResponseTemplate { Body = null };
+
+            var response = _strategy.GetResponseBodyStringFromTemplate(nullBodyResponseTemplate);
+
+            response.Should()
+                .BeNull();
         }
     }
 }

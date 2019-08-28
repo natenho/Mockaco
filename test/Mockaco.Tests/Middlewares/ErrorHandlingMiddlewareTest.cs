@@ -22,7 +22,7 @@ namespace Mockaco.Tests.Middlewares
 
         public ErrorHandlingMiddlewareTest()
         {
-            _next = Moq.Mock.Of<RequestDelegate>();            
+            _next = Moq.Mock.Of<RequestDelegate>();
             _statusCodeOptions = Moq.Mock.Of<IOptionsSnapshot<MockacoOptions>>(o => o.Value == new MockacoOptions());
             _mockProvider = Moq.Mock.Of<IMockProvider>();
             _logger = Moq.Mock.Of<ILogger<ErrorHandlingMiddleware>>();
@@ -36,26 +36,24 @@ namespace Mockaco.Tests.Middlewares
             var httpContext = CreateHttpResponseMock(() => written = true);
 
             Moq.Mock.Get(_next).Setup(n => n.Invoke(It.IsAny<HttpContext>())).ThrowsAsync(new InvalidOperationException("Any error"));
-                        
+
             var mockacoContext = Moq.Mock.Of<IMockacoContext>(c => c.Errors == new List<Error>());
-                       
+
             await _middleware.Invoke(httpContext, mockacoContext, _statusCodeOptions, _mockProvider, _logger);
 
-            Moq.Mock.Verify();
             written.Should().BeTrue();
-        }     
+        }
 
         [Fact]
         public async Task Writes_Mockaco_Context_Errors_To_Response_Body()
         {
             var written = false;
-            var httpContext = CreateHttpResponseMock(() => written = true);        
-                        
-            var mockacoContext = Moq.Mock.Of<IMockacoContext>(c => c.Errors == new List<Error>() { new Error("any message") });
-            
+            var httpContext = CreateHttpResponseMock(() => written = true);
+
+            var mockacoContext = Moq.Mock.Of<IMockacoContext>(c => c.Errors == new List<Error> { new Error("any message") });
+
             await _middleware.Invoke(httpContext, mockacoContext, _statusCodeOptions, _mockProvider, _logger);
 
-            Moq.Mock.Verify();
             written.Should().BeTrue();
         }
 
@@ -63,17 +61,17 @@ namespace Mockaco.Tests.Middlewares
         public async Task Includes_MockProvider_Errors_To_Response_Body_When_Any_Error_Occurs()
         {
             var written = false;
-            var providerMessage = "any provider message";
+            const string providerMessage = "any provider message";
             var httpContext = CreateHttpResponseMock(() => written = true);
 
             Moq.Mock.Get(_mockProvider).Setup(m => m.GetErrors()).Returns(new[] { ("any/mock", providerMessage) }).Verifiable();
 
-            var errors = new List<Error>() { new Error("any message") };
+            var errors = new List<Error> { new Error("any message") };
             var mockacoContext = Moq.Mock.Of<IMockacoContext>(c => c.Errors == errors);
 
             await _middleware.Invoke(httpContext, mockacoContext, _statusCodeOptions, _mockProvider, _logger);
 
-            Moq.Mock.Verify();
+            Moq.Mock.Verify(Moq.Mock.Get(_mockProvider));
             written.Should().BeTrue();
             errors.Should().HaveCount(2);
             errors.Any(e => e.Message.Contains(providerMessage)).Should().BeTrue();
@@ -81,14 +79,12 @@ namespace Mockaco.Tests.Middlewares
 
         private static HttpContext CreateHttpResponseMock(Action writeAsyncCallback)
         {
-            var httpResponse = new Moq.Mock<HttpResponse>();
+            var httpResponse = new Mock<HttpResponse>();
             httpResponse
                 .Setup(r => r.Body.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .Callback((byte[] data, int offset, int length, CancellationToken token) => writeAsyncCallback.Invoke());
+                .Callback((byte[] _, int __, int ___, CancellationToken ____) => writeAsyncCallback.Invoke());
 
-            var httpContext = Moq.Mock.Of<HttpContext>(c => c.Response == httpResponse.Object);
-
-            return httpContext;
+            return Moq.Mock.Of<HttpContext>(c => c.Response == httpResponse.Object);
         }
     }
 }

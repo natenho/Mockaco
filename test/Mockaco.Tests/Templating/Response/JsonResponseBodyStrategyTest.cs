@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using FluentAssertions;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
-using FluentAssertions;
 
 namespace Mockaco.Tests.Templating
 {
@@ -13,24 +9,22 @@ namespace Mockaco.Tests.Templating
         private const string UnindentedValidJson = "{\"property1\":\"property1Value\"}";
         private const string IndentedValidJson = "{\r\n  \"property1\": \"property1Value\"\r\n}";
 
-        private JsonResponseBodyStrategy _strategy;
-        private ResponseTemplate _validJsonResponseTemplate;
+        private readonly JsonResponseBodyStrategy _strategy;
+        private readonly ResponseTemplate _validJsonResponseTemplate;
 
         public JsonResponseBodyStrategyTest()
         {
             _strategy = new JsonResponseBodyStrategy();
 
-            _validJsonResponseTemplate = new ResponseTemplate
-            {
-                Body = JToken.Parse(UnindentedValidJson)
-            };
+            _validJsonResponseTemplate = new ResponseTemplate { Body = JToken.Parse(UnindentedValidJson) };
         }
 
         [Fact]
         public void Can_Handle_Valid_Json_Response_Body_By_Default()
         {
             _strategy.CanHandle(_validJsonResponseTemplate)
-                .Should().BeTrue();
+                .Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -39,7 +33,8 @@ namespace Mockaco.Tests.Templating
             _validJsonResponseTemplate.Headers.Add(HttpHeaders.ContentType, HttpContentTypes.ApplicationJson);
 
             _strategy.CanHandle(_validJsonResponseTemplate)
-                .Should().BeTrue();
+                .Should()
+                .BeTrue();
         }
 
         [Fact]
@@ -48,7 +43,8 @@ namespace Mockaco.Tests.Templating
             _validJsonResponseTemplate.Headers.Add(HttpHeaders.ContentType, "any/content-type");
 
             _strategy.CanHandle(_validJsonResponseTemplate)
-                .Should().BeFalse();
+                .Should()
+                .BeFalse();
         }
 
         [Fact]
@@ -58,8 +54,8 @@ namespace Mockaco.Tests.Templating
 
             var response = _strategy.GetResponseBodyStringFromTemplate(_validJsonResponseTemplate);
 
-            response
-                .Should().Be(UnindentedValidJson);
+            response.Should()
+                .Be(UnindentedValidJson);
         }
 
         [Fact]
@@ -69,8 +65,8 @@ namespace Mockaco.Tests.Templating
 
             var response = _strategy.GetResponseBodyStringFromTemplate(_validJsonResponseTemplate);
 
-            response
-                .Should().Be(IndentedValidJson);
+            response.Should()
+                .Be(IndentedValidJson);
         }
 
         [Fact]
@@ -78,8 +74,19 @@ namespace Mockaco.Tests.Templating
         {
             var response = _strategy.GetResponseBodyStringFromTemplate(_validJsonResponseTemplate);
 
-            response
-                .Should().Be(IndentedValidJson);
+            response.Should()
+                .Be(IndentedValidJson);
+        }
+
+        [Fact]
+        public void Returns_Null_For_Null_Body()
+        {
+            var nullBodyResponseTemplate = new ResponseTemplate { Body = null };
+
+            var response = _strategy.GetResponseBodyStringFromTemplate(nullBodyResponseTemplate);
+
+            response.Should()
+                .BeNull();
         }
     }
 }

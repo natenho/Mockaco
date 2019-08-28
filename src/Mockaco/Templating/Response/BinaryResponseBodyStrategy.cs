@@ -24,9 +24,14 @@ namespace Mockaco
 
         public async Task<byte[]> GetResponseBodyBytesFromTemplate(ResponseTemplate responseTemplate)
         {
+            if (string.IsNullOrEmpty(responseTemplate.File) && string.IsNullOrEmpty(responseTemplate.Body?.ToString()))
+            {
+                return default;
+            }
+
             if (string.IsNullOrEmpty(responseTemplate.File))
             {
-                return Encoding.UTF8.GetBytes(responseTemplate.Body?.ToString());
+                return Encoding.UTF8.GetBytes(responseTemplate.Body.ToString());
             }
 
             if (string.IsNullOrEmpty(responseTemplate.Body?.ToString()))
@@ -54,4 +59,3 @@ namespace Mockaco
         }
     }
 }
-

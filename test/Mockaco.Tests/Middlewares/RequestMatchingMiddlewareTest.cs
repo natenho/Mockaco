@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,15 +13,13 @@ namespace Mockaco.Tests.Middlewares
 {
     public class RequestMatchingMiddlewareTest
     {
-        private readonly ILogger<RequestMatchingMiddleware> _logger;
         private readonly RequestMatchingMiddleware _middleware;
-        private readonly RequestDelegate _next;
 
         public RequestMatchingMiddlewareTest()
         {
-            _next = Moq.Mock.Of<RequestDelegate>();
-            _logger = Moq.Mock.Of<ILogger<RequestMatchingMiddleware>>();
-            _middleware = new RequestMatchingMiddleware(_next, _logger);
+            var next = Moq.Mock.Of<RequestDelegate>();
+            var logger = Moq.Mock.Of<ILogger<RequestMatchingMiddleware>>();
+            _middleware = new RequestMatchingMiddleware(next, logger);
         }
 
         [Fact]
@@ -32,7 +29,7 @@ namespace Mockaco.Tests.Middlewares
             var expectedBody = Encoding.UTF8.GetBytes("TestBodyData");
 
             var httpRequest = new Moq.Mock<HttpRequest>();
-            httpRequest.Setup(h => h.Scheme).Returns(expectedUri.Scheme.ToString());
+            httpRequest.Setup(h => h.Scheme).Returns(expectedUri.Scheme);
             httpRequest.Setup(h => h.Host).Returns(new HostString(expectedUri.Host));
             httpRequest.Setup(h => h.Query).Returns(new QueryCollection());
             httpRequest.Setup(h => h.Headers).Returns(new HeaderDictionary());
@@ -54,10 +51,9 @@ namespace Mockaco.Tests.Middlewares
                 var requestMatchers = Moq.Mock.Of<IEnumerable<IRequestMatcher>>();
 
                 await _middleware.Invoke(httpContext, mockacoContext, scriptContext.Object, mockProvider.Object, templateTransformer, requestMatchers);
-            }
-            
-            Moq.Mock.Verify();            
-        }
 
+                Moq.Mock.Verify(scriptContext);
+            }
+        }
     }
 }
