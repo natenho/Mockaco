@@ -9,7 +9,9 @@ namespace Mockaco
 
         public Task<byte[]> GetResponseBodyBytesFromTemplate(ResponseTemplate responseTemplate)
         {
-            return Task.FromResult(Encoding.UTF8.GetBytes(GetResponseBodyStringFromTemplate(responseTemplate)));
+            var responseBodyStringFromTemplate = GetResponseBodyStringFromTemplate(responseTemplate);
+
+            return Task.FromResult(responseBodyStringFromTemplate == default ? default : Encoding.UTF8.GetBytes(responseBodyStringFromTemplate));
         }
 
         public abstract string GetResponseBodyStringFromTemplate(ResponseTemplate responseTemplate);

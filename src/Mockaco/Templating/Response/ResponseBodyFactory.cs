@@ -17,7 +17,7 @@ namespace Mockaco
         {
             var selectedStrategy = _strategies.FirstOrDefault(_ => _.CanHandle(responseTemplate));
 
-            return selectedStrategy.GetResponseBodyBytesFromTemplate(responseTemplate);
+            return selectedStrategy != null ? selectedStrategy.GetResponseBodyBytesFromTemplate(responseTemplate) : Task.FromResult<byte[]>(null);
         }
     }
 }

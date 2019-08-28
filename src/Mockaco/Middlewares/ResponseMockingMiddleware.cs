@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -39,6 +38,11 @@ namespace Mockaco
             AddHeadersFromTemplate(httpResponse, transformedTemplate.Response, options);
 
             var bodyBytes = await responseBodyFactory.GetResponseBodyBytesFromTemplate(transformedTemplate.Response);
+
+            if (bodyBytes == default)
+            {
+                return;
+            }
 
             await httpResponse.Body.WriteAsync(bodyBytes, 0, bodyBytes.Length, default);
         }
