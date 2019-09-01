@@ -2,6 +2,8 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Polly;
+using Polly.Retry;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +15,18 @@ namespace Mockaco
     public sealed class TemplateFileProvider : ITemplateProvider, IDisposable
     {
         public event EventHandler OnChange;
+
+        private const string DefaultTemplateFolder = "Mocks";
+        private const string DefaultTemplateSearchPattern = "*.json";
+
+        private static readonly RetryPolicy _retryPolicy = Policy
+            .Handle<IOException>()
+            .WaitAndRetry(new[] 
+            {
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(3)
+            });
 
         private readonly ILogger<TemplateFileProvider> _logger;
         private readonly PhysicalFileProvider _fileProvider;
@@ -26,12 +40,12 @@ namespace Mockaco
             _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             _logger = logger;
 
-            KeepWatchingForFileChanges();            
+            KeepWatchingForFileChanges();
         }
 
         private void KeepWatchingForFileChanges()
         {
-            _fileChangeToken = _fileProvider.Watch("Mocks/**/*.json");
+            _fileChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");
             _fileChangeToken.RegisterChangeCallback(TemplateFileModified, default);
         }
 
@@ -67,14 +81,22 @@ namespace Mockaco
 
         private static IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
         {
-            var directory = new DirectoryInfo("Mocks");
+            var directory = new DirectoryInfo(DefaultTemplateFolder);
 
-            foreach (var file in directory.GetFiles("*.json", SearchOption.AllDirectories)
+            foreach (var file in directory.GetFiles(DefaultTemplateSearchPattern, SearchOption.AllDirectories)
                 .OrderBy(f => f.FullName))
             {
                 var name = Path.GetRelativePath(directory.FullName, file.FullName);
+                var rawContent = string.Empty;
 
-                var rawContent = File.ReadAllText(file.FullName);
+                _retryPolicy.Execute(() =>
+                {
+                    using (var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var streamReader = new StreamReader(stream))
+                    {
+                        rawContent = streamReader.ReadToEnd();
+                    }
+                });
 
                 yield return new RawTemplate(name, rawContent);
             }
