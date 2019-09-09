@@ -44,7 +44,7 @@ namespace Mockaco
 
                     var template = await templateTransformer.Transform(mock.RawTemplate, scriptContext);
 
-                    var conditionIsMatch = template.Request.Condition ?? true;
+                    var conditionIsMatch = template.Request?.Condition ?? true;
 
                     if (conditionIsMatch)
                     {

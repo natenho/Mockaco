@@ -4,17 +4,18 @@ namespace Mockaco
 {
     public class RequestRouteMatcher : IRequestMatcher
     {
+        private const string DefaultRoute = "/";
+
         public bool IsMatch(HttpRequest httpRequest, Mock mock)
         {
+            var routeMatcher = new RouteMatcher();
+
             if (string.IsNullOrWhiteSpace(mock?.Route))
             {
-                return false;
+                return routeMatcher.IsMatch(DefaultRoute, httpRequest.Path);
             }
 
-            var routeMatcher = new RouteMatcher();
-            var isMatch = routeMatcher.IsMatch(mock.Route, httpRequest.Path);
-
-            return isMatch;
+            return routeMatcher.IsMatch(mock.Route, httpRequest.Path);
         }
     }
 }

@@ -20,12 +20,13 @@ namespace Mockaco
 
             await _next(httpContext);
 
-            if(mockacoContext.TransformedTemplate == null)
+            var transformedTemplate = mockacoContext.TransformedTemplate;
+            if (transformedTemplate == default)
             {
                 return;
             }
 
-            int responseDelay = mockacoContext.TransformedTemplate.Response.Delay.GetValueOrDefault();
+            int responseDelay = transformedTemplate.Response?.Delay.GetValueOrDefault() ?? 0; 
 
             stopwatch.Stop();
 

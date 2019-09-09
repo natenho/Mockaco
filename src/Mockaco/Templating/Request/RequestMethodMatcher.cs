@@ -9,7 +9,7 @@ namespace Mockaco
         {
             if (string.IsNullOrWhiteSpace(mock?.Method))
             {
-                return false;
+                return httpRequest.Method == HttpMethods.Get;
             }
 
             var isMatch = httpRequest.Method.Equals(mock.Method, StringComparison.InvariantCultureIgnoreCase);

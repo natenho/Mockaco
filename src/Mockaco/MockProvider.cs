@@ -82,10 +82,11 @@ namespace Mockaco
                     _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
                     var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
+                    var mock = CreateMock(rawTemplate, template.Request);
 
-                    mocks.Add(new Mock(template.Request.Method, template.Request.Route, rawTemplate, template.Request.Condition.HasValue));
+                    mocks.Add(mock);
 
-                    _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request.Method, template.Request.Route);
+                    _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request?.Method, template.Request?.Route);
                 }
                 catch (JsonReaderException ex)
                 {
@@ -112,6 +113,11 @@ namespace Mockaco
             _cache = mocks.OrderByDescending(r => r.HasCondition).ToList();
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
+        }
+
+        private static Mock CreateMock(IRawTemplate rawTemplate, RequestTemplate requestTemplate)
+        {
+            return new Mock(requestTemplate?.Method, requestTemplate?.Route, rawTemplate, requestTemplate?.Condition != default);
         }
     }
 }

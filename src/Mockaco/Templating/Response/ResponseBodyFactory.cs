@@ -15,9 +15,14 @@ namespace Mockaco
 
         public Task<byte[]> GetResponseBodyBytesFromTemplate(ResponseTemplate responseTemplate)
         {
+            if (responseTemplate == default)
+            {
+                return Task.FromResult<byte[]>(default);
+            }
+
             var selectedStrategy = _strategies.FirstOrDefault(_ => _.CanHandle(responseTemplate));
 
-            return selectedStrategy != null ? selectedStrategy.GetResponseBodyBytesFromTemplate(responseTemplate) : Task.FromResult<byte[]>(null);
+            return selectedStrategy != null ? selectedStrategy.GetResponseBodyBytesFromTemplate(responseTemplate) : Task.FromResult<byte[]>(default);
         }
     }
 }

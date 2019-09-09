@@ -49,14 +49,14 @@ namespace Mockaco
 
         private int GetResponseStatusFromTemplate(ResponseTemplate responseTemplate, MockacoOptions options)
         {
-            return responseTemplate.Status == default
+            return responseTemplate?.Status == default
                             ? (int)options.DefaultHttpStatusCode
                             : (int)responseTemplate.Status;
         }
 
         private void AddHeadersFromTemplate(HttpResponse response, ResponseTemplate responseTemplate, MockacoOptions options)
         {
-            if (responseTemplate.Headers != null)
+            if (responseTemplate?.Headers != null)
             {
                 foreach (var header in responseTemplate.Headers)
                 {

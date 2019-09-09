@@ -60,7 +60,7 @@ namespace Mockaco
 
         public void AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate)
         {
-            Response = new ScriptContextResponse(httpResponse.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString()), responseTemplate.Body);
+            Response = new ScriptContextResponse(httpResponse.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString()), responseTemplate?.Body);
         }
     }
 }
