@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -7,6 +8,6 @@ namespace Mockaco
     {
         event EventHandler OnChange;
 
-        IEnumerable<IRawTemplate> GetTemplates();
+        Task<IEnumerable<RawTemplate>> GetTemplates();
     }
 }

@@ -4,13 +4,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco", "src\Mockaco\Mockaco.csproj", "{8BAA1EC5-0BF5-4DA2-87F7-ED0C7B652517}"
+	ProjectSection(ProjectDependencies) = postProject
+		{49949D5C-4511-47DB-9717-775D4AB0E5E4} = {49949D5C-4511-47DB-9717-775D4AB0E5E4}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3F7B6722-59F1-4943-8D45-94D42CE49639}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mockaco.Tests", "test\Mockaco.Tests\Mockaco.Tests.csproj", "{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Tests", "test\Mockaco.Tests\Mockaco.Tests.csproj", "{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Extensions.FileTemplateProvider", "src\Mockaco.Extensions.FileTemplateProvider\Mockaco.Extensions.FileTemplateProvider.csproj", "{49949D5C-4511-47DB-9717-775D4AB0E5E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Sdk", "src\Mockaco.Sdk\Mockaco.Sdk.csproj", "{20A4F40A-0903-4068-971B-D826704BC457}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +33,14 @@ Global
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49949D5C-4511-47DB-9717-775D4AB0E5E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49949D5C-4511-47DB-9717-775D4AB0E5E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49949D5C-4511-47DB-9717-775D4AB0E5E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49949D5C-4511-47DB-9717-775D4AB0E5E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20A4F40A-0903-4068-971B-D826704BC457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20A4F40A-0903-4068-971B-D826704BC457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20A4F40A-0903-4068-971B-D826704BC457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20A4F40A-0903-4068-971B-D826704BC457}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

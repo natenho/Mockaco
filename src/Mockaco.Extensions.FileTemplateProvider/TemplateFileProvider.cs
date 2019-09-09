@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -24,7 +25,7 @@ namespace Mockaco
 
         private static readonly RetryPolicy _retryPolicy = Policy
             .Handle<IOException>()
-            .WaitAndRetry(new[] 
+            .WaitAndRetry(new[]
             {
                 TimeSpan.FromSeconds(1),
                 TimeSpan.FromSeconds(2),
@@ -33,7 +34,7 @@ namespace Mockaco
 
         private readonly ILogger<TemplateFileProvider> _logger;
         private readonly PhysicalFileProvider _fileProvider;
-        private readonly IMemoryCache _memoryCache;        
+        private readonly IMemoryCache _memoryCache;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
@@ -47,7 +48,7 @@ namespace Mockaco
 
         private void KeepWatchingForFileChanges()
         {
-            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");            
+            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");
             jsonChangeToken.RegisterChangeCallback(TemplateFileModified, default);
 
             var mockIgnoreChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/*{MockIgnoreFileName}");
@@ -66,9 +67,9 @@ namespace Mockaco
             KeepWatchingForFileChanges();
         }
 
-        public IEnumerable<IRawTemplate> GetTemplates()
+        public Task<IEnumerable<RawTemplate>> GetTemplates()
         {
-            return _memoryCache.GetOrCreate(
+            return Task.FromResult(_memoryCache.GetOrCreate(
                 nameof(TemplateFileProvider),
                 e =>
                 {
@@ -76,7 +77,7 @@ namespace Mockaco
                     e.AddExpirationToken(new CancellationChangeToken(_resetCacheToken.Token));
 
                     return LoadTemplatesFromDirectory();
-                });
+                }));
         }
 
         private void PostEvictionCallback(object key, object value, EvictionReason reason, object state)
@@ -84,14 +85,14 @@ namespace Mockaco
             _logger.LogDebug("Cache invalidated because of {reason}", reason);
         }
 
-        private IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
+        private IEnumerable<RawTemplate> LoadTemplatesFromDirectory()
         {
             var directory = new DirectoryInfo(DefaultTemplateFolder);
 
             foreach (var file in directory.GetFiles(DefaultTemplateSearchPattern, SearchOption.AllDirectories)
                                 .OrderBy(f => f.FullName))
-            {                
-                if(ShouldIgnoreFile(file))
+            {
+                if (ShouldIgnoreFile(file))
                 {
                     _logger.LogDebug("{filePath} ignored using a {MockIgnoreFileName} file", Path.GetRelativePath(DefaultTemplateFolder, file.FullName), MockIgnoreFileName);
                     continue;
@@ -128,7 +129,7 @@ namespace Mockaco
             {
                 ignores = new IgnoreList(mockIgnorePath);
             });
-                        
+
             return ignores.IsIgnored(file);
         }
 
@@ -145,7 +146,7 @@ namespace Mockaco
 
         public void Dispose()
         {
-            _fileProvider.Dispose();            
+            _fileProvider.Dispose();
         }
     }
 }

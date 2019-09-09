@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Mockaco
 {
     [DebuggerDisplay("{Name}")]
-    public class RawTemplate : IRawTemplate
+    public class RawTemplate 
     {
         public string Name { get; }
 

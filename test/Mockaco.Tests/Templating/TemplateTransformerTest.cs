@@ -16,7 +16,7 @@ namespace Mockaco.Tests.Templating
         {
             var templateTransformer = new TemplateTransformer(Moq.Mock.Of<IScriptRunnerFactory>(), Moq.Mock.Of<ILogger<TemplateTransformer>>());
 
-            var rawTemplate = Moq.Mock.Of<IRawTemplate>(t => t.Content == content);
+            var rawTemplate = Moq.Mock.Of<RawTemplate>(t => t.Content == content);
             var scriptContext = Moq.Mock.Of<IScriptContext>();
 
             var transformedTemplate = await templateTransformer.Transform(rawTemplate, scriptContext);
@@ -28,7 +28,7 @@ namespace Mockaco.Tests.Templating
         [TextFileData("Templating/Transforms_Scripted_Json_Template.json")]
         public async Task Transforms_Scripted_Json_Template(string content)
         {
-            var rawTemplate = Moq.Mock.Of<IRawTemplate>(t => t.Content == content);
+            var rawTemplate = Moq.Mock.Of<RawTemplate>(t => t.Content == content);
             var scriptContext = Moq.Mock.Of<IScriptContext>();
 
             var scriptRunnerFactory = Moq.Mock.Of<IScriptRunnerFactory>(f =>

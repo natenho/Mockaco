@@ -12,25 +12,29 @@ namespace Mockaco
     public class MockProvider : IMockProvider
     {
         private List<Mock> _cache;
-        private readonly List<(string TemplateName, string ErrorMessage)> _errors = new List<(string TemplateName, string Error)>();        
+        private readonly List<(string TemplateName, string ErrorMessage)> _errors = new List<(string TemplateName, string Error)>();
         private readonly IFakerFactory _fakerFactory;
         private readonly IRequestBodyFactory _requestBodyFactory;
-        private readonly ITemplateProvider _templateProvider;
+        private readonly IEnumerable<ITemplateProvider> _templateProviders;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly ILogger<MockProvider> _logger;
 
         public MockProvider
-            (IFakerFactory fakerFactory, 
-            IRequestBodyFactory requestBodyFactory, 
-            ITemplateProvider templateProvider, 
-            ITemplateTransformer templateTransformer, 
+            (IFakerFactory fakerFactory,
+            IRequestBodyFactory requestBodyFactory,
+            IEnumerable<ITemplateProvider> templateProviders,
+            ITemplateTransformer templateTransformer,
             ILogger<MockProvider> logger)
         {
             _cache = new List<Mock>();
             _fakerFactory = fakerFactory;
             _requestBodyFactory = requestBodyFactory;
-            _templateProvider = templateProvider;
-            _templateProvider.OnChange += TemplateProviderChange;
+            _templateProviders = templateProviders;
+
+            foreach (var templateProvider in _templateProviders)
+            {
+                templateProvider.OnChange += TemplateProviderChange;
+            }
 
             _templateTransformer = templateTransformer;
 
@@ -55,6 +59,11 @@ namespace Mockaco
 
         public async Task WarmUp()
         {
+            if (!_templateProviders.Any())
+            {
+                _logger.LogWarning("Unable to load any mock because there is no template provider plugin available");
+            }
+
             var stopwatch = Stopwatch.StartNew();
 
             var nullScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory);
@@ -64,22 +73,23 @@ namespace Mockaco
 
             _errors.Clear();
 
-            foreach (var rawTemplate in _templateProvider.GetTemplates())
-            {
-                try
+            foreach (var templateProvider in _templateProviders)
+                foreach (var rawTemplate in await templateProvider.GetTemplates())
                 {
-                    var existentCachedRoute = _cache.FirstOrDefault(cachedRoute => cachedRoute.RawTemplate.Hash == rawTemplate.Hash);
-
-                    if (existentCachedRoute != default)
+                    try
                     {
-                        _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                        var existentCachedRoute = _cache.FirstOrDefault(cachedRoute => cachedRoute.RawTemplate.Hash == rawTemplate.Hash);
 
-                        mocks.Add(existentCachedRoute);
+                        if (existentCachedRoute != default)
+                        {
+                            _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
-                        continue;
-                    }
+                            mocks.Add(existentCachedRoute);
 
-                    _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                            continue;
+                        }
+
+                        _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
                     var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
 
@@ -97,21 +107,26 @@ namespace Mockaco
                 {
                     _errors.Add((rawTemplate.Name, $"Script parser error - {ex.Message} {ex.Location}"));
 
-                    _logger.LogWarning("Skipping {0}: Script parser error - {1} {2} ", rawTemplate.Name, ex.Message, ex.Location);
-                }
-                catch (Exception ex)
-                {
-                    _errors.Add((rawTemplate.Name, ex.Message));
+                        _logger.LogWarning("Skipping {0}: Script parser error - {1} {2} ", rawTemplate.Name, ex.Message, ex.Location);
+                    }
+                    catch (Exception ex)
+                    {
+                        _errors.Add((rawTemplate.Name, ex.Message));
 
-                    _logger.LogWarning("Skipping {0}: {1}", rawTemplate.Name, ex.Message);
+                        _logger.LogWarning("Skipping {0}: {1}", rawTemplate.Name, ex.Message);
+                    }
                 }
-            }
 
             _cache.Clear();
 
             _cache = mocks.OrderByDescending(r => r.HasCondition).ToList();
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
+        }
+
+        private static Mock CreateMock(RawTemplate rawTemplate, RequestTemplate requestTemplate)
+        {
+            return new Mock(requestTemplate?.Method, requestTemplate?.Route, rawTemplate, requestTemplate?.Condition != default);
         }
     }
 }

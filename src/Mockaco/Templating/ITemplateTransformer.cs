@@ -4,6 +4,6 @@ namespace Mockaco
 {
     public interface ITemplateTransformer
     {
-        Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext);
+        Task<Template> Transform(RawTemplate rawTemplate, IScriptContext scriptContext);
     }
 }

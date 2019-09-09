@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Mockaco
 {
     public partial class Startup
     {
         private readonly IConfiguration _configuration;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
+            _loggerFactory = loggerFactory;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -28,7 +32,12 @@ namespace Mockaco
 
                 .AddSingleton<IFakerFactory, LocalizedFakerFactory>()
                 .AddSingleton<IMockProvider, MockProvider>()
-                .AddSingleton<ITemplateProvider, TemplateFileProvider>()
+
+                .Scan(scan => scan
+                    .FromPluginAssemblies(_loggerFactory)                    
+                    .AddClassesAssignableTo<ITemplateProvider>()
+                    .AsImplementedInterfaces()
+                    .WithSingletonLifetime())
 
                 .AddTransient<IRequestMatcher, RequestMethodMatcher>()
                 .AddTransient<IRequestMatcher, RequestRouteMatcher>()
@@ -45,7 +54,7 @@ namespace Mockaco
                 .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
-                
+
                 .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 

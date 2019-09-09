@@ -18,7 +18,7 @@ namespace Mockaco
             _logger = logger;
         }
 
-        public async Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext)
+        public async Task<Template> Transform(RawTemplate rawTemplate, IScriptContext scriptContext)
         {
             var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
 

@@ -35,7 +35,7 @@ namespace Mockaco
             {
                 return;
             }
-
+            
             foreach (var mock in mockProvider.GetMocks())
             {
                 if (requestMatchers.All(_ => _.IsMatch(httpContext.Request, mock)))
