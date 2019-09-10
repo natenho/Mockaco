@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -25,13 +26,13 @@ namespace Mockaco
         }
 
         public Task Invoke(
-            HttpContext httpContext, 
-            IMockacoContext mockacoContext, 
-            IScriptContext scriptContext, 
-            ITemplateTransformer templateTransformer, 
+            HttpContext httpContext,
+            IMockacoContext mockacoContext,
+            IScriptContext scriptContext,
+            ITemplateTransformer templateTransformer,
             IOptionsSnapshot<MockacoOptions> options)
         {
-            if (mockacoContext.TransformedTemplate?.Callback == null)
+            if (mockacoContext.TransformedTemplate?.Callbacks?.Any() != true)
             {
                 return Task.CompletedTask;
             }
@@ -39,17 +40,18 @@ namespace Mockaco
             httpContext.Response.OnCompleted(
                 () =>
                 {
-                    var fireAndForgetTask = PerformCallback(httpContext, mockacoContext, scriptContext, templateTransformer, options.Value);
+                    //TODO Refactor to avoid method with too many parameters (maybe a CallbackRunnerFactory?)
+                    var fireAndForgetTask = PerformCallbacks(httpContext, mockacoContext, scriptContext, templateTransformer, options.Value);
                     return Task.CompletedTask;
                 });
 
             return Task.CompletedTask;
         }
-
-        private async Task PerformCallback(
-            HttpContext httpContext, 
-            IMockacoContext mockacoContext, 
-            IScriptContext scriptContext, 
+        
+        private async Task PerformCallbacks(
+            HttpContext httpContext,
+            IMockacoContext mockacoContext,
+            IScriptContext scriptContext,
             ITemplateTransformer templateTransformer,
             MockacoOptions options)
         {
@@ -57,15 +59,34 @@ namespace Mockaco
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                var callbackTemplate = await PrepareCallbackTemplate(mockacoContext, scriptContext, templateTransformer);
+                var template = await templateTransformer.Transform(mockacoContext.Mock.RawTemplate, scriptContext);
 
+                var callbackTasks = new List<Task>();
+
+                foreach (var callbackTemplate in template.Callbacks)
+                {
+                    callbackTasks.Add(PerformCallback(httpContext, callbackTemplate, options, stopwatch.ElapsedMilliseconds));
+                }
+
+                await Task.WhenAll(callbackTasks);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error preparing callback(s)");
+            }
+        }
+
+        private async Task PerformCallback(HttpContext httpContext, CallbackTemplate callbackTemplate, MockacoOptions options, long elapsedMilliseconds)
+        {
+            try
+            {
                 var request = PrepareHttpRequest(callbackTemplate, options);
 
                 var httpClient = PrepareHttpClient(httpContext, callbackTemplate);
 
-                await DelayRequest(callbackTemplate, stopwatch.ElapsedMilliseconds);
+                await DelayRequest(callbackTemplate, elapsedMilliseconds);
 
-                stopwatch.Restart();
+                var stopwatch = Stopwatch.StartNew();
 
                 _logger.LogDebug("Callback started");
 
@@ -77,13 +98,6 @@ namespace Mockaco
             {
                 _logger.LogError(ex, "Callback error");
             }
-        }
-
-        private static async Task<CallbackTemplate> PrepareCallbackTemplate(IMockacoContext mockacoContext, IScriptContext scriptContext, ITemplateTransformer templateTransformer)
-        {
-            var template = await templateTransformer.Transform(mockacoContext.Mock.RawTemplate, scriptContext);
-
-            return template.Callback;
         }
 
         private static HttpRequestMessage PrepareHttpRequest(CallbackTemplate callbackTemplate, MockacoOptions options)
