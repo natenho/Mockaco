@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace Mockaco
 {
@@ -8,9 +10,11 @@ namespace Mockaco
     {
         private readonly IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
-            _configuration = configuration;
+            _configuration = configuration;          
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();            
+            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -45,7 +49,7 @@ namespace Mockaco
                 .AddTransient<IResponseBodyStrategy, JsonResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
-                
+
                 .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
