@@ -4,7 +4,6 @@
     "route": "hello/{message}"
   },
   "response": {
-    "status": "OK",
     "body": {
 		"id": "<#= Faker.Random.Guid() #>",
 		"message": "Hello <#= Request.Route["message"] #>!",

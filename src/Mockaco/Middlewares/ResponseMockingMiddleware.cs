@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -49,7 +50,7 @@ namespace Mockaco
 
         private int GetResponseStatusFromTemplate(ResponseTemplate responseTemplate, MockacoOptions options)
         {
-            return responseTemplate?.Status == default
+            return responseTemplate?.Status == default(HttpStatusCode)
                             ? (int)options.DefaultHttpStatusCode
                             : (int)responseTemplate.Status;
         }
