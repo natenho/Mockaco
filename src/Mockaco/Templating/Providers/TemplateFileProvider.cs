@@ -21,19 +21,10 @@ namespace Mockaco
         private const string MockIgnoreFileName = ".mockignore";
         private const string DefaultTemplateFolder = "Mocks";
         private const string DefaultTemplateSearchPattern = "*.json";
-
-        private static readonly RetryPolicy _retryPolicy = Policy
-            .Handle<IOException>()
-            .WaitAndRetry(new[] 
-            {
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(2),
-                TimeSpan.FromSeconds(3)
-            });
-
+                
         private readonly ILogger<TemplateFileProvider> _logger;
         private readonly PhysicalFileProvider _fileProvider;
-        private readonly IMemoryCache _memoryCache;        
+        private readonly IMemoryCache _memoryCache;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
@@ -47,7 +38,7 @@ namespace Mockaco
 
         private void KeepWatchingForFileChanges()
         {
-            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");            
+            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");
             jsonChangeToken.RegisterChangeCallback(TemplateFileModified, default);
 
             var mockIgnoreChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/*{MockIgnoreFileName}");
@@ -90,30 +81,36 @@ namespace Mockaco
 
             foreach (var file in directory.GetFiles(DefaultTemplateSearchPattern, SearchOption.AllDirectories)
                                 .OrderBy(f => f.FullName))
-            {                
-                if(ShouldIgnoreFile(file))
+            {
+                var relativeFilePath = Path.GetRelativePath(DefaultTemplateFolder, file.FullName);
+
+                if (ShouldIgnoreFile(file))
                 {
-                    _logger.LogDebug("{filePath} ignored using a {MockIgnoreFileName} file", Path.GetRelativePath(DefaultTemplateFolder, file.FullName), MockIgnoreFileName);
+                    _logger.LogDebug("{relativeFilePath} ignored using a {MockIgnoreFileName} file", relativeFilePath, MockIgnoreFileName);
                     continue;
                 }
 
                 var name = Path.GetRelativePath(directory.FullName, file.FullName);
                 var rawContent = string.Empty;
-
-                _retryPolicy.Execute(() =>
+                                
+                var rawTemplate = WrapWithFileExceptionHandling(relativeFilePath, () =>
                 {
                     using (var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
                     using (var streamReader = new StreamReader(stream))
                     {
                         rawContent = streamReader.ReadToEnd();
+                        return new RawTemplate(name, rawContent);
                     }
                 });
 
-                yield return new RawTemplate(name, rawContent);
+                if (rawTemplate != default)
+                {
+                    yield return rawTemplate;
+                }
             }
         }
 
-        private static bool ShouldIgnoreFile(FileInfo file)
+        private bool ShouldIgnoreFile(FileInfo file)
         {
             var mockIgnorePath = Path.Combine(file.DirectoryName, MockIgnoreFileName);
 
@@ -122,14 +119,36 @@ namespace Mockaco
                 return false;
             }
 
-            IgnoreList ignores = default;
-
-            _retryPolicy.Execute(() =>
+            var ignores = WrapWithFileExceptionHandling(mockIgnorePath, () =>
             {
-                ignores = new IgnoreList(mockIgnorePath);
+                return new IgnoreList(mockIgnorePath);
             });
-                        
+
+            if(ignores == default)
+            {
+                return false;
+            }
+
             return ignores.IsIgnored(file);
+        }
+
+        private T WrapWithFileExceptionHandling<T>(string path, Func<T> action)
+        {
+            void log(Exception ex) => _logger.LogWarning("Could not load {path} due to {exceptionType}: {exceptionMessage}", path, ex.GetType(), ex.Message);
+
+            try
+            {
+                return Policy.Handle<IOException>()
+                        .WaitAndRetry(sleepDurations: new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) }, 
+                                      onRetry: (ex, _) => log(ex))
+                        .Execute(action);
+            }
+            catch (Exception ex)
+            {
+                log(ex);
+            }
+
+            return default;
         }
 
         private void FlushCache()
@@ -145,7 +164,7 @@ namespace Mockaco
 
         public void Dispose()
         {
-            _fileProvider.Dispose();            
+            _fileProvider.Dispose();
         }
     }
 }
