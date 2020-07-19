@@ -72,21 +72,21 @@ namespace Mockaco
 
                     if (existentCachedRoute != default)
                     {
-                        _logger.LogInformation("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                        _logger.LogDebug("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
                         mocks.Add(existentCachedRoute);
 
                         continue;
                     }
 
-                    _logger.LogInformation("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                    _logger.LogDebug("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
                     var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
                     var mock = CreateMock(rawTemplate, template.Request);
 
                     mocks.Add(mock);
 
-                    _logger.LogInformation("Mapped {0} to {1} {2}", rawTemplate.Name, template.Request?.Method, template.Request?.Route);
+                    _logger.LogInformation("{method} {route} mapped from {templateName}", template.Request?.Method, template.Request?.Route, rawTemplate.Name);
                 }
                 catch (JsonReaderException ex)
                 {

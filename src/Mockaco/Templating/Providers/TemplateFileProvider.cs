@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Polly;
 using System;
@@ -18,29 +19,74 @@ namespace Mockaco
         public event EventHandler OnChange;
 
         private const string MockIgnoreFileName = ".mockignore";
-        private const string DefaultTemplateFolder = "Mocks";
         private const string DefaultTemplateSearchPattern = "*.json";
-                
+
         private readonly ILogger<TemplateFileProvider> _logger;
-        private readonly PhysicalFileProvider _fileProvider;
         private readonly IMemoryCache _memoryCache;
+        private PhysicalFileProvider _fileProvider;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public TemplateFileProvider(IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
+        public TemplateFileProvider(IOptionsMonitor<TemplateFileProviderOptions> options, IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
         {
             _memoryCache = memoryCache;
-            _fileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory(), ExclusionFilters.Hidden | ExclusionFilters.System);
             _logger = logger;
+
+            SetMockRootPath(options.CurrentValue.Path);
+            KeepWatchingForFileChanges();
+
+            options.OnChange(options => {
+                SetMockRootPath(options.Path);
+                ResetCacheAndNotifyChange();
+            });
+        }
+
+        private void SetMockRootPath(string path)
+        {
+            try
+            {
+                if(_fileProvider?.Root.Equals(path) == true)
+                {
+                    return;
+                }
+
+                var fullPath = Path.IsPathRooted(path) 
+                    ? path 
+                    : Path.Combine(Directory.GetCurrentDirectory(), path);
+
+                var fileProvider = new PhysicalFileProvider(fullPath, ExclusionFilters.Hidden | ExclusionFilters.System);
+
+                _fileProvider?.Dispose();
+                _fileProvider = fileProvider;
+
+                _logger.LogInformation("Mock root path: {fullPath}", fullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting mock root path");
+            }
+        }
+
+        private void ResetCacheAndNotifyChange()
+        {
+            FlushCache();
+            GetTemplates();
+
+            OnChange?.Invoke(this, EventArgs.Empty);
 
             KeepWatchingForFileChanges();
         }
 
         private void KeepWatchingForFileChanges()
         {
-            var jsonChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/{DefaultTemplateSearchPattern}");
+            if(_fileProvider == null)
+            {
+                return;
+            }
+
+            var jsonChangeToken = _fileProvider.Watch($"**/{DefaultTemplateSearchPattern}");
             jsonChangeToken.RegisterChangeCallback(TemplateFileModified, default);
 
-            var mockIgnoreChangeToken = _fileProvider.Watch($"{DefaultTemplateFolder}/**/*{MockIgnoreFileName}");
+            var mockIgnoreChangeToken = _fileProvider.Watch($"**/*{MockIgnoreFileName}");
             mockIgnoreChangeToken.RegisterChangeCallback(TemplateFileModified, default);
         }
 
@@ -48,12 +94,7 @@ namespace Mockaco
         {
             _logger.LogInformation("File change detected");
 
-            FlushCache();
-            GetTemplates();
-
-            OnChange?.Invoke(this, EventArgs.Empty);
-
-            KeepWatchingForFileChanges();
+            ResetCacheAndNotifyChange();
         }
 
         public IEnumerable<IRawTemplate> GetTemplates()
@@ -71,17 +112,22 @@ namespace Mockaco
 
         private void PostEvictionCallback(object key, object value, EvictionReason reason, object state)
         {
-            _logger.LogDebug("Cache invalidated because of {reason}", reason);
+            _logger.LogDebug("Mock files cache invalidated because of {reason}", reason);
         }
 
         private IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
         {
-            var directory = new DirectoryInfo(DefaultTemplateFolder);
+            if(_fileProvider == null)
+            {
+                yield break;
+            }
+
+            var directory = new DirectoryInfo(_fileProvider.Root);
 
             foreach (var file in directory.GetFiles(DefaultTemplateSearchPattern, SearchOption.AllDirectories)
                                 .OrderBy(f => f.FullName))
             {
-                var relativeFilePath = Path.GetRelativePath(DefaultTemplateFolder, file.FullName);
+                var relativeFilePath = Path.GetRelativePath(_fileProvider.Root, file.FullName);
 
                 if (ShouldIgnoreFile(file))
                 {
@@ -91,15 +137,13 @@ namespace Mockaco
 
                 var name = Path.GetRelativePath(directory.FullName, file.FullName);
                 var rawContent = string.Empty;
-                                
+
                 var rawTemplate = WrapWithFileExceptionHandling(relativeFilePath, () =>
                 {
-                    using (var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    using (var streamReader = new StreamReader(stream))
-                    {
-                        rawContent = streamReader.ReadToEnd();
-                        return new RawTemplate(name, rawContent);
-                    }
+                    using var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var streamReader = new StreamReader(stream);
+                    rawContent = streamReader.ReadToEnd();
+                    return new RawTemplate(name, rawContent);
                 });
 
                 if (rawTemplate != default)
@@ -123,7 +167,7 @@ namespace Mockaco
                 return new IgnoreList(mockIgnorePath);
             });
 
-            if(ignores == default)
+            if (ignores == default)
             {
                 return false;
             }
@@ -138,7 +182,7 @@ namespace Mockaco
             try
             {
                 return Policy.Handle<IOException>()
-                        .WaitAndRetry(sleepDurations: new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) }, 
+                        .WaitAndRetry(sleepDurations: new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
                                       onRetry: (ex, _) => log(ex))
                         .Execute(action);
             }
@@ -163,7 +207,7 @@ namespace Mockaco
 
         public void Dispose()
         {
-            _fileProvider.Dispose();
+            _fileProvider?.Dispose();
         }
     }
 }

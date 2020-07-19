@@ -22,6 +22,7 @@ namespace Mockaco
                 .AddOptions()
 
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
+                .Configure<TemplateFileProviderOptions>(_configuration.GetSection("Mockaco:TemplateFileProvider"))
 
                 .AddScoped<IMockacoContext, MockacoContext>()
                 .AddScoped<IScriptContext, ScriptContext>()

@@ -14,7 +14,7 @@ namespace Mockaco
         public List<string> References { get; set; }
 
         public List<string> Imports { get; set; }
-
+        
         public MockacoOptions()
         {
             DefaultHttpStatusCode = HttpStatusCode.OK;
