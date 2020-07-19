@@ -108,7 +108,7 @@ namespace Mockaco
 
             if (callbackTemplate.Body != null)
             {
-                request.Content = callbackTemplate.Headers.ContainsKey(HttpHeaders.ContentType)
+                request.Content = callbackTemplate.Headers?.ContainsKey(HttpHeaders.ContentType) == true
                     ? new StringContent(callbackTemplate.Body.ToString(), Encoding.UTF8, callbackTemplate.Headers[HttpHeaders.ContentType])
                     : new StringContent(callbackTemplate.Body.ToString(formatting));
             }
