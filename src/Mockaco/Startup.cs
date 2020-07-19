@@ -10,11 +10,9 @@ namespace Mockaco
     {
         private readonly IConfiguration _configuration;
 
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration)
         {
             _configuration = configuration;          
-            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();            
-            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -53,8 +51,11 @@ namespace Mockaco
                 .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
+
             app.UseMiddleware<ErrorHandlingMiddleware>()
                 .UseMiddleware<ResponseDelayMiddleware>()
                 .UseMiddleware<RequestMatchingMiddleware>()

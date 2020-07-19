@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -11,9 +12,9 @@ namespace Mockaco
             return httpRequest.HasFormContentType;
         }
 
-        public JObject ReadBodyAsJson(HttpRequest httpRequest)
+        public Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
         {
-            return JObject.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString()));
+            return Task.FromResult(JObject.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString())));
         }
     }
 }

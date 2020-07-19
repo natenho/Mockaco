@@ -1,11 +1,17 @@
-<img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
+<h1>
+    <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
+    Mockaco 
+</h1>
 
-# Mockaco [![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/natenho/mockaco)](https://hub.docker.com/r/natenho/mockaco)
-Mockaco is an HTTP-based API mock server with fast setup, featuring:
+Mockaco is an HTTP-based API mock server with fast setup.
+
+[![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/natenho/mockaco)](https://hub.docker.com/r/natenho/mockaco)
+
+## Features
 
 - Simple JSON-based configuration
 - Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
-- Fake data generation - built-in hassle-free fake data generation
+- Fake data generation - built-in fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
 - Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
 

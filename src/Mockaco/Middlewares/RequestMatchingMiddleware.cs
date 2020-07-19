@@ -27,7 +27,7 @@ namespace Mockaco
             IEnumerable<IRequestMatcher> requestMatchers
             )
         {
-            LogHttpContext(httpContext);
+            await LogHttpContext(httpContext);
 
             AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
 
@@ -40,7 +40,7 @@ namespace Mockaco
             {
                 if (requestMatchers.All(_ => _.IsMatch(httpContext.Request, mock)))
                 {
-                    scriptContext.AttachRouteParameters(httpContext.Request, mock);
+                    await scriptContext.AttachRouteParameters(httpContext.Request, mock);
 
                     var template = await templateTransformer.Transform(mock.RawTemplate, scriptContext);
 
@@ -89,13 +89,13 @@ namespace Mockaco
             }
         }
 
-        private void LogHttpContext(HttpContext httpContext)
+        private async Task LogHttpContext(HttpContext httpContext)
         {
             _logger.LogInformation("Incoming request from {remoteIp}", httpContext.Connection.RemoteIpAddress);
 
             _logger.LogDebug("Headers: {headers}", httpContext.Request.Headers.ToJson());
 
-            var body = httpContext.Request.ReadBodyStream();
+            var body = await httpContext.Request.ReadBodyStream();
 
             if (string.IsNullOrEmpty(body))
             {

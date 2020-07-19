@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace Mockaco
+﻿namespace Mockaco
 {
     public class RequestTemplate
     {

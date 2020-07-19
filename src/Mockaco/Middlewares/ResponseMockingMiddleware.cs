@@ -23,7 +23,7 @@ namespace Mockaco
         {
             await PrepareResponse(httpContext.Response, mockacoContext.TransformedTemplate, responseBodyFactory, options.Value);
 
-            scriptContext.AttachResponse(httpContext.Response, mockacoContext.TransformedTemplate.Response);
+            await scriptContext.AttachResponse(httpContext.Response, mockacoContext.TransformedTemplate.Response);
 
             await _next(httpContext);
         }

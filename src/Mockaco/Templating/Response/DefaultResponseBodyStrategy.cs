@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-
-namespace Mockaco
+﻿namespace Mockaco
 {
     public class DefaultResponseBodyStrategy : StringResponseBodyStrategy
     {

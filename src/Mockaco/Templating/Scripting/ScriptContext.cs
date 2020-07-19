@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -38,29 +39,33 @@ namespace Mockaco
             Response = new ScriptContextResponse(new StringDictionary(), new JObject());
         }
 
-        public void AttachRequest(HttpRequest httpRequest)
+        public async Task AttachRequest(HttpRequest httpRequest)
         {
             _uri = httpRequest.GetUri();
             _queryDictionary = httpRequest.Query.ToStringDictionary(k => k.Key, v => v.Value.ToString());
             _headersDictionary = httpRequest.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString());
-            _bodyAsJson = _requestBodyFactory.ReadBodyAsJson(httpRequest);
+            _bodyAsJson = await _requestBodyFactory.ReadBodyAsJson(httpRequest);
 
             Faker = _fakerFactory?.GetFaker(httpRequest.GetAcceptLanguageValues());
 
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _bodyAsJson);
         }
 
-        public void AttachRouteParameters(HttpRequest httpRequest, Mock mock)
+        public Task AttachRouteParameters(HttpRequest httpRequest, Mock mock)
         {
             _routeDictionary = httpRequest.GetRouteData(mock)
                 .ToStringDictionary(k => k.Key, v => v.Value.ToString());
 
             Request = new ScriptContextRequest(url: _uri, route: _routeDictionary, query: _queryDictionary, header: _headersDictionary, body: _bodyAsJson);
+
+            return Task.CompletedTask;
         }
 
-        public void AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate)
+        public Task AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate)
         {
             Response = new ScriptContextResponse(httpResponse.Headers.ToStringDictionary(k => k.Key, v => v.Value.ToString()), responseTemplate?.Body);
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -12,10 +12,10 @@ namespace Mockaco
 
         ScriptContextResponse Response { get; set; }
 
-        void AttachRequest(HttpRequest httpRequest);
+        Task AttachRequest(HttpRequest httpRequest);
 
-        void AttachRouteParameters(HttpRequest httpRequest, Mock route);
+        Task AttachRouteParameters(HttpRequest httpRequest, Mock route);
 
-        void AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate);
+        Task AttachResponse(HttpResponse httpResponse, ResponseTemplate responseTemplate);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +15,7 @@ namespace Mockaco
             _strategies = strategies;
         }
 
-        public JObject ReadBodyAsJson(HttpRequest httpRequest)
+        public async Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
         {
             if (httpRequest.Body?.CanRead == false)
             {
@@ -25,7 +24,12 @@ namespace Mockaco
 
             var selectedStrategy = _strategies.FirstOrDefault(strategy => strategy.CanHandle(httpRequest));
 
-            return selectedStrategy?.ReadBodyAsJson(httpRequest) ?? new JObject();
+            if (selectedStrategy == null)
+            {
+                return new JObject();
+            }
+
+            return await selectedStrategy.ReadBodyAsJson(httpRequest);
         }
     }
 }

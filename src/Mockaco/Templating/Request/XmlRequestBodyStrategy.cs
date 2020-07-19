@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Mockaco
@@ -12,9 +13,9 @@ namespace Mockaco
             return httpRequest.HasXmlContentType();
         }
 
-        public JObject ReadBodyAsJson(HttpRequest httpRequest)
+        public async Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
         {
-            var body = httpRequest.ReadBodyStream();
+            var body = await httpRequest.ReadBodyStream();
 
             if (string.IsNullOrWhiteSpace(body))
             {

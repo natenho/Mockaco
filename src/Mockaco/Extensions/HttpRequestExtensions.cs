@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Net.Http.Headers;
 using Mockaco;
 using System;
@@ -30,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Http
 {
@@ -100,13 +100,13 @@ namespace Microsoft.AspNetCore.Http
                 || parsedValue?.MediaType.Equals(HttpContentTypes.TextXml, StringComparison.OrdinalIgnoreCase) == true;
         }
 
-        public static string ReadBodyStream(this HttpRequest httpRequest)
+        public static async Task<string> ReadBodyStream(this HttpRequest httpRequest)
         {
-            httpRequest.EnableRewind();
+            httpRequest.EnableBuffering();
 
             var reader = new StreamReader(httpRequest.Body);
 
-            var body = reader.ReadToEnd();
+            var body = await reader.ReadToEndAsync();
 
             if (httpRequest.Body.CanSeek)
             {
