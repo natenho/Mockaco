@@ -26,8 +26,8 @@ namespace Mockaco
         public Task<TResult> Invoke<TContext, TResult>(TContext context, string code)
         {
             var runner = GetOrCreateRunner<TContext, TResult>(code);
-
-            return runner.Invoke(context);
+            
+            return runner.Invoke(context);            
         }
 
         private ScriptRunner<TResult> GetOrCreateRunner<TContext, TResult>(string code)
@@ -39,14 +39,14 @@ namespace Mockaco
                 return runner;
             }
 
-            runner = CreateRunner<TContext, TResult>(code, out runner);
+            runner = CreateRunner<TContext, TResult>(code);
 
             _cache.Set(code, runner);
 
             return runner;
         }
 
-        public ScriptRunner<TResult> CreateRunner<TContext, TResult>(string code, out ScriptRunner<TResult> runner)
+        public ScriptRunner<TResult> CreateRunner<TContext, TResult>(string code)
         {
             var stopWatch = Stopwatch.StartNew();
 
@@ -72,9 +72,9 @@ namespace Mockaco
                 code,
                 globalsType: typeof(TContext),
                 options: scriptOptions);
-
-            runner = script.CreateDelegate();
-
+            
+            var runner = script.CreateDelegate();
+            
             _logger.LogTrace("Created runner in {elapsedTime} milliseconds", stopWatch.ElapsedMilliseconds);
 
             return runner;

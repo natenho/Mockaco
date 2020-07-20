@@ -13,6 +13,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - Pure C# scripting - you don't need to learn a new specific language or API to configure your mocks
 - Fake data generation - built-in fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
+- State support - stateful mock support allow a mock to be returned based on a global variable previously set by another mock
 - Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
 
 # Table of Contents
@@ -20,7 +21,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - [Get Started](#get-started)
   * [Running the application](#running-the-application)
   * [Creating a request/response template](#creating-a-requestresponse-template)
-  * [Send a request and get the mocked response](#send-a-request-and-get-the-mocked-response)
+  * [Sending a request and get the mocked response](#sending-a-request-and-getting-the-mocked-response)
 - [Request Template Matching](#request-template-matching)
   * [Method attribute](#method-attribute)
   * [Route attribute](#route-attribute)
@@ -66,6 +67,7 @@ $ dotnet run
 ```
 
 ## Creating a request/response template
+
 Create a file named `PingPong.json` under `Mocks` folder:
 
 ```json
@@ -85,7 +87,8 @@ Create a file named `PingPong.json` under `Mocks` folder:
 
 This example contains a request/response template, meaning "Whenever you receive a ```GET``` request in the route ```/ping```, respond with status ```OK``` and the body ```{ "response": "pong" }```"
 	
-## Send a request and get the mocked response
+## Sending a request and getting the mocked response
+
 ```http
 curl -iX GET http://localhost:5000/ping
 
@@ -101,6 +104,7 @@ Transfer-Encoding: chunked
 ```
 
 # Request Template Matching
+
 Use the ```request``` attribute to provide the necessary information for the engine to decide which response will be returned. All criteria must evaluate to ```true``` to produce the response of a given template.
 
 ## Method attribute

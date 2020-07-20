@@ -17,17 +17,20 @@ namespace Mockaco
         private readonly IFakerFactory _fakerFactory;
         private readonly IRequestBodyFactory _requestBodyFactory;
 
+        public IGlobalVariableStorage Global { get; }
+
         public Faker Faker { get; private set; }
 
         public ScriptContextRequest Request { get; set; }
 
         public ScriptContextResponse Response { get; set; }
 
-        public ScriptContext(IFakerFactory fakerFactory, IRequestBodyFactory requestBodyFactory)
+        public ScriptContext(IFakerFactory fakerFactory, IRequestBodyFactory requestBodyFactory, IGlobalVariableStorage globalVarialeStorage)
         {
             _fakerFactory = fakerFactory;
             _requestBodyFactory = requestBodyFactory;
             Faker = fakerFactory?.GetDefaultFaker();
+            Global = globalVarialeStorage;
 
             Request = new ScriptContextRequest(
                 default,

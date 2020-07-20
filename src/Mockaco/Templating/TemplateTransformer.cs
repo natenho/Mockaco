@@ -18,11 +18,22 @@ namespace Mockaco
             _logger = logger;
         }
 
-        public async Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext)
+        public async Task<Template> TransformAndSetVariables(IRawTemplate rawTemplate, IScriptContext scriptContext)
         {
+            scriptContext.Global.EnableWriting();
+
             var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
 
             return JsonConvert.DeserializeObject<Template>(transformedTemplate);
+        }
+
+        public async Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext)
+        {            
+            scriptContext.Global.DisableWriting();
+
+            var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
+
+            return JsonConvert.DeserializeObject<Template>(transformedTemplate);           
         }
 
         private async Task<string> Transform(string input, IScriptContext scriptContext)
@@ -62,6 +73,7 @@ namespace Mockaco
 
                         break;
                     case State.Block:
+                        await Run(tokeniser.Value, scriptContext);                             
                         break;
                     case State.Helper:
                         break;
@@ -80,7 +92,7 @@ namespace Mockaco
 
             return output.ToString();
         }
-                
+
         private async Task<object> Run(string code, IScriptContext scriptContext)
         {
             object result = null;
@@ -98,5 +110,6 @@ namespace Mockaco
 
             return result;
         }
+
     }
 }

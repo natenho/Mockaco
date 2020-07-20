@@ -38,29 +38,20 @@ namespace Mockaco
 
             foreach (var mock in mockProvider.GetMocks())
             {
-                if (requestMatchers.All(_ => _.IsMatch(httpContext.Request, mock)))
-                {
+                if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
+                {                    
+                    _logger.LogInformation("Incoming request matched {mock}", mock);
+
                     await scriptContext.AttachRouteParameters(httpContext.Request, mock);
 
-                    var template = await templateTransformer.Transform(mock.RawTemplate, scriptContext);
+                    var template = await templateTransformer.TransformAndSetVariables(mock.RawTemplate, scriptContext);
 
-                    var conditionIsMatch = template.Request?.Condition ?? true;
+                    mockacoContext.Mock = mock;
+                    mockacoContext.TransformedTemplate = template;
 
-                    if (conditionIsMatch)
-                    {
-                        _logger.LogInformation("Incoming request matched {mock}", mock);
+                    await _next(httpContext);
 
-                        mockacoContext.Mock = mock;
-                        mockacoContext.TransformedTemplate = template;
-
-                        await _next(httpContext);
-
-                        return;
-                    }
-                    else
-                    {
-                        _logger.LogDebug("Incoming request didn't match condition for {mock}", mock);
-                    }
+                    return;
                 }
                 else
                 {
@@ -73,6 +64,7 @@ namespace Mockaco
             mockacoContext.Errors.Add(new Error("Incoming request didn't match any mock"));
         }
 
+        //TODO Remove redundant code
         private void AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
         {
             try

@@ -6,6 +6,8 @@ namespace Mockaco
 {
     public interface IScriptContext
     {
+        IGlobalVariableStorage Global { get; }
+
         Faker Faker { get; }
 
         ScriptContextRequest Request { get; set; }

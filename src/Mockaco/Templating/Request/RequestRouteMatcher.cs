@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -6,16 +7,16 @@ namespace Mockaco
     {
         private const string DefaultRoute = "/";
 
-        public bool IsMatch(HttpRequest httpRequest, Mock mock)
+        public Task<bool> IsMatch(HttpRequest httpRequest, Mock mock)
         {
             var routeMatcher = new RouteMatcher();
 
             if (string.IsNullOrWhiteSpace(mock?.Route))
             {
-                return routeMatcher.IsMatch(DefaultRoute, httpRequest.Path);
+                return Task.FromResult(routeMatcher.IsMatch(DefaultRoute, httpRequest.Path));
             }
 
-            return routeMatcher.IsMatch(mock.Route, httpRequest.Path);
+            return Task.FromResult(routeMatcher.IsMatch(mock.Route, httpRequest.Path));
         }
     }
 }

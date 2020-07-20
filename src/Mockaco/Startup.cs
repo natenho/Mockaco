@@ -26,15 +26,17 @@ namespace Mockaco
 
                 .AddScoped<IMockacoContext, MockacoContext>()
                 .AddScoped<IScriptContext, ScriptContext>()
+                .AddTransient<IGlobalVariableStorage, ScriptContextGlobalVariableStorage>()
 
                 .AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>()
-
+                
                 .AddSingleton<IFakerFactory, LocalizedFakerFactory>()
                 .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
 
-                .AddTransient<IRequestMatcher, RequestMethodMatcher>()
-                .AddTransient<IRequestMatcher, RequestRouteMatcher>()
+                .AddScoped<IRequestMatcher, RequestMethodMatcher>()
+                .AddScoped<IRequestMatcher, RequestRouteMatcher>()
+                .AddScoped<IRequestMatcher, RequestConditionMatcher>()
 
                 .AddTransient<IRequestBodyFactory, RequestBodyFactory>()
 

@@ -19,7 +19,7 @@ namespace Mockaco.Tests.Templating
             var rawTemplate = Moq.Mock.Of<IRawTemplate>(t => t.Content == content);
             var scriptContext = Moq.Mock.Of<IScriptContext>();
 
-            var transformedTemplate = await templateTransformer.Transform(rawTemplate, scriptContext);
+            var transformedTemplate = await templateTransformer.TransformAndSetVariables(rawTemplate, scriptContext);
 
             Assert(transformedTemplate);
         }
@@ -38,7 +38,7 @@ namespace Mockaco.Tests.Templating
 
             var templateTransformer = new TemplateTransformer(scriptRunnerFactory, Moq.Mock.Of<ILogger<TemplateTransformer>>());
 
-            var transformedTemplate = await templateTransformer.Transform(rawTemplate, scriptContext);
+            var transformedTemplate = await templateTransformer.TransformAndSetVariables(rawTemplate, scriptContext);
 
             Assert(transformedTemplate);
         }

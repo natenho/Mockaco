@@ -17,6 +17,7 @@ namespace Mockaco
         private readonly IRequestBodyFactory _requestBodyFactory;
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
+        private readonly IGlobalVariableStorage _globalVariableStorage;
         private readonly ILogger<MockProvider> _logger;
 
         public MockProvider
@@ -24,6 +25,7 @@ namespace Mockaco
             IRequestBodyFactory requestBodyFactory, 
             ITemplateProvider templateProvider, 
             ITemplateTransformer templateTransformer, 
+            IGlobalVariableStorage globalVariableStorage,
             ILogger<MockProvider> logger)
         {
             _cache = new List<Mock>();
@@ -33,7 +35,7 @@ namespace Mockaco
             _templateProvider.OnChange += TemplateProviderChange;
 
             _templateTransformer = templateTransformer;
-
+            _globalVariableStorage = globalVariableStorage;
             _logger = logger;
         }
 
@@ -57,7 +59,7 @@ namespace Mockaco
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var nullScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory);
+            var warmUpScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory, _globalVariableStorage);
 
             const int defaultCapacity = 16;
             var mocks = new List<Mock>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
@@ -81,7 +83,7 @@ namespace Mockaco
 
                     _logger.LogDebug("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
 
-                    var template = await _templateTransformer.Transform(rawTemplate, nullScriptContext);
+                    var template = await _templateTransformer.Transform(rawTemplate, warmUpScriptContext);
                     var mock = CreateMock(rawTemplate, template.Request);
 
                     mocks.Add(mock);

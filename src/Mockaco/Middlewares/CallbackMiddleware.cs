@@ -58,7 +58,7 @@ namespace Mockaco
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-
+                                
                 var template = await templateTransformer.Transform(mockacoContext.Mock.RawTemplate, scriptContext);
 
                 var callbackTasks = new List<Task>();

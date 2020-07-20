@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
     public interface IRequestMatcher
     {
-        bool IsMatch(HttpRequest httpRequest, Mock mock);
+        Task<bool> IsMatch(HttpRequest httpRequest, Mock mock);
     }
 }
