@@ -28,7 +28,7 @@ deploy:
 - provider: GitHub
   tag: v$(appveyor_build_version)
   auth_token:
-    secure: /I2jw4WdsgmkOPWZ/Xaoht8/eQ4W+dOP+H8jwMnzO7tNt3AsDoDhuJg4ClZuQT9v
+    secure: CvKPdU/e9Xdh7mSAfJKIF4cgeK4k/hQc2HaFfTLGfogHIsb/nGyX9v23L/tKEYyV
   artifact: Mockaco Web Site
   draft: false
   on:
