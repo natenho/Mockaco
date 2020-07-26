@@ -18,7 +18,8 @@ namespace Mockaco.Tests.Templating
 
             var rawTemplate = Moq.Mock.Of<IRawTemplate>(t => t.Content == content);
             var scriptContext = Moq.Mock.Of<IScriptContext>();
-
+            Moq.Mock.Get(scriptContext).Setup(m => m.Global).Returns(Moq.Mock.Of<IGlobalVariableStorage>());
+            
             var transformedTemplate = await templateTransformer.TransformAndSetVariables(rawTemplate, scriptContext);
 
             Assert(transformedTemplate);
@@ -30,6 +31,7 @@ namespace Mockaco.Tests.Templating
         {
             var rawTemplate = Moq.Mock.Of<IRawTemplate>(t => t.Content == content);
             var scriptContext = Moq.Mock.Of<IScriptContext>();
+            Moq.Mock.Get(scriptContext).Setup(m => m.Global).Returns(Moq.Mock.Of<IGlobalVariableStorage>());
 
             var scriptRunnerFactory = Moq.Mock.Of<IScriptRunnerFactory>(f =>
             f.Invoke<IScriptContext, object>(scriptContext, "Request.Route[\"parameter1\"] == \"firstParameter\"") == Task.FromResult((object)true)
