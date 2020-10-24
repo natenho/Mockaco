@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Mockaco.Commands;
 using Serilog;
+using System;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -11,20 +16,46 @@ namespace Mockaco
     {
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            var host = CreateHostBuilder().Build();
 
-            using (var scope = host.Services.CreateScope())
+            var app = new CommandLineApplication<Program>();
+            app.Conventions
+            .UseDefaultConventions()
+            .UseConstructorInjection(host.Services);
+
+            app.Name = Assembly.GetExecutingAssembly().GetName().Name.ToLower();
+            app.FullName = $"{Assembly.GetExecutingAssembly().GetName().Name} {Assembly.GetExecutingAssembly().GetName().Version}";
+
+            app.Command("run", config =>
             {
-                var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
+                config.Description = "Runs mock server";
+                config.OnExecuteAsync(RunServer(host));
+            });
 
-                await mockProvider.WarmUp();
-            }
+            host.Services.GetRequiredService<GenerateCommand>().SelfRegister(app);
 
-            await host.RunAsync();
+            app.OnExecuteAsync(RunServer(host));
+
+            await app.ExecuteAsync(args);
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        private static Func<CancellationToken, Task> RunServer(IHost host)
+        {
+            return async (cancelationToken) =>
+            {
+                using (var scope = host.Services.CreateScope())
+                {
+                    var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
+
+                    await mockProvider.WarmUp();
+                }
+
+                await host.RunAsync(cancelationToken);
+            };
+        }
+
+        public static IHostBuilder CreateHostBuilder() =>
+            Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile("Settings/appsettings.json", optional: true, reloadOnChange: true))

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mockaco.Commands;
 using System.Reflection;
 
 namespace Mockaco
@@ -29,7 +30,7 @@ namespace Mockaco
                 .AddTransient<IGlobalVariableStorage, ScriptContextGlobalVariableStorage>()
 
                 .AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>()
-                
+
                 .AddSingleton<IFakerFactory, LocalizedFakerFactory>()
                 .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
@@ -51,7 +52,11 @@ namespace Mockaco
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
 
-                .AddTransient<ITemplateTransformer, TemplateTransformer>();
+                .AddTransient<ITemplateTransformer, TemplateTransformer>()
+
+            //Commands
+
+                .AddScoped<GenerateCommand>();
         }
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
