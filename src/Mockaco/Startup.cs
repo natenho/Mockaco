@@ -19,7 +19,8 @@ namespace Mockaco
         {
             services.AddMemoryCache()
                 .AddHttpClient()
-                .AddOptions()
+                .AddCors()
+                .AddOptions()                
 
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
                 .Configure<TemplateFileProviderOptions>(_configuration.GetSection("Mockaco:TemplateFileProvider"))
@@ -58,8 +59,9 @@ namespace Mockaco
         {
             AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
             logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
-
-            app.UseMiddleware<ErrorHandlingMiddleware>()
+            
+            app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin())
+                .UseMiddleware<ErrorHandlingMiddleware>()
                 .UseMiddleware<ResponseDelayMiddleware>()
                 .UseMiddleware<RequestMatchingMiddleware>()
                 .UseMiddleware<ResponseMockingMiddleware>()
