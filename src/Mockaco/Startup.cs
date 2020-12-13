@@ -12,7 +12,7 @@ namespace Mockaco
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;          
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -29,7 +29,7 @@ namespace Mockaco
                 .AddTransient<IGlobalVariableStorage, ScriptContextGlobalVariableStorage>()
 
                 .AddSingleton<IScriptRunnerFactory, ScriptRunnerFactory>()
-                
+
                 .AddSingleton<IFakerFactory, LocalizedFakerFactory>()
                 .AddSingleton<IMockProvider, MockProvider>()
                 .AddSingleton<ITemplateProvider, TemplateFileProvider>()
@@ -40,9 +40,9 @@ namespace Mockaco
 
                 .AddTransient<IRequestBodyFactory, RequestBodyFactory>()
 
-                .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
                 .AddTransient<IRequestBodyStrategy, JsonRequestBodyStrategy>()
                 .AddTransient<IRequestBodyStrategy, XmlRequestBodyStrategy>()
+                .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
 
                 .AddTransient<IResponseBodyFactory, ResponseBodyFactory>()
 
