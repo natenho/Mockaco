@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Mockaco
 {
     public class RequestConditionMatcher : IRequestMatcher
-    {        
+    {
         private readonly ITemplateTransformer _templateTransformer;
         private readonly IFakerFactory _fakerFactory;
         private readonly IRequestBodyFactory _requestBodyFactory;
@@ -15,14 +15,14 @@ namespace Mockaco
         private readonly IGlobalVariableStorage _globalVarialeStorage;
         private readonly ILogger _logger;
 
-        public RequestConditionMatcher(            
+        public RequestConditionMatcher(
             ITemplateTransformer templateTransformer,
             IFakerFactory fakerFactory,
             IRequestBodyFactory requestBodyFactory,
             IMockacoContext mockacoContext,
             IGlobalVariableStorage globalVariableStoreage,
             ILogger<RequestConditionMatcher> logger)
-        {            
+        {
             _templateTransformer = templateTransformer;
             _fakerFactory = fakerFactory;
             _requestBodyFactory = requestBodyFactory;
@@ -34,8 +34,8 @@ namespace Mockaco
         public async Task<bool> IsMatch(HttpRequest httpRequest, Mock mock)
         {
             var conditionMatcherScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory, _globalVarialeStorage);
-
-            AttachRequestToScriptContext(httpRequest.HttpContext, _mockacoContext, conditionMatcherScriptContext);
+            
+            await AttachRequestToScriptContext(httpRequest.HttpContext, _mockacoContext, conditionMatcherScriptContext);
 
             if (_mockacoContext.Errors.Any())
             {
@@ -52,11 +52,11 @@ namespace Mockaco
         }
 
         //TODO Remove redundant code
-        private void AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
+        private async Task AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
         {
             try
             {
-                scriptContext.AttachRequest(httpContext.Request);
+                await scriptContext.AttachRequest(httpContext.Request);
             }
             catch (Exception ex)
             {
