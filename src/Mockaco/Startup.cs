@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mockaco.Properties;
+using System;
+using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Mockaco
 {
@@ -55,10 +60,16 @@ namespace Mockaco
                 .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
-        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, ILogger<Startup> logger, IOptions<MockacoOptions> options)
         {
+
+            if (!options.Value.HideStartupLogo)
+            {
+                Console.WriteLine(Resources.mockaco_ansi);
+            }
+
             AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
+            logger.LogInformation("{assemblyName} v{assemblyVersion} by Renato Lima [github.com/natenho]", assemblyName.Name, assemblyName.Version);
             
             app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin())
                 .UseMiddleware<ErrorHandlingMiddleware>()

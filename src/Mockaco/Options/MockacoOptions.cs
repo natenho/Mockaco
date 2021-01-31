@@ -5,6 +5,8 @@ namespace Mockaco
 {
     public class MockacoOptions
     {
+        public bool HideStartupLogo { get; set; }
+
         public HttpStatusCode DefaultHttpStatusCode { get; set; }
 
         public HttpStatusCode ErrorHttpStatusCode { get; set; }       
