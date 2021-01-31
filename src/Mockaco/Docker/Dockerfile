@@ -20,4 +20,4 @@ COPY ./Mocks/hello.json /app/Mocks/
 COPY Settings /app/Settings
 VOLUME /app/Mocks
 VOLUME /app/Settings
-ENTRYPOINT ["dotnet", "Mockaco.dll"]
+ENTRYPOINT ["dotnet", "Mockaco.dll", "--path", "Mocks", "--urls", "http://+:5000"]

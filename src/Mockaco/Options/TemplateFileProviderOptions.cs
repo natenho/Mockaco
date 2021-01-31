@@ -11,7 +11,7 @@ namespace Mockaco
 
         public TemplateFileProviderOptions()
         {
-            Path = "Mocks";
+            Path = string.Empty;
         }
     }
 }

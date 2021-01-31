@@ -3,6 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Mockaco
@@ -27,7 +31,18 @@ namespace Mockaco
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureAppConfiguration((_, configuration) => configuration.AddJsonFile("Settings/appsettings.json", optional: true, reloadOnChange: true))
+                    webBuilder.ConfigureAppConfiguration((_, configuration) =>
+                    {
+                        var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                        configuration.SetBasePath(Path.Combine(assemblyLocation, "Settings"));
+                        
+                        var switchMappings = new Dictionary<string, string>() {
+                            {"--path", "Mockaco:TemplateFileProvider:Path" },
+                            {"--logs", "Serilog:WriteTo:0:Args:path" }                            
+                        };
+
+                        configuration.AddCommandLine(args, switchMappings);
+                    })                    
                     .UseSerilog((context, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(context.Configuration))
                     .UseStartup<Startup>();
                 });

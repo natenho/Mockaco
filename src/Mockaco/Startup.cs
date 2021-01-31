@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.IO;
 using System.Reflection;
 
 namespace Mockaco
@@ -12,7 +15,7 @@ namespace Mockaco
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration;            
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -20,7 +23,7 @@ namespace Mockaco
             services.AddMemoryCache()
                 .AddHttpClient()
                 .AddCors()
-                .AddOptions()                
+                .AddOptions()
 
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
                 .Configure<TemplateFileProviderOptions>(_configuration.GetSection("Mockaco:TemplateFileProvider"))
@@ -58,7 +61,7 @@ namespace Mockaco
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
             AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
+            logger.LogInformation("{assemblyName} v{assemblyVersion} by Renato Lima [github.com/natenho]\n\n{logo}", assemblyName.Name, assemblyName.Version, _logo);
             
             app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin())
                 .UseMiddleware<ErrorHandlingMiddleware>()

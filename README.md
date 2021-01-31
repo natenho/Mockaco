@@ -52,6 +52,13 @@ You can run Mockaco from the official [Docker image](https://hub.docker.com/r/na
 $ docker run -it --rm -p 5000:80 -v /your/folder:/app/Mocks natenho/mockaco
 ```
 
+Or install an run as a dotnet tool:
+
+```console
+$ dotnet tool install -g mockaco
+$ mockaco
+```
+
 Or using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
 
 ```console
