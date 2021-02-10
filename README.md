@@ -6,6 +6,7 @@
 Mockaco is an HTTP-based API mock server with fast setup.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/natenho/mockaco)](https://hub.docker.com/r/natenho/mockaco)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
 
 ## Features
 
@@ -419,3 +420,7 @@ The built-in fake data is generated via [Bogus](https://github.com/bchavez/Bogus
 The faker can also generate localized data using ```Accept-Language``` HTTP header. Defaults to ```en``` (english) fake data.
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_large)
