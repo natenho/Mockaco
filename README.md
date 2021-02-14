@@ -56,7 +56,7 @@ Or install an run as a dotnet tool:
 
 ```console
 $ dotnet tool install -g mockaco
-$ mockaco
+$ mockaco --urls "http://localhost:5000;https://localhost:5001"
 ```
 
 Or using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
