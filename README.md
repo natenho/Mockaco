@@ -46,24 +46,40 @@ Mockaco is an HTTP-based API mock server with fast setup.
 
 ## Running the application
 
-You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco) (replace ```/your/folder``` with an existing directory of your preference):
+### .NET CLI
 
-```console
-$ docker run -it --rm -p 5000:80 -v /your/folder:/app/Mocks natenho/mockaco
-```
-
-Or install an run as a dotnet tool:
+Install and run as a dotnet tool:
 
 ```console
 $ dotnet tool install -g mockaco
-$ mockaco --urls "http://localhost:5000;https://localhost:5001"
+$ mockaco --urls "http://localhost:5000"
 ```
 
-Or using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
+A random local port is chosen if `--urls` parameter is not provided.
+
+### Docker
+
+You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco) (replace ```/your/folder``` with an existing directory of your preference):
+
+```console
+$ docker run -it --rm -p 5000:5000 -v /your/folder:/app/Mocks natenho/mockaco
+```
+
+The port exposed by the container is 5000 (HTTP) by default.
+
+### Binaries
+
+Using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
 
 ```console
 $ dotnet Mockaco.dll
 ```
+
+A random local port is chosen if `--urls` parameter is not provided.
+
+The binaries can also be published on Microsoft IIS.
+
+### Sources
 
 Or your can run it directly from sources:
 
@@ -72,6 +88,8 @@ $ git clone https://github.com/natenho/Mockaco.git
 $ cd Mockaco\src\Mockaco
 $ dotnet run
 ```
+
+A random local port is chosen if `--urls` parameter is not provided.
 
 ## Creating a request/response template
 
