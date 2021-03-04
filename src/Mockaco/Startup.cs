@@ -60,8 +60,10 @@ namespace Mockaco
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
-            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation("{assemblyName} v{assemblyVersion} by Renato Lima [github.com/natenho]\n\n{logo}", assemblyName.Name, assemblyName.Version, _logo);
+            var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+            var version = GitVersionInformation.InformationalVersion;
+
+            logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
             
             app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin())
                 .UseMiddleware<ErrorHandlingMiddleware>()
