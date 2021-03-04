@@ -12,9 +12,9 @@ namespace Mockaco
             return httpRequest.HasFormContentType;
         }
 
-        public Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
+        public Task<JToken> ReadBodyAsJson(HttpRequest httpRequest)
         {
-            return Task.FromResult(JObject.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString())));
+            return Task.FromResult(JToken.FromObject(httpRequest.Form.ToDictionary(f => f.Key, f => f.Value.ToString())));
         }
     }
 }

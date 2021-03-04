@@ -13,7 +13,7 @@ namespace Mockaco
             return httpRequest.HasXmlContentType();
         }
 
-        public async Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
+        public async Task<JToken> ReadBodyAsJson(HttpRequest httpRequest)
         {
             var body = await httpRequest.ReadBodyStream();
 
@@ -27,7 +27,7 @@ namespace Mockaco
 
             var json = JsonConvert.SerializeXmlNode(xmlDocument);
 
-            return JObject.Parse(json);
+            return JToken.Parse(json);
         }
     }
 }
