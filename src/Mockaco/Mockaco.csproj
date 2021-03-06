@@ -6,6 +6,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Configurations>Debug;Release;Nuget</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -42,13 +43,24 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Plugins\Readme.md">
+  <ItemGroup Condition="$(Configuration) != 'Debug'">
+    <Content Remove="Mocks\**" />
+    <None Include="Mocks\hello.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\mockaco-icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <Content Remove="Settings\**" />
+    <None Include="Settings\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Plugins\Readme.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
