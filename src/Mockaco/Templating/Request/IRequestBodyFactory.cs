@@ -6,6 +6,6 @@ namespace Mockaco
 {
     public interface IRequestBodyFactory
     {
-        Task<JObject> ReadBodyAsJson(HttpRequest httpRequest);
+        Task<JToken> ReadBodyAsJson(HttpRequest httpRequest);
     }
 }

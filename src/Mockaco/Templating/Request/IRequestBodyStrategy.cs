@@ -7,6 +7,6 @@ namespace Mockaco
     public interface IRequestBodyStrategy
     {
         bool CanHandle(HttpRequest httpRequest);
-        Task<JObject> ReadBodyAsJson(HttpRequest httpRequest);
+        Task<JToken> ReadBodyAsJson(HttpRequest httpRequest);
     }
 }
