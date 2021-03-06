@@ -24,7 +24,7 @@ Mockaco is an HTTP-based API mock server with fast setup, featuring:
 The default image ships with a sample "hello" mock:
 
 ```console
-$ docker run -it --rm -p 5000:80 natenho/mockaco
+$ docker run -it --rm -p 5000:5000 natenho/mockaco
 ```
 
 Mockaco can be accessed by any HTTP client via `http://localhost:5000`

@@ -17,10 +17,11 @@ RUN dotnet publish "Mockaco.csproj" -c Release -o /app/publish
 
 FROM base AS final
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+ENV ASPNETCORE_ENVIRONMENT=Docker
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY ./src/Mockaco/Mocks/hello.json /app/Mocks/
 COPY ./src/Mockaco/Settings /app/Settings
 VOLUME /app/Mocks
 VOLUME /app/Settings
-ENTRYPOINT ["dotnet", "Mockaco.dll", "--path", "Mocks", "--urls", "http://+:5000"]
+ENTRYPOINT ["dotnet", "Mockaco.dll"]

@@ -1,18 +1,12 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
-  "profiles": {    
+  "profiles": {
     "Mockaco": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/values",
-      "environmentVariables": {},
-      "httpPort": 63715
     }
   }
 }
