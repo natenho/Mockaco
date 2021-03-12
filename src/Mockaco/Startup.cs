@@ -2,9 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.IO;
 using System.Reflection;
 
 namespace Mockaco
@@ -15,7 +12,7 @@ namespace Mockaco
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;            
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -64,13 +61,16 @@ namespace Mockaco
             var version = GitVersionInformation.InformationalVersion;
 
             logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
-            
-            app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin())
-                .UseMiddleware<ErrorHandlingMiddleware>()
-                .UseMiddleware<ResponseDelayMiddleware>()
-                .UseMiddleware<RequestMatchingMiddleware>()
-                .UseMiddleware<ResponseMockingMiddleware>()
-                .UseMiddleware<CallbackMiddleware>();
+
+            app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials())
+            .UseMiddleware<ErrorHandlingMiddleware>()
+            .UseMiddleware<ResponseDelayMiddleware>()
+            .UseMiddleware<RequestMatchingMiddleware>()
+            .UseMiddleware<ResponseMockingMiddleware>()
+            .UseMiddleware<CallbackMiddleware>();
         }
     }
 }
