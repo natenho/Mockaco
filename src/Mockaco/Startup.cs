@@ -62,10 +62,10 @@ namespace Mockaco
 
             logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
 
-            app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin()
+            app.UseCors(configurePolicy => configurePolicy
+                .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials())
+                .AllowAnyHeader())
             .UseMiddleware<ErrorHandlingMiddleware>()
             .UseMiddleware<ResponseDelayMiddleware>()
             .UseMiddleware<RequestMatchingMiddleware>()
