@@ -23,20 +23,21 @@ namespace Mockaco
         private const string DefaultTemplateSearchPattern = "*.json";
 
         private readonly ILogger<TemplateFileProvider> _logger;
-        
+
         private readonly IMemoryCache _memoryCache;
         private PhysicalFileProvider _fileProvider;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IOptionsMonitor<TemplateFileProviderOptions> options, IWebHostEnvironment webHostEnvironment, IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
-        {            
+        {
             _memoryCache = memoryCache;
             _logger = logger;
 
             SetMockRootPath(options.CurrentValue.Path);
             KeepWatchingForFileChanges();
 
-            options.OnChange(options => {
+            options.OnChange(options =>
+            {
                 SetMockRootPath(options.Path);
                 ResetCacheAndNotifyChange();
             });
@@ -46,22 +47,22 @@ namespace Mockaco
         {
             try
             {
-                if(_fileProvider?.Root.Equals(path) == true)
+                if (_fileProvider?.Root.Equals(path) == true)
                 {
                     return;
                 }
 
-                var fullPath = Path.IsPathRooted(path) 
-                    ? path 
+                var fullPath = Path.IsPathRooted(path)
+                    ? path
                     : Path.Combine(Directory.GetCurrentDirectory(), path);
-                
+
                 var fileProvider = new PhysicalFileProvider(fullPath, ExclusionFilters.Hidden | ExclusionFilters.System);
 
                 _fileProvider?.Dispose();
                 _fileProvider = fileProvider;
 
                 _logger.LogInformation("Mock path: {fullPath}", fullPath);
-            }            
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error setting mock root path");
@@ -80,14 +81,14 @@ namespace Mockaco
 
         private void KeepWatchingForFileChanges()
         {
-            if(_fileProvider == null)
+            if (_fileProvider == null)
             {
                 return;
             }
 
             var jsonChangeToken = _fileProvider.Watch($"**/{DefaultTemplateSearchPattern}");
             jsonChangeToken.RegisterChangeCallback(TemplateFileModified, default);
-
+            
             var mockIgnoreChangeToken = _fileProvider.Watch($"**/*{MockIgnoreFileName}");
             mockIgnoreChangeToken.RegisterChangeCallback(TemplateFileModified, default);
         }
@@ -102,7 +103,7 @@ namespace Mockaco
         public IEnumerable<IRawTemplate> GetTemplates()
         {
             return _memoryCache.GetOrCreate(
-                nameof(TemplateFileProvider),
+                nameof(TemplateFileProvider) + nameof(GetTemplates),
                 e =>
                 {
                     e.RegisterPostEvictionCallback(PostEvictionCallback);
@@ -119,7 +120,7 @@ namespace Mockaco
 
         private IEnumerable<IRawTemplate> LoadTemplatesFromDirectory()
         {
-            if(_fileProvider == null)
+            if (_fileProvider == null)
             {
                 yield break;
             }
@@ -133,7 +134,7 @@ namespace Mockaco
 
                 if (ShouldIgnoreFile(file))
                 {
-                    _logger.LogDebug("{relativeFilePath} ignored using a {MockIgnoreFileName} file", relativeFilePath, MockIgnoreFileName);
+                    _logger.LogDebug("{relativeFilePath} ignored by a {MockIgnoreFileName} file", relativeFilePath, MockIgnoreFileName);
                     continue;
                 }
 
@@ -157,24 +158,45 @@ namespace Mockaco
 
         private bool ShouldIgnoreFile(FileInfo file)
         {
-            var mockIgnorePath = Path.Combine(file.DirectoryName, MockIgnoreFileName);
-
-            if (!File.Exists(mockIgnorePath))
-            {
-                return false;
-            }
-
-            var ignores = WrapWithFileExceptionHandling(mockIgnorePath, () =>
-            {
-                return new IgnoreList(mockIgnorePath);
-            });
-
-            if (ignores == default)
-            {
-                return false;
-            }
+            var ignores = GetIgnoreList(file.Directory);
 
             return ignores.IsIgnored(file);
+        }
+
+        private IgnoreList GetIgnoreList(DirectoryInfo directoryInfo)
+        {
+            var relativePath = Path.GetRelativePath(_fileProvider.Root, directoryInfo.FullName);
+            var pathSegments = relativePath.Split(Path.DirectorySeparatorChar);
+
+            var ignoreList = new IgnoreList();
+
+            var currentCombinedPath = _fileProvider.Root;
+
+            TryIncludeIgnoreListFrom(currentCombinedPath, ignoreList);
+
+            foreach (var pathSegment in pathSegments)
+            {
+                currentCombinedPath = Path.Combine(currentCombinedPath, pathSegment);
+
+                TryIncludeIgnoreListFrom(currentCombinedPath, ignoreList);
+            }
+
+            return ignoreList;
+        }
+
+        private void TryIncludeIgnoreListFrom(string currentCombinedPath, IgnoreList ignoreList)
+        {
+            var mockIgnorePath = Path.Combine(currentCombinedPath, MockIgnoreFileName);
+
+            if (File.Exists(mockIgnorePath))
+            {
+                WrapWithFileExceptionHandling(mockIgnorePath, () =>
+                {
+                    ignoreList.AddRules(mockIgnorePath);
+
+                    return ignoreList;
+                });
+            }
         }
 
         private T WrapWithFileExceptionHandling<T>(string path, Func<T> action)
@@ -184,8 +206,7 @@ namespace Mockaco
             try
             {
                 return Policy.Handle<IOException>()
-                        .WaitAndRetry(sleepDurations: new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
-                                      onRetry: (ex, _) => log(ex))
+                        .WaitAndRetry(sleepDurations: new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) })
                         .Execute(action);
             }
             catch (Exception ex)
