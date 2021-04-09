@@ -17,6 +17,8 @@ namespace Mockaco
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.AddMemoryCache()
                 .AddHttpClient()
                 .AddCors()
@@ -62,15 +64,24 @@ namespace Mockaco
 
             logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
 
-            app.UseCors(configurePolicy => configurePolicy
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader())
-            .UseMiddleware<ErrorHandlingMiddleware>()
-            .UseMiddleware<ResponseDelayMiddleware>()
-            .UseMiddleware<RequestMatchingMiddleware>()
-            .UseMiddleware<ResponseMockingMiddleware>()
-            .UseMiddleware<CallbackMiddleware>();
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            app.UseCors("CorsPolicy");
+
+            app.MapWhen(context => !context.Request.Path.StartsWithSegments("/verify"), appBuilder =>
+            {
+                appBuilder.UseMiddleware<ErrorHandlingMiddleware>()
+                    .UseMiddleware<ResponseDelayMiddleware>()
+                    .UseMiddleware<RequestMatchingMiddleware>()
+                    .UseMiddleware<ResponseMockingMiddleware>()
+                    .UseMiddleware<CallbackMiddleware>();
+
+            });
         }
     }
 }

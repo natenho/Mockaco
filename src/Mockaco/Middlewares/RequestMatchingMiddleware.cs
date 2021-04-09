@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Mockaco
 {
@@ -24,7 +25,8 @@ namespace Mockaco
             IScriptContext scriptContext,
             IMockProvider mockProvider,
             ITemplateTransformer templateTransformer,
-            IEnumerable<IRequestMatcher> requestMatchers
+            IEnumerable<IRequestMatcher> requestMatchers,
+            IMemoryCache cache
             )
         {
             await LogHttpContext(httpContext);
@@ -39,7 +41,14 @@ namespace Mockaco
             foreach (var mock in mockProvider.GetMocks())
             {
                 if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
-                {                    
+                {
+                    cache.Set(mock.Route, new
+                    {
+                        Route = mock.Route,
+                        Timestamp = $"{DateTime.Now.Hour}:{DateTime.Now.Minute}",
+                        Body = await httpContext.Request.ReadBodyStream()
+                    }, DateTime.Now.AddHours(1));
+
                     _logger.LogInformation("Incoming request matched {mock}", mock);
 
                     await scriptContext.AttachRouteParameters(httpContext.Request, mock);
