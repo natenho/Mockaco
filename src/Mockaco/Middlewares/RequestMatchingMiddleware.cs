@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Mockaco
 {
@@ -26,7 +27,8 @@ namespace Mockaco
             IMockProvider mockProvider,
             ITemplateTransformer templateTransformer,
             IEnumerable<IRequestMatcher> requestMatchers,
-            IMemoryCache cache
+            IMemoryCache cache,
+            IOptionsSnapshot<MockacoOptions> options
             )
         {
             await LogHttpContext(httpContext);
@@ -42,12 +44,12 @@ namespace Mockaco
             {
                 if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
                 {
-                    cache.Set(mock.Route, new
+                    cache.Set($"{nameof(RequestMatchingMiddleware)} {mock.Route}",new
                     {
                         Route = mock.Route,
                         Timestamp = $"{DateTime.Now.Hour}:{DateTime.Now.Minute}",
                         Body = await httpContext.Request.ReadBodyStream()
-                    }, DateTime.Now.AddHours(1));
+                    }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesDefaultCacheDuration));
 
                     _logger.LogInformation("Incoming request matched {mock}", mock);
 

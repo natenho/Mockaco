@@ -16,7 +16,7 @@ namespace Mockaco.Controllers
         [HttpGet]
         public IActionResult Get([FromQuery] string route)
         {
-            var requestHappened = _cache.TryGetValue(route, out var mock);
+            var requestHappened = _cache.TryGetValue($"{nameof(RequestMatchingMiddleware)} {route}", out var mock);
             if (requestHappened)
             {
                 return Ok(mock);
