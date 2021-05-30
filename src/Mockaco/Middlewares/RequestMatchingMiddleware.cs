@@ -28,7 +28,7 @@ namespace Mockaco
             ITemplateTransformer templateTransformer,
             IEnumerable<IRequestMatcher> requestMatchers,
             IMemoryCache cache,
-            IOptionsSnapshot<MockacoOptions> options
+            IOptions<MockacoOptions> options
             )
         {
             await LogHttpContext(httpContext);
@@ -49,7 +49,7 @@ namespace Mockaco
                         Route = mock.Route,
                         Timestamp = $"{DateTime.Now.Hour}:{DateTime.Now.Minute}",
                         Body = await httpContext.Request.ReadBodyStream()
-                    }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesDefaultCacheDuration));
+                    }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
 
                     _logger.LogInformation("Incoming request matched {mock}", mock);
 

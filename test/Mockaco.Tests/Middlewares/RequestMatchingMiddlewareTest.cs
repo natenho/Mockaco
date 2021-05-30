@@ -51,7 +51,7 @@ namespace Mockaco.Tests.Middlewares
                 var templateTransformer = Moq.Mock.Of<ITemplateTransformer>();
                 var requestMatchers = Moq.Mock.Of<IEnumerable<IRequestMatcher>>();
                 var memoryCache = Moq.Mock.Of<IMemoryCache>();
-                var options = Moq.Mock.Of<OptionsManager<MockacoOptions>>();
+                var options = Moq.Mock.Of<IOptions<MockacoOptions>>();
 
                 await _middleware.Invoke(httpContext, mockacoContext, scriptContext.Object, mockProvider.Object, templateTransformer, requestMatchers, memoryCache, options);
 

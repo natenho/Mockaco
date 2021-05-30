@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 
 namespace Mockaco
@@ -16,7 +15,7 @@ namespace Mockaco
 
         public List<string> Imports { get; set; }
 
-        public int MatchedRoutesDefaultCacheDuration { get; set; }
+        public int MatchedRoutesCacheDuration { get; set; }
         
         public MockacoOptions()
         {
@@ -25,7 +24,7 @@ namespace Mockaco
             DefaultHttpContentType = HttpContentTypes.ApplicationJson;
             References = new List<string>();
             Imports = new List<string>();
-            MatchedRoutesDefaultCacheDuration = 60;
+            MatchedRoutesCacheDuration = 60;
         }
     }
 }
