@@ -14,6 +14,8 @@ namespace Mockaco
         public List<string> References { get; set; }
 
         public List<string> Imports { get; set; }
+
+        public int MatchedRoutesCacheDuration { get; set; }
         
         public MockacoOptions()
         {
@@ -22,6 +24,7 @@ namespace Mockaco
             DefaultHttpContentType = HttpContentTypes.ApplicationJson;
             References = new List<string>();
             Imports = new List<string>();
+            MatchedRoutesCacheDuration = 60;
         }
     }
 }

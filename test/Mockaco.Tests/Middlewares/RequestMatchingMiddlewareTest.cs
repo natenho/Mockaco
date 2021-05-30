@@ -6,6 +6,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Mockaco.Tests.Middlewares
@@ -48,8 +50,10 @@ namespace Mockaco.Tests.Middlewares
 
                 var templateTransformer = Moq.Mock.Of<ITemplateTransformer>();
                 var requestMatchers = Moq.Mock.Of<IEnumerable<IRequestMatcher>>();
+                var memoryCache = Moq.Mock.Of<IMemoryCache>();
+                var options = Moq.Mock.Of<IOptions<MockacoOptions>>();
 
-                await _middleware.Invoke(httpContext, mockacoContext, scriptContext.Object, mockProvider.Object, templateTransformer, requestMatchers);
+                await _middleware.Invoke(httpContext, mockacoContext, scriptContext.Object, mockProvider.Object, templateTransformer, requestMatchers, memoryCache, options);
 
                 Moq.Mock.Verify(scriptContext);
             }
