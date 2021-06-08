@@ -20,7 +20,7 @@ build_script:
 test_script:
 - cmd: dotnet test .\test\Mockaco.Tests\Mockaco.Tests.csproj
 artifacts:
-- path: src\Mockaco\bin\Release\netcoreapp3.1\publish\
+- path: src\Mockaco\bin\Release\net5.0\publish\
   name: Mockaco Web Site
 deploy:
 - provider: GitHub

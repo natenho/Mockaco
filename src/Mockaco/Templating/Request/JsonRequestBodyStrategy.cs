@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+
 
 namespace Mockaco
 {
@@ -8,7 +10,7 @@ namespace Mockaco
     {
         public bool CanHandle(HttpRequest httpRequest)
         {
-            return httpRequest.HasJsonContentType();
+            return httpRequest.HasFormContentType;
         }
 
         public async Task<JToken> ReadBodyAsJson(HttpRequest httpRequest)
