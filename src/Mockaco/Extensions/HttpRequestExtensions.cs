@@ -104,7 +104,8 @@ namespace Microsoft.AspNetCore.Http
         {
             httpRequest.EnableBuffering();
 
-            var reader = new StreamReader(httpRequest.Body);
+            var encoding = GetEncodingFromContentType(httpRequest.ContentType) ?? Encoding.UTF8;
+            var reader = new StreamReader(httpRequest.Body, encoding); 
 
             var body = await reader.ReadToEndAsync();
 
@@ -126,6 +127,15 @@ namespace Microsoft.AspNetCore.Http
             }
 
             return acceptLanguages?.Select(l => l.Value.ToString());
+        }
+
+        private static Encoding GetEncodingFromContentType(string contentType)
+        {
+            // although the value is well parsed, the encoding is null when it is not informed
+            if (MediaTypeHeaderValue.TryParse(contentType, out var parsedValue))
+                return parsedValue.Encoding;
+
+            return null;
         }
     }
 }
