@@ -3,9 +3,8 @@ name: ASP.NET Core CI
 on:
   
 
-on: 
-  [push] 
-  [workflow_dispatch]
+on: [push] 
+    [workflow_dispatch]
 
 jobs:
   build:
