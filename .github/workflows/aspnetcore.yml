@@ -39,7 +39,7 @@ jobs:
       - name: Create nupkg
         run: dotnet pack --configuration Nuget --output ./nupkg
       - name: Publish nupkg
-        run: dotnet nuget push **/*.nupkg --api-key ${{secrets.NUGET_AUTH_TOKEN}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push **/*.nupkg --api-key ${{secrets.NUGET_AUTH_TOKEN}} --source https://api.nuget.org/v3/index.json --skip-duplicate
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
