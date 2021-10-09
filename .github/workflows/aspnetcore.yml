@@ -1,10 +1,11 @@
 name: ASP.NET Core CI
 
-on:
-  
 
-on: [push] 
-    [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master  
 
 jobs:
   build:
