@@ -26,9 +26,6 @@ jobs:
       - name: Determine Version
         id: git_version
         uses: gittools/actions/gitversion/execute@v0.9.7
-      - name: Display SemVer
-        run: |
-          echo "SemVer: ${{ steps.git_version.semVer }}"          
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
@@ -76,7 +73,7 @@ jobs:
           context: ./
           file: ./src/Mockaco/Docker/Dockerfile
           push: ${{ !contains(github.event.head_commit.message, 'skip-docker') }}
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.tag_version.outputs.new_tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
