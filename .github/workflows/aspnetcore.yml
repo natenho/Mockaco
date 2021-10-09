@@ -19,8 +19,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:         
           dotnet-version: '5.0.x'
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
         with:
@@ -37,6 +35,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Create nupkg
-        run: dotnet pack --configuration Nuget --output ./nupkg
+        run: dotnet pack --configuration Nuget --api-key ${{secrets.NUGET_AUTH_TOKEN}} --output ./nupkg
       - name: Publish nupkg
         run: dotnet nuget push **/*.nupkg --source https://api.nuget.org/v3/index.json
