@@ -73,7 +73,7 @@ jobs:
           context: ./
           file: ./src/Mockaco/Docker/Dockerfile
           push: ${{ !contains(github.event.head_commit.message, 'skip-docker') }}
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.tag_version.outputs.new_tag }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.tag_version.outputs.new_version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
