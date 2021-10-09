@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./
-          file: ./Docker/Dockerfile
+          file: ./src/Mockaco/Docker/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest
           cache-from: type=local,src=/tmp/.buildx-cache
