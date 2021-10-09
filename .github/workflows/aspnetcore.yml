@@ -37,6 +37,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Create nupkg
-        run: dotnet pack --configuration Nuget --output .\nupkg\
+        run: dotnet pack --configuration Nuget --output ./nupkg
       - name: Publish nupkg
         run: dotnet nuget push **/*.nupkg --source https://api.nuget.org/v3/index.json
