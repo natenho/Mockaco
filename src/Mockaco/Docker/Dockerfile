@@ -3,8 +3,8 @@ WORKDIR /app
 EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
-COPY ./src/Mockaco/Mockaco.csproj ./src/Mockaco/
-WORKDIR ./src/Mockaco
+COPY ./src/Mockaco/Mockaco.csproj /src/Mockaco/
+WORKDIR /src/Mockaco
 RUN dotnet restore
 WORKDIR /repo
 COPY ./ ./
