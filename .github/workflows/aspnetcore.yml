@@ -9,17 +9,25 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
       - uses: actions/checkout@v1
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
+          fetch-depth: 0
           dotnet-version: 3.1.403
-      - name: GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
-        with:
-          versionSpec: '5.x'
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+      - name: Display SemVer
+        run: |
+          echo "SemVer: $GITVERSION_SEMVER"
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
@@ -27,8 +35,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Create nupkg
-        run: dotnet pack --configuration Nuget --output .\nupkg\
+        run: dotnet pack --no-build --configuration Nuget --output .\nupkg\
       - name: Publish nupkg
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
-        run: dotnet nuget push .\nupkg\*.pkg --api-key $NUGET_AUTH_TOKEN --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push **/*.nupkg --source https://api.nuget.org/v3/index.json
