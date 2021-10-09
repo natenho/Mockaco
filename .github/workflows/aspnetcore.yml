@@ -22,11 +22,11 @@ jobs:
       - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
         with:         
-          dotnet-version: 5.0.10
+          dotnet-version: '5.0.x'
       - name: Setup .NET 3.1
         uses: actions/setup-dotnet@v1
         with:         
-          dotnet-version: 3.1.403
+          dotnet-version: '3.1.x'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
       - name: Determine Version
