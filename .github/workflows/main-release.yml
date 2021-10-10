@@ -24,7 +24,7 @@ jobs:
         with:
           versionSpec: '5.x'
       - name: Determine Version
-        id: git_version
+        id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
       - name: Restore dependencies
         run: dotnet restore --verbosity normal
