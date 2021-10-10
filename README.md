@@ -68,18 +68,6 @@ $ docker run -it --rm -p 5000:5000 -v /your/folder:/app/Mocks natenho/mockaco
 
 The port exposed by the container is 5000 (HTTP) by default.
 
-### Binaries
-
-Using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
-
-```console
-$ dotnet Mockaco.dll
-```
-
-A random local port is chosen if `--urls` parameter is not provided.
-
-The binaries can also be published on Microsoft IIS.
-
 ### Sources
 
 Or your can run it directly from sources:
