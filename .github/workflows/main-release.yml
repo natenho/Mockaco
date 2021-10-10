@@ -27,11 +27,11 @@ jobs:
         id: git_version
         uses: gittools/actions/gitversion/execute@v0.9.7
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore --verbosity normal
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --verbosity normal src/**
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal test/**
+        run: dotnet test --configuration Release --verbosity normal test/**
       - name: Bump version and push tag
         if: "!contains(github.event.head_commit.message, 'skip-release')"
         id: tag_version
