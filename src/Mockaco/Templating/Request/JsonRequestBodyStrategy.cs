@@ -10,7 +10,7 @@ namespace Mockaco
     {
         public bool CanHandle(HttpRequest httpRequest)
         {
-            return httpRequest.HasFormContentType;
+            return httpRequest.HasJsonContentType();
         }
 
         public async Task<JToken> ReadBodyAsJson(HttpRequest httpRequest)
