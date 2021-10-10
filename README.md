@@ -5,7 +5,7 @@
 
 Mockaco is an HTTP-based API mock server with fast setup.
 
-![Main Build](https://github.com/natenho/Mockaco/actions/workflows/main-release.yml/badge.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/natenho/mockaco) ![Nuget](https://img.shields.io/nuget/dt/Mockaco?color=blue&label=nuget%20downloads) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
+[![Main Build](https://github.com/natenho/Mockaco/actions/workflows/main-release.yml/badge.svg)](https://github.com/natenho/Mockaco/actions/workflows/main-release.yml) [![Docker Pulls](https://img.shields.io/docker/pulls/natenho/mockaco)](https://hub.docker.com/repository/docker/natenho/mockaco) [![Nuget](https://img.shields.io/nuget/dt/Mockaco?color=blue&label=nuget%20downloads)](https://www.nuget.org/packages/Mockaco/) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
 
 ## Features
 
