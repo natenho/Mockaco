@@ -5,8 +5,7 @@
 
 Mockaco is an HTTP-based API mock server with fast setup.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/natenho/mockaco)](https://hub.docker.com/r/natenho/mockaco)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
+![Main Build](https://github.com/natenho/Mockaco/actions/workflows/aspnetcore.yml/badge.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/natenho/mockaco) ![Nuget](https://img.shields.io/nuget/dt/Mockaco?color=blue&label=nuget%20downloads) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
 
 ## Features
 
@@ -15,7 +14,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - Fake data generation - built-in fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
 - State support - stateful mock support allow a mock to be returned based on a global variable previously set by another mock
-- Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
+- Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/main/release-notes/5.0/5.0-supported-os.md)
 
 # Table of Contents
 
