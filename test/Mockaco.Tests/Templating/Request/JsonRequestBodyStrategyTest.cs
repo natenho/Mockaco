@@ -55,12 +55,32 @@ namespace Mockaco.Tests.Templating.Request
                 .Throw<JsonReaderException>();
         }
 
-        private Moq.Mock<HttpRequest> PrepareHttpRequest(string givenBody)
+        [Theory]
+        [InlineData("application/json", true)]
+        [InlineData("application/json; charset=utf-8", true)]
+        [InlineData("application/x-www-form-urlencoded", false)]
+        [InlineData("multipart/form-data", false)]
+        [InlineData("application/xml", false)]
+        public void Can_Handle_Specific_ContentType(string givenContenType, bool expectedCanHandle)
+        {
+            var httpRequest = PrepareHttpRequest("{}", givenContenType);
+
+            var bodyStrategy = new JsonRequestBodyStrategy();
+            var actualCanHandle = bodyStrategy.CanHandle(httpRequest.Object);
+
+            actualCanHandle
+                .Should()
+                .Be(expectedCanHandle);
+        }
+
+        private Moq.Mock<HttpRequest> PrepareHttpRequest(string givenBody, string givenContentType = "application/json")
         {
             var httpRequest = new Moq.Mock<HttpRequest>();
             var bodyBuffer = Encoding.UTF8.GetBytes(givenBody);
             _bodyStream = new MemoryStream(bodyBuffer);
 
+            httpRequest.Setup(h => h.ContentType).Returns(givenContentType);
+            httpRequest.Setup(h => h.Headers).Returns(new HeaderDictionary() { { "Content-Type", givenContentType } });
             httpRequest.Setup(h => h.Body).Returns(_bodyStream);
 
             return httpRequest;
