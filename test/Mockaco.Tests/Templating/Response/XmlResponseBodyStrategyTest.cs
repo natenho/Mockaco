@@ -1,16 +1,23 @@
 ﻿using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Mockaco.Tests.Templating
 {
     public class XmlResponseBodyStrategyTest
     {
-        private const string UnindentedValidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><hung bat=\"saw\">-820689514</hung><clay among=\"roof\"><wet>lunch</wet><yard either=\"event\"><product><!--green dry rose baby classroom thick-->174824199.0168128</product><![CDATA[express work bottle]]><exchange>-1202804739.2211328</exchange></yard></clay></root>";
-        private const string IndentedValidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<root>\r\n  <hung bat=\"saw\">-820689514</hung>\r\n  <clay among=\"roof\">\r\n    <wet>lunch</wet>\r\n    <yard either=\"event\">\r\n      <product>\r\n        <!--green dry rose baby classroom thick-->174824199.0168128</product><![CDATA[express work bottle]]><exchange>-1202804739.2211328</exchange></yard>\r\n  </clay>\r\n</root>";
+        private static string UnindentedValidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><hung bat=\"saw\">-820689514</hung><clay among=\"roof\"><wet>lunch</wet><yard either=\"event\"><product><!--green dry rose baby classroom thick-->174824199.0168128</product><![CDATA[express work bottle]]><exchange>-1202804739.2211328</exchange></yard></clay></root>";
+        private static string IndentedValidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                        + Environment.NewLine + "<root>"
+                        + Environment.NewLine + "  <hung bat=\"saw\">-820689514</hung>"
+                        + Environment.NewLine + "  <clay among=\"roof\">"
+                        + Environment.NewLine + "    <wet>lunch</wet>"
+                        + Environment.NewLine + "    <yard either=\"event\">"
+                        + Environment.NewLine + "      <product>"
+                        + Environment.NewLine + "        <!--green dry rose baby classroom thick-->174824199.0168128</product><![CDATA[express work bottle]]><exchange>-1202804739.2211328</exchange></yard>"
+                        + Environment.NewLine + "  </clay>"
+                        + Environment.NewLine + "</root>";
 
         private XmlResponseBodyStrategy _strategy;
 
@@ -92,7 +99,7 @@ namespace Mockaco.Tests.Templating
             var responseTemplate = new ResponseTemplate();
             responseTemplate.Headers.Add(HttpHeaders.ContentType, HttpContentTypes.ApplicationXml);
             responseTemplate.Body = JToken.FromObject(UnindentedValidXml);
-            
+
             var response = _strategy.GetResponseBodyStringFromTemplate(responseTemplate);
 
             response

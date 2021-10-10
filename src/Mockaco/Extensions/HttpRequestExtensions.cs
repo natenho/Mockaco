@@ -85,13 +85,6 @@ namespace Microsoft.AspNetCore.Http
             return routeMatcher.Match(mock.Route, request.Path);
         }
 
-        public static bool HasJsonContentType(this HttpRequest request)
-        {
-            MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
-
-            return parsedValue?.MediaType.Equals(HttpContentTypes.ApplicationJson, StringComparison.OrdinalIgnoreCase) == true;
-        }
-
         public static bool HasXmlContentType(this HttpRequest request)
         {
             MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);

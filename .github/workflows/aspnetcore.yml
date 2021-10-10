@@ -4,20 +4,20 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master  
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip-ci')"
-    steps:      
+    steps:
       - name: Checkout code
         uses: actions/checkout@v1
         with:
-          fetch-depth: 0      
+          fetch-depth: 0
       - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
-        with:         
+        with:
           dotnet-version: '5.0.x'
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal test/**
       - name: Bump version and push tag
         if: "!contains(github.event.head_commit.message, 'skip-release')"
         id: tag_version
@@ -45,7 +45,7 @@ jobs:
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}     
+          body: ${{ steps.tag_version.outputs.changelog }}
       - name: Create nupkg
         run: dotnet pack --configuration Nuget --output ./nupkg
       - name: Publish nupkg
