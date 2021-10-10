@@ -78,8 +78,8 @@ namespace Mockaco.Tests.Templating.Request
             var httpRequest = new Moq.Mock<HttpRequest>(Moq.MockBehavior.Strict);
             var bodyBuffer = Encoding.UTF8.GetBytes(givenBody);
             _bodyStream = new MemoryStream(bodyBuffer);
-            
-            httpRequest.Setup(h => h.ContentType).Returns(givenContentType);            
+
+            httpRequest.Setup(h => h.ContentType).Returns(givenContentType);
             httpRequest.Setup(h => h.Body).Returns(_bodyStream);
 
             return httpRequest;
