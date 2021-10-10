@@ -75,12 +75,11 @@ namespace Mockaco.Tests.Templating.Request
 
         private Moq.Mock<HttpRequest> PrepareHttpRequest(string givenBody, string givenContentType = "application/json")
         {
-            var httpRequest = new Moq.Mock<HttpRequest>();
+            var httpRequest = new Moq.Mock<HttpRequest>(Moq.MockBehavior.Strict);
             var bodyBuffer = Encoding.UTF8.GetBytes(givenBody);
             _bodyStream = new MemoryStream(bodyBuffer);
-
-            httpRequest.Setup(h => h.ContentType).Returns(givenContentType);
-            httpRequest.Setup(h => h.Headers).Returns(new HeaderDictionary() { { "Content-Type", givenContentType } });
+            
+            httpRequest.Setup(h => h.ContentType).Returns(givenContentType);            
             httpRequest.Setup(h => h.Body).Returns(_bodyStream);
 
             return httpRequest;
