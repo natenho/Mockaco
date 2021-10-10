@@ -37,14 +37,14 @@ jobs:
         id: tag_version
         uses: mathieudutour/github-tag-action@v5.6
         with:
-          custom_tag: ${{ steps.git_version.semVer }}
+          custom_tag: ${{ steps.gitversion.outputs.semVer }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create a GitHub release
         id: github_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.git_version.semVer }}
-          name: ${{ steps.git_version.semVer }}
+          tag: v${{ steps.gitversion.outputs.semVer }}
+          name: v${{ steps.gitversion.outputs.semVer }}
           body: ${{ steps.tag_version.outputs.changelog }}
       - name: Create nupkg
         run: dotnet pack --configuration Nuget --output ./nupkg
@@ -73,7 +73,7 @@ jobs:
           context: ./
           file: ./src/Mockaco/Docker/Dockerfile
           push: ${{ !contains(github.event.head_commit.message, 'skip-docker') }}
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.git_version.semVer }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.gitversion.outputs.semVer }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
