@@ -47,7 +47,7 @@ namespace Mockaco
                     cache.Set($"{nameof(RequestMatchingMiddleware)} {mock.Route}",new
                     {
                         Route = mock.Route,
-                        Timestamp = $"{DateTime.Now.Hour}:{DateTime.Now.Minute}",
+                        Timestamp = $"{DateTime.Now.ToString("t")}",
                         Body = await httpContext.Request.ReadBodyStream()
                     }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
 

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Mockaco.Controllers
 {
-    [Route("/verify")]
     public class VerifyController : Controller
     {
         private readonly IMemoryCache _cache;

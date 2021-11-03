@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace Mockaco
 {
+    using Settings;
+
     public partial class Startup
     {
         private readonly IConfiguration _configuration;
@@ -27,6 +29,7 @@ namespace Mockaco
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
                 .Configure<TemplateFileProviderOptions>(_configuration.GetSection("Mockaco:TemplateFileProvider"))
 
+                .AddSingleton<VerificationRouteValueTransformer>()
                 .AddScoped<IMockacoContext, MockacoContext>()
                 .AddScoped<IScriptContext, ScriptContext>()
                 .AddTransient<IGlobalVariableStorage, ScriptContextGlobalVariableStorage>()
@@ -65,23 +68,25 @@ namespace Mockaco
             logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
 
             app.UseRouting();
+            
+            var verificationEndpointPrefix = _configuration["Mockaco:VerificationEndpointPrefix"];
+            var verificationEndpointName = _configuration["Mockaco:VerificationEndpointName"];
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            app.UseCors("CorsPolicy");
-
-            app.MapWhen(context => !context.Request.Path.StartsWithSegments("/verify"), appBuilder =>
+            app.MapWhen(context => !context.Request.Path.StartsWithSegments($"/{verificationEndpointPrefix}/{verificationEndpointName}"), appBuilder =>
             {
                 appBuilder.UseMiddleware<ErrorHandlingMiddleware>()
                     .UseMiddleware<ResponseDelayMiddleware>()
                     .UseMiddleware<RequestMatchingMiddleware>()
                     .UseMiddleware<ResponseMockingMiddleware>()
                     .UseMiddleware<CallbackMiddleware>();
-
             });
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDynamicControllerRoute<VerificationRouteValueTransformer>("{controller}/{action}");
+            });
+
+            app.UseCors("CorsPolicy");
         }
     }
 }
