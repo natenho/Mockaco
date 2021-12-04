@@ -2,7 +2,7 @@
 {
     public partial class Startup
     {
-        private const string _banner =
+        private const string _logo =
         "                                            .x000000000000000000000d.          \n" +
         "                                          .kMW0OkdooooooooooooooookNWd.        \n" +
         "                          ...           .kMNOdoc;;;;;;;;;;;;;;;;;;;:xNWx.      \n" +

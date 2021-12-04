@@ -15,7 +15,7 @@ namespace Mockaco
             _strategies = strategies;
         }
 
-        public async Task<JObject> ReadBodyAsJson(HttpRequest httpRequest)
+        public async Task<JToken> ReadBodyAsJson(HttpRequest httpRequest)
         {
             if (httpRequest.Body?.CanRead == false)
             {

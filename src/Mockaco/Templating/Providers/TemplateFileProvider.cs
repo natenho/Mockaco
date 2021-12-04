@@ -1,4 +1,5 @@
 ﻿using MAB.DotIgnore;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
@@ -22,12 +23,13 @@ namespace Mockaco
         private const string DefaultTemplateSearchPattern = "*.json";
 
         private readonly ILogger<TemplateFileProvider> _logger;
+        
         private readonly IMemoryCache _memoryCache;
         private PhysicalFileProvider _fileProvider;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
-        public TemplateFileProvider(IOptionsMonitor<TemplateFileProviderOptions> options, IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
-        {
+        public TemplateFileProvider(IOptionsMonitor<TemplateFileProviderOptions> options, IWebHostEnvironment webHostEnvironment, IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
+        {            
             _memoryCache = memoryCache;
             _logger = logger;
 
@@ -52,14 +54,14 @@ namespace Mockaco
                 var fullPath = Path.IsPathRooted(path) 
                     ? path 
                     : Path.Combine(Directory.GetCurrentDirectory(), path);
-
+                
                 var fileProvider = new PhysicalFileProvider(fullPath, ExclusionFilters.Hidden | ExclusionFilters.System);
 
                 _fileProvider?.Dispose();
                 _fileProvider = fileProvider;
 
-                _logger.LogInformation("Mock root path: {fullPath}", fullPath);
-            }
+                _logger.LogInformation("Mock path: {fullPath}", fullPath);
+            }            
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error setting mock root path");

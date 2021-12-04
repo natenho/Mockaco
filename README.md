@@ -5,7 +5,7 @@
 
 Mockaco is an HTTP-based API mock server with fast setup.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/0e0qfnp2kobgakl6/branch/master?svg=true)](https://ci.appveyor.com/project/natenho/mockaco/branch/master) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/natenho/mockaco)](https://hub.docker.com/r/natenho/mockaco)
+[![Main Build](https://github.com/natenho/Mockaco/actions/workflows/main-release.yml/badge.svg)](https://github.com/natenho/Mockaco/actions/workflows/main-release.yml) [![Docker Pulls](https://img.shields.io/docker/pulls/natenho/mockaco)](https://hub.docker.com/repository/docker/natenho/mockaco) [![Nuget](https://img.shields.io/nuget/dt/Mockaco?color=blue&label=nuget%20downloads)](https://www.nuget.org/packages/Mockaco/) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_shield)
 
 ## Features
 
@@ -14,7 +14,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - Fake data generation - built-in fake data generation
 - Callback support - trigger another service call when a request hits your mocked API
 - State support - stateful mock support allow a mock to be returned based on a global variable previously set by another mock
-- Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/master/release-notes/2.2/2.2-supported-os.md)
+- Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/main/release-notes/5.0/5.0-supported-os.md)
 
 # Table of Contents
 
@@ -46,17 +46,28 @@ Mockaco is an HTTP-based API mock server with fast setup.
 
 ## Running the application
 
+### .NET CLI
+
+Install and run as a dotnet tool:
+
+```console
+$ dotnet tool install -g mockaco
+$ mockaco --urls "http://localhost:5000"
+```
+
+A random local port is chosen if `--urls` parameter is not provided.
+
+### Docker
+
 You can run Mockaco from the official [Docker image](https://hub.docker.com/r/natenho/mockaco) (replace ```/your/folder``` with an existing directory of your preference):
 
 ```console
-$ docker run -it --rm -p 5000:80 -v /your/folder:/app/Mocks natenho/mockaco
+$ docker run -it --rm -p 5000:5000 -v /your/folder:/app/Mocks natenho/mockaco
 ```
 
-Or using [.NET Core](https://dotnet.microsoft.com/download) dotnet CLI, you can run the [latest binaries](https://github.com/natenho/Mockaco/releases/latest/download/Mockaco.Web.Site.zip):
+The port exposed by the container is 5000 (HTTP) by default.
 
-```console
-$ dotnet Mockaco.dll
-```
+### Sources
 
 Or your can run it directly from sources:
 
@@ -65,6 +76,8 @@ $ git clone https://github.com/natenho/Mockaco.git
 $ cd Mockaco\src\Mockaco
 $ dotnet run
 ```
+
+A random local port is chosen if `--urls` parameter is not provided.
 
 ## Creating a request/response template
 
@@ -412,3 +425,7 @@ The built-in fake data is generated via [Bogus](https://github.com/bchavez/Bogus
 The faker can also generate localized data using ```Accept-Language``` HTTP header. Defaults to ```en``` (english) fake data.
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_large)

@@ -1,13 +1,16 @@
 ﻿using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using System;
 
 namespace Mockaco.Tests.Templating
 {
     public class JsonResponseBodyStrategyTest
     {
-        private const string UnindentedValidJson = "{\"property1\":\"property1Value\"}";
-        private const string IndentedValidJson = "{\r\n  \"property1\": \"property1Value\"\r\n}";
+        private static string UnindentedValidJson = "{\"property1\":\"property1Value\"}";
+        private static string IndentedValidJson = "{"
+                        + Environment.NewLine + "  \"property1\": \"property1Value\""
+                        + Environment.NewLine + "}";
 
         private readonly JsonResponseBodyStrategy _strategy;
         private readonly ResponseTemplate _validJsonResponseTemplate;

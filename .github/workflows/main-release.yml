@@ -1,0 +1,80 @@
+name: Main Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '5.0.x'
+      - name: Setup GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+      - name: Determine version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+      - name: Restore dependencies
+        run: dotnet restore --verbosity normal
+      - name: Build
+        run: dotnet build --configuration Release --verbosity normal src/**
+      - name: Test
+        run: dotnet test --configuration Release --verbosity normal test/**
+      - name: Bump version and push tag
+        if: "!contains(github.event.head_commit.message, 'skip-release')"
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          custom_tag: ${{ steps.gitversion.outputs.semVer }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create a GitHub release
+        id: github_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.gitversion.outputs.semVer }}
+          name: v${{ steps.gitversion.outputs.semVer }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+      - name: Create nupkg
+        run: dotnet pack --configuration Nuget --output ./nupkg
+      - name: Publish nupkg
+        if: "!contains(github.event.head_commit.message, 'skip-nuget')"
+        run: dotnet nuget push **/*.nupkg --api-key ${{secrets.NUGET_AUTH_TOKEN}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Setup Docker Build
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Docker Build
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./src/Mockaco/Docker/Dockerfile
+          push: ${{ !contains(github.event.head_commit.message, 'skip-docker') }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.gitversion.outputs.semVer }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      - name: Docker Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}

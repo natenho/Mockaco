@@ -13,13 +13,14 @@ namespace Mockaco
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;          
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache()
                 .AddHttpClient()
+                .AddCors()
                 .AddOptions()
 
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
@@ -41,9 +42,9 @@ namespace Mockaco
 
                 .AddTransient<IRequestBodyFactory, RequestBodyFactory>()
 
-                .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
                 .AddTransient<IRequestBodyStrategy, JsonRequestBodyStrategy>()
                 .AddTransient<IRequestBodyStrategy, XmlRequestBodyStrategy>()
+                .AddTransient<IRequestBodyStrategy, FormRequestBodyStrategy>()
 
                 .AddTransient<IResponseBodyFactory, ResponseBodyFactory>()
 
@@ -61,14 +62,20 @@ namespace Mockaco
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
-            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-            logger.LogInformation($"{assemblyName.Name} v{assemblyName.Version} by Renato Lima [github.com/natenho]\n\n{_banner}");
+            var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+            var version = GitVersionInformation.InformationalVersion;
 
-            app.UseMiddleware<ErrorHandlingMiddleware>()
-                .UseMiddleware<ResponseDelayMiddleware>()
-                .UseMiddleware<RequestMatchingMiddleware>()
-                .UseMiddleware<ResponseMockingMiddleware>()
-                .UseMiddleware<CallbackMiddleware>();
+            logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
+
+            app.UseCors(configurePolicy => configurePolicy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader())
+            .UseMiddleware<ErrorHandlingMiddleware>()
+            .UseMiddleware<ResponseDelayMiddleware>()
+            .UseMiddleware<RequestMatchingMiddleware>()
+            .UseMiddleware<ResponseMockingMiddleware>()
+            .UseMiddleware<CallbackMiddleware>();
         }
     }
 }

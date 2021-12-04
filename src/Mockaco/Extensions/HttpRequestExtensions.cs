@@ -85,13 +85,6 @@ namespace Microsoft.AspNetCore.Http
             return routeMatcher.Match(mock.Route, request.Path);
         }
 
-        public static bool HasJsonContentType(this HttpRequest request)
-        {
-            MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
-
-            return parsedValue?.MediaType.Equals(HttpContentTypes.ApplicationJson, StringComparison.OrdinalIgnoreCase) == true;
-        }
-
         public static bool HasXmlContentType(this HttpRequest request)
         {
             MediaTypeHeaderValue.TryParse(request.ContentType, out var parsedValue);
@@ -104,7 +97,8 @@ namespace Microsoft.AspNetCore.Http
         {
             httpRequest.EnableBuffering();
 
-            var reader = new StreamReader(httpRequest.Body);
+            var encoding = GetEncodingFromContentType(httpRequest.ContentType) ?? Encoding.UTF8;
+            var reader = new StreamReader(httpRequest.Body, encoding); 
 
             var body = await reader.ReadToEndAsync();
 
@@ -126,6 +120,15 @@ namespace Microsoft.AspNetCore.Http
             }
 
             return acceptLanguages?.Select(l => l.Value.ToString());
+        }
+
+        private static Encoding GetEncodingFromContentType(string contentType)
+        {
+            // although the value is well parsed, the encoding is null when it is not informed
+            if (MediaTypeHeaderValue.TryParse(contentType, out var parsedValue))
+                return parsedValue.Encoding;
+
+            return null;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Mockaco
         {
             await LogHttpContext(httpContext);
 
-            AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
+            await AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
 
             if (mockacoContext.Errors.Any())
             {
@@ -65,11 +65,11 @@ namespace Mockaco
         }
 
         //TODO Remove redundant code
-        private void AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
+        private async Task AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
         {
             try
             {
-                scriptContext.AttachRequest(httpContext.Request);
+                await scriptContext.AttachRequest(httpContext.Request);
             }
             catch (Exception ex)
             {

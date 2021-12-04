@@ -13,7 +13,7 @@ namespace Mockaco
         private StringDictionary _queryDictionary = new StringDictionary();
         private StringDictionary _headersDictionary = new StringDictionary();
         private StringDictionary _routeDictionary = new StringDictionary();
-        private JObject _bodyAsJson;
+        private JToken _bodyAsJson;
         private readonly IFakerFactory _fakerFactory;
         private readonly IRequestBodyFactory _requestBodyFactory;
 
