@@ -1,7 +1,9 @@
-﻿namespace Mockaco.Generation
+﻿using System.Threading.Tasks;
+
+namespace Mockaco.Generation
 {
     public interface ITemplateGenerator
     {
-        void GenerateTemplate(TemplateGenerationContext context);
+        Task GenerateTemplateAsync(TemplateGenerationContext context);
     }
 }

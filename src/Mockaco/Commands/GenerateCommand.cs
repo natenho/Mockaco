@@ -9,8 +9,8 @@ namespace Mockaco.Commands
     public class GenerateCommand : ISelfRegisterCommand
     {
         [Required]
-        [Option("-g|--generator", Description = "Sets generator type")]
-        public string Generator { get; set; }
+        [Option("-t|--type", Description = "Sets source type")]
+        public string Type { get; set; }
 
         [Argument(1, Description = "Source URI", Name = "source_uri")]
         public string SourceUri { get; set; }
