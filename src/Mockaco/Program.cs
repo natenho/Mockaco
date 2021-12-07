@@ -1,12 +1,14 @@
-﻿using McMaster.Extensions.CommandLineUtils;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Mockaco.Commands;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -18,27 +20,20 @@ namespace Mockaco
     {
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder().Build();
+            var host = CreateHostBuilder(args).Build();
+            await BuildCommandLine(host).UseDefaults().Build().InvokeAsync(args);
+        }
 
-            var app = new CommandLineApplication<Program>();
-            app.Conventions
-            .UseDefaultConventions()
-            .UseConstructorInjection(host.Services);
-
-            app.Name = Assembly.GetExecutingAssembly().GetName().Name.ToLower();
-            app.FullName = $"{Assembly.GetExecutingAssembly().GetName().Name} {Assembly.GetExecutingAssembly().GetName().Version}";
-
-            app.Command("run", config =>
+        private static CommandLineBuilder BuildCommandLine(IHost host)
+        {
+            var root = new RootCommand();
+            foreach (var cmd in host.Services.GetService<IEnumerable<Command>>() ?? Array.Empty<Command>())
             {
-                config.Description = "Runs mock server";
-                config.OnExecuteAsync(RunServer(host));
-            });
-
-            host.Services.GetRequiredService<GenerateCommand>().SelfRegister(app);
-
-            app.OnExecuteAsync(RunServer(host));
-
-            await app.ExecuteAsync(args);
+                root.AddCommand(cmd);
+            }
+            
+            root.Handler = CommandHandler.Create(RunServer(host));
+            return new CommandLineBuilder(root);
         }
 
         private static Func<CancellationToken, Task> RunServer(IHost host)
@@ -56,7 +51,7 @@ namespace Mockaco
             };
         }
 
-        public static IHostBuilder CreateHostBuilder() =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

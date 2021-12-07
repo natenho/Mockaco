@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mockaco.Commands;
 using System.Reflection;
+using Mockaco.Templating.Generating;
 
 namespace Mockaco
 {
@@ -22,6 +22,7 @@ namespace Mockaco
                 .AddHttpClient()
                 .AddCors()
                 .AddOptions()
+                .AddTemplatesGenerating()
 
                 .Configure<MockacoOptions>(_configuration.GetSection("Mockaco"))
                 .Configure<TemplateFileProviderOptions>(_configuration.GetSection("Mockaco:TemplateFileProvider"))
@@ -53,11 +54,7 @@ namespace Mockaco
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
 
-                .AddTransient<ITemplateTransformer, TemplateTransformer>()
-
-            //Commands
-
-                .AddScoped<GenerateCommand>();
+                .AddTransient<ITemplateTransformer, TemplateTransformer>();
         }
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
