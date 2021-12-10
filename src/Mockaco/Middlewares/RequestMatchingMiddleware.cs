@@ -44,9 +44,9 @@ namespace Mockaco
             {
                 if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
                 {
-                    cache.Set($"{nameof(RequestMatchingMiddleware)} {mock.Route}",new
+                    cache.Set($"{nameof(RequestMatchingMiddleware)} {httpContext.Request.Path.Value}",new
                     {
-                        Route = mock.Route,
+                        Route = httpContext.Request.Path.Value,
                         Timestamp = $"{DateTime.Now.ToString("t")}",
                         Body = await httpContext.Request.ReadBodyStream()
                     }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
