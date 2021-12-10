@@ -43,6 +43,13 @@ Mockaco is an HTTP-based API mock server with fast setup.
     + [Example: Accessing request data](#example-accessing-request-data)
     + [Example: Generating fake data](#example-generating-fake-data)
 - [Verification](#verification)
+    + [Example: Verifying call to mocked endpoint](#example-verifying-call-to-mocked-endpoint)
+      + [Verify request without body](#verify-request-without-body)
+      + [Verify request with body](#verify-request-with-body)
+    + [Configure custom name of verification endpoint](#configure-custom-name-of-verification-endpoint)
+    + [Configure the duration of cache storing last request for verification](#configure-the-time-of-cache-storing-last-request-for-verification)
+    + [Verification summary](#verification-summary)
+
 
 # Get Started
 
@@ -442,7 +449,7 @@ The faker can also generate localized data using ```Accept-Language``` HTTP head
 
 There is a default endpoint provided that let's you verify the  last call for each mocked endpoint. The default path for this endpoint is ```http://localhost:5000/_mockaco/verification?route={path to verify}```.
 
-## Example: verifying call to mocked endpoint
+## Example: Verifying call to mocked endpoint
 
 ### Verify request without body
 
@@ -490,7 +497,7 @@ You can configure the default name of verification enpoint by modifying ```Mocka
 
 You will be able to access the verification endpoint on ```http://localhost:5000/_internal/customVerify```
 
-## Configure the time of cache storing last request for verification
+## Configure the duration of cache storing last request for verification
 
 Each request with the exact time of being ivoked, body and path is being stored in the internal .Net cache for 60 minutes. You can configure this time by changing
 
