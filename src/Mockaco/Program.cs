@@ -17,12 +17,13 @@ namespace Mockaco
         {
             var host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
+            _ = Task.Factory.StartNew(() =>
             {
+                using var scope = host.Services.CreateScope();
                 var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
 
-                await mockProvider.WarmUp();
-            }
+                mockProvider.BuildCache();
+            });
 
             await host.RunAsync();
         }

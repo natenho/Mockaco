@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mockaco
 {
@@ -12,11 +13,24 @@ namespace Mockaco
 
         public string Hash { get; }
 
-        public RawTemplate(string name, string content)
+        public DateTime LastModified { get; }
+
+        public RawTemplate(string name, string content, DateTime lastModified)
         {
             Name = name;
             Content = content;
             Hash = content.ToSHA1Hash();
+            LastModified = lastModified;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Hash})";
+        }
+
+        public bool Equals([AllowNull] IRawTemplate other)
+        {
+            return other.Hash == Hash;
         }
     }
 }

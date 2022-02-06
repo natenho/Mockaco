@@ -2,17 +2,20 @@
 using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mockaco
 {
     public class MockProvider : IMockProvider
     {
-        private List<Mock> _cache;
-        private readonly List<(string TemplateName, string ErrorMessage)> _errors = new List<(string TemplateName, string Error)>();        
+        private ConcurrentDictionary<string, Mock> _cache = new();
+        private readonly ConcurrentDictionary<string, (IRawTemplate, string)> _badTemplateHashes = new();
+        private readonly ConcurrentBag<(string TemplateName, string ErrorMessage)> _errors = new();
         private readonly IFakerFactory _fakerFactory;
         private readonly IRequestBodyFactory _requestBodyFactory;
         private readonly ITemplateProvider _templateProvider;
@@ -20,15 +23,17 @@ namespace Mockaco
         private readonly IGlobalVariableStorage _globalVariableStorage;
         private readonly ILogger<MockProvider> _logger;
 
+        private CancellationTokenSource _cancellationTokenSource;
+        private AutoResetEvent _autoResetEvent = new(true);
+
         public MockProvider
-            (IFakerFactory fakerFactory, 
-            IRequestBodyFactory requestBodyFactory, 
-            ITemplateProvider templateProvider, 
-            ITemplateTransformer templateTransformer, 
+            (IFakerFactory fakerFactory,
+            IRequestBodyFactory requestBodyFactory,
+            ITemplateProvider templateProvider,
+            ITemplateTransformer templateTransformer,
             IGlobalVariableStorage globalVariableStorage,
             ILogger<MockProvider> logger)
         {
-            _cache = new List<Mock>();
             _fakerFactory = fakerFactory;
             _requestBodyFactory = requestBodyFactory;
             _templateProvider = templateProvider;
@@ -39,15 +44,17 @@ namespace Mockaco
             _logger = logger;
         }
 
-        private async void TemplateProviderChange(object sender, EventArgs e)
+        private void TemplateProviderChange(object sender, EventArgs e)
         {
-            await WarmUp();
+            BuildCache();
         }
 
-        //TODO: Fix potential thread-unsafe method
-        public List<Mock> GetMocks()
+        public IEnumerable<Mock> GetMocks()
         {
-            return _cache;
+            return _cache
+                .Select(m => m.Value)
+                .OrderBy(m => m.RawTemplate.Name)
+                .ThenByDescending(m => m.HasCondition);
         }
 
         public IEnumerable<(string TemplateName, string ErrorMessage)> GetErrors()
@@ -55,66 +62,149 @@ namespace Mockaco
             return _errors;
         }
 
-        public async Task WarmUp()
+        public void BuildCache()
         {
+            _cancellationTokenSource?.Cancel();
+
+            _autoResetEvent.WaitOne();
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
             var stopwatch = Stopwatch.StartNew();
-
-            var warmUpScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory, _globalVariableStorage);
-
-            const int defaultCapacity = 16;
-            var mocks = new List<Mock>(_cache.Count > 0 ? _cache.Count : defaultCapacity);
 
             _errors.Clear();
 
-            foreach (var rawTemplate in _templateProvider.GetTemplates())
+            var templates = _templateProvider
+                .GetTemplates()
+                .ToList();
+
+            try
+            {
+                RemoveMissingTemplatesFromCache(templates, _cancellationTokenSource);
+
+                var recentlyModifiedTemplates = templates.Where(_ => _.LastModified > DateTime.Now.AddMinutes(-15));
+                BuildCacheFromTemplates(recentlyModifiedTemplates, _cancellationTokenSource);
+
+                BuildCacheFromTemplates(templates.Except(recentlyModifiedTemplates), _cancellationTokenSource);
+
+                _logger.LogDebug("{0} loaded {1} mocks in {2} ms", nameof(MockProvider), _cache.Count, stopwatch.ElapsedMilliseconds);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Changes were detected while building cache");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error building mock cache");             
+            }
+            finally
+            {
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+                _autoResetEvent.Set();
+            }
+        }
+
+        private void RemoveMissingTemplatesFromCache(IEnumerable<IRawTemplate> templates, CancellationTokenSource cancellationTokenSource)
+        {
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = cancellationTokenSource.Token,
+                MaxDegreeOfParallelism = Environment.ProcessorCount
+            };
+
+            Parallel.ForEach(_cache, parallelOptions, cacheItem =>
+                {
+                    if (templates.Any(template => template.Hash == cacheItem.Key))
+                    {
+                        return;
+                    }
+
+                    if (!_cache.TryRemove(cacheItem.Key, out var removedMock))
+                    {
+                        _logger.LogWarning("Could not remove {0} from cache", cacheItem.Value.RawTemplate);
+                        return;
+                    }
+
+                    _logger.LogDebug("Removed {0} from cache", removedMock.RawTemplate);
+                });
+        }
+
+        private void BuildCacheFromTemplates(IEnumerable<IRawTemplate> templates, CancellationTokenSource _cancellationTokenSource)
+        {
+            var warmUpScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory, _globalVariableStorage);
+
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = _cancellationTokenSource.Token,
+                MaxDegreeOfParallelism = Environment.ProcessorCount
+            };
+
+            Parallel.ForEach(templates, parallelOptions, async rawTemplate =>
             {
                 try
                 {
-                    var existentCachedRoute = _cache.FirstOrDefault(cachedRoute => cachedRoute.RawTemplate.Hash == rawTemplate.Hash);
-
-                    if (existentCachedRoute != default)
+                    if (_badTemplateHashes.TryGetValue(rawTemplate.Hash, out (IRawTemplate RawTemplate, string ErrorMessage) failedRawTemplate))
                     {
-                        _logger.LogDebug("Using cached {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                        _logger.LogWarning("Skipping {0}: {1}", failedRawTemplate.RawTemplate.Name, failedRawTemplate.ErrorMessage);
 
-                        mocks.Add(existentCachedRoute);
-
-                        continue;
+                        return;
                     }
 
-                    _logger.LogDebug("Loading {0} ({1})", rawTemplate.Name, rawTemplate.Hash);
+                    _cache.TryGetValue(rawTemplate.Hash, out var cachedMock);
+
+                    if (cachedMock != default)
+                    {
+                        _logger.LogDebug("Using cached {0}", rawTemplate);
+
+                        return;
+                    }
+
+                    _logger.LogDebug("Loading {0}", rawTemplate);
 
                     var template = await _templateTransformer.Transform(rawTemplate, warmUpScriptContext);
                     var mock = CreateMock(rawTemplate, template.Request);
 
-                    mocks.Add(mock);
+                    if (!_cache.TryAdd(rawTemplate.Hash, mock))
+                    {
+                        _logger.LogWarning("Duplicated mocks: {0} and {1}", _cache[rawTemplate.Hash].RawTemplate, rawTemplate);
+                        return;
+                    }
 
                     _logger.LogInformation("{method} {route} mapped from {templateName}", template.Request?.Method, template.Request?.Route, rawTemplate.Name);
                 }
                 catch (JsonReaderException ex)
                 {
-                    _errors.Add((rawTemplate.Name, $"Generated JSON is invalid - {ex.Message}"));
-                    
-                    _logger.LogWarning("Skipping {0}: Generated JSON is invalid - {1}", rawTemplate.Name, ex.Message);
+                    var message = $"Generated JSON is invalid - {ex.Message}";
+                    _errors.Add((rawTemplate.Name, message));
+
+                    _logger.LogWarning("Skipping {0}: Generated JSON is invalid - {1}", rawTemplate.Name, message);
+
+                    _badTemplateHashes.TryAdd(rawTemplate.Hash, (rawTemplate, message));
                 }
                 catch (ParserException ex)
                 {
-                    _errors.Add((rawTemplate.Name, $"Script parser error - {ex.Message} {ex.Location}"));
+                    var message = $"Script parser error - {ex.Message} {ex.Location}";
 
-                    _logger.LogWarning("Skipping {0}: Script parser error - {1} {2} ", rawTemplate.Name, ex.Message, ex.Location);
+                    _errors.Add((rawTemplate.Name, message));
+
+                    _logger.LogWarning("Skipping {0}: Script parser error - {1}", rawTemplate.Name, message);
+
+                    _badTemplateHashes.TryAdd(rawTemplate.Hash, (rawTemplate, message));
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
                     _errors.Add((rawTemplate.Name, ex.Message));
 
                     _logger.LogWarning("Skipping {0}: {1}", rawTemplate.Name, ex.Message);
+
+                    _badTemplateHashes.TryAdd(rawTemplate.Hash, (rawTemplate, ex.Message));
                 }
-            }
-
-            _cache.Clear();
-
-            _cache = mocks.OrderByDescending(r => r.HasCondition).ToList();
-
-            _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
+            });
         }
 
         private static Mock CreateMock(IRawTemplate rawTemplate, RequestTemplate requestTemplate)

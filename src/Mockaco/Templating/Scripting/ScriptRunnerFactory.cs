@@ -26,8 +26,8 @@ namespace Mockaco
         public Task<TResult> Invoke<TContext, TResult>(TContext context, string code)
         {
             var runner = GetOrCreateRunner<TContext, TResult>(code);
-            
-            return runner.Invoke(context);            
+
+            return runner.Invoke(context);
         }
 
         private ScriptRunner<TResult> GetOrCreateRunner<TContext, TResult>(string code)
@@ -67,14 +67,14 @@ namespace Mockaco
                     "Newtonsoft.Json.Linq")
                 .AddImports(_options.CurrentValue.Imports)
                 .WithOptimizationLevel(OptimizationLevel.Release);
-            
+
             var script = CSharpScript.Create<TResult>(
                 code,
                 globalsType: typeof(TContext),
                 options: scriptOptions);
-            
+
             var runner = script.CreateDelegate();
-            
+
             _logger.LogTrace("Created runner in {elapsedTime} milliseconds", stopWatch.ElapsedMilliseconds);
 
             return runner;

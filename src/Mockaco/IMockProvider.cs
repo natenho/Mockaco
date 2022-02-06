@@ -5,10 +5,10 @@ namespace Mockaco
 {
     public interface IMockProvider
     {
-        List<Mock> GetMocks();
+        IEnumerable<Mock> GetMocks();
 
         IEnumerable<(string TemplateName, string ErrorMessage)> GetErrors();
 
-        Task WarmUp();
+        void BuildCache();
     }
 }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -73,7 +74,7 @@ namespace Mockaco
             FlushCache();
             GetTemplates();
 
-            OnChange?.Invoke(this, EventArgs.Empty);
+            Task.Factory.StartNew(() => OnChange(this, EventArgs.Empty));
 
             KeepWatchingForFileChanges();
         }
@@ -145,7 +146,7 @@ namespace Mockaco
                     using var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
                     using var streamReader = new StreamReader(stream);
                     rawContent = streamReader.ReadToEnd();
-                    return new RawTemplate(name, rawContent);
+                    return new RawTemplate(name, rawContent, file.LastWriteTimeUtc);
                 });
 
                 if (rawTemplate != default)
