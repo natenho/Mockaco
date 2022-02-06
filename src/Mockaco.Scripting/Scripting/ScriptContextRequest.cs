@@ -8,7 +8,7 @@ namespace Mockaco
     {
         public Uri Url { get; }
 
-        public IReadOnlyDictionary<string, string> Route { get; }
+        public IReadOnlyDictionary<string, string> Route { get; private set; }
 
         public IReadOnlyDictionary<string, string> Query { get; }
 
@@ -28,6 +28,11 @@ namespace Mockaco
             Query = query;
             Header = header;
             Body = body;
-        }      
+        }
+
+        public void AttachRouteParams(StringDictionary routes)
+        {
+            Route = routes;
+        }
     }
 }

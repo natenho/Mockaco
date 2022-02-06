@@ -33,8 +33,8 @@ namespace Mockaco
 
         public async Task<bool> IsMatch(HttpRequest httpRequest, Mock mock)
         {
-            var conditionMatcherScriptContext = new ScriptContext(_fakerFactory, _requestBodyFactory, _globalVarialeStorage);
-            
+            var conditionMatcherScriptContext = new ScriptContext(_fakerFactory, _globalVarialeStorage);
+
             await AttachRequestToScriptContext(httpRequest.HttpContext, _mockacoContext, conditionMatcherScriptContext);
 
             if (_mockacoContext.Errors.Any())
@@ -56,7 +56,7 @@ namespace Mockaco
         {
             try
             {
-                await scriptContext.AttachRequest(httpContext.Request);
+                await scriptContext.AttachRequest(httpContext.Request, _fakerFactory, _requestBodyFactory);
             }
             catch (Exception ex)
             {

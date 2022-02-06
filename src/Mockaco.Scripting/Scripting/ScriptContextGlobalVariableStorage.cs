@@ -22,7 +22,7 @@ namespace Mockaco
             {
                 if (_canWrite)
                 {
-                    _variables.AddOrUpdate(name, value, (name, _) => _variables[name] = value);
+                    _variables.AddOrUpdate(name, value, (key, _) => _variables[key] = value);
                 }
             }
         }

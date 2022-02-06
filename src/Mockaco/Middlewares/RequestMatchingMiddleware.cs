@@ -24,12 +24,13 @@ namespace Mockaco
             IScriptContext scriptContext,
             IMockProvider mockProvider,
             ITemplateTransformer templateTransformer,
-            IEnumerable<IRequestMatcher> requestMatchers
-            )
+            IEnumerable<IRequestMatcher> requestMatchers,
+            IFakerFactory fakerFactor,
+            IRequestBodyFactory requestBodyFactory)
         {
             await LogHttpContext(httpContext);
 
-            await AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext);
+            await AttachRequestToScriptContext(httpContext, mockacoContext, scriptContext, fakerFactor, requestBodyFactory);
 
             if (mockacoContext.Errors.Any())
             {
@@ -39,7 +40,7 @@ namespace Mockaco
             foreach (var mock in mockProvider.GetMocks())
             {
                 if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
-                {                    
+                {
                     _logger.LogInformation("Incoming request matched {mock}", mock);
 
                     await scriptContext.AttachRouteParameters(httpContext.Request, mock);
@@ -65,11 +66,11 @@ namespace Mockaco
         }
 
         //TODO Remove redundant code
-        private async Task AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext)
+        private async Task AttachRequestToScriptContext(HttpContext httpContext, IMockacoContext mockacoContext, IScriptContext scriptContext, IFakerFactory fakerFactory, IRequestBodyFactory requestBodyFactory)
         {
             try
             {
-                await scriptContext.AttachRequest(httpContext.Request);
+                await scriptContext.AttachRequest(httpContext.Request, fakerFactory, requestBodyFactory);
             }
             catch (Exception ex)
             {

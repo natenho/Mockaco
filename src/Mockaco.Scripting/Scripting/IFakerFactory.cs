@@ -7,6 +7,6 @@ namespace Mockaco
     {
         Faker GetDefaultFaker();
 
-        Faker GetFaker(IEnumerable<string> acceptLanguages);     
+        Faker GetFaker(IEnumerable<string> acceptLanguages);
     }
 }

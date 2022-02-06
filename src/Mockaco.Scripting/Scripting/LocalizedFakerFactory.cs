@@ -64,7 +64,7 @@ namespace Mockaco
                 catch (CultureNotFoundException)
                 {
                     _logger.LogWarning("Accept-Language not supported: {language}", acceptLanguage);
-                }                
+                }
             }
 
             return bogusLocales;
