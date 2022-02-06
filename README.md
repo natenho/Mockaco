@@ -110,7 +110,7 @@ This example contains a request/response template, meaning "Whenever you receive
 	
 ## Sending a request and getting the mocked response
 
-```http
+```
 curl -iX GET http://localhost:5000/ping
 
 HTTP/1.1 200 OK
@@ -291,7 +291,7 @@ Sets the response body indentation for some structured content-types. If ommited
 
 Result:
 
-```http
+```
 curl -iX GET http://localhost:5000
 
 HTTP/1.1 200 OK
@@ -474,7 +474,7 @@ Both JSON body and x-www-form-urlencoded body are supported.
 
 You can configure the default name of verification enpoint by modifying ```Mockaco.VerificationEndpointName``` and ```Mockaco.VerificationEndpointPrefix``` fields in ``appsettings.json`` file. So if you will rename it like so:
 
-```json
+```
 "Mockaco": {
     ...
     "VerificationEndpointName": "customVerify",
@@ -488,7 +488,7 @@ You will be able to access the verification endpoint on ```http://localhost:5000
 
 Each request with the exact time of being ivoked, body and path is being stored in the internal .Net cache for 60 minutes. You can configure this time by changing
 
-```json
+```
 "Mockaco": {
     ...
     "MatchedRoutesCacheDuration": 60, 
@@ -507,7 +507,7 @@ http://localhost:5000/test
 
 With the verification functionality you can check the last performed call for each of these 2 endpoints and different variations of {message}, so if you called these 2 endpoints in the following ways:
 
-```http
+```
 curl --location --request GET 'http://localhost:5000/hello/Jane Doe'
 curl --location --request GET 'http://localhost:5000/hello/Marzipan'
 curl --location --request GET 'http://localhost:5000/hello/There!'
