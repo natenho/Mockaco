@@ -55,7 +55,7 @@ namespace Mockaco
                 }
                 else
                 {
-                    _logger.LogDebug("Incoming request didn't match {mock}", mock);
+                    _logger.LogTrace("Incoming request didn't match {mock}", mock);
                 }
             }
 

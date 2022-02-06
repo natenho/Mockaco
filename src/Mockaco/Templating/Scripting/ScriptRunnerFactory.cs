@@ -34,7 +34,7 @@ namespace Mockaco
         {
             if (_cache.TryGetValue<ScriptRunner<TResult>>(code, out var runner))
             {
-                _logger.LogTrace("Cache hit");
+                _logger.LogTrace("Script cache hit");
 
                 return runner;
             }
