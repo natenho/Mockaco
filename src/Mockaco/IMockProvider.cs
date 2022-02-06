@@ -9,6 +9,6 @@ namespace Mockaco
 
         IEnumerable<(string TemplateName, string ErrorMessage)> GetErrors();
 
-        void BuildCache();
+        Task BuildCache();
     }
 }

@@ -25,6 +25,7 @@ namespace Mockaco
 
         private CancellationTokenSource _cancellationTokenSource;
         private AutoResetEvent _autoResetEvent = new(true);
+        private SemaphoreSlim _semaphoreSlim = new(1, 1);
 
         public MockProvider
             (IFakerFactory fakerFactory,
@@ -46,7 +47,7 @@ namespace Mockaco
 
         private void TemplateProviderChange(object sender, EventArgs e)
         {
-            BuildCache();
+            _ = BuildCache();
         }
 
         public IEnumerable<Mock> GetMocks()
@@ -62,24 +63,26 @@ namespace Mockaco
             return _errors;
         }
 
-        public void BuildCache()
+        public async Task BuildCache()
         {
             _cancellationTokenSource?.Cancel();
 
-            _autoResetEvent.WaitOne();
-
-            _cancellationTokenSource = new CancellationTokenSource();
+            await _semaphoreSlim.WaitAsync();
 
             var stopwatch = Stopwatch.StartNew();
 
-            _errors.Clear();
-
-            var templates = _templateProvider
-                .GetTemplates()
-                .ToList();
-
             try
             {
+                _cancellationTokenSource?.Token.ThrowIfCancellationRequested();
+
+                _cancellationTokenSource = new CancellationTokenSource();
+
+                _errors.Clear();
+
+                var templates = _templateProvider
+                    .GetTemplates()
+                    .ToList();
+
                 RemoveMissingTemplatesFromCache(templates, _cancellationTokenSource);
 
                 var recentlyModifiedTemplates = templates.Where(_ => _.LastModified > DateTime.Now.AddMinutes(-15));
@@ -93,15 +96,15 @@ namespace Mockaco
             {
                 _logger.LogWarning("Changes were detected while building cache");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Error building mock cache");             
+                _logger.LogError(ex, "Error building mock cache");
             }
             finally
             {
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = null;
-                _autoResetEvent.Set();
+                _semaphoreSlim.Release();
             }
         }
 
