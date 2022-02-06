@@ -16,7 +16,7 @@ namespace Mockaco
         {
             Name = name;
             Content = content;
-            Hash = content.ToMD5Hash();
+            Hash = content.ToSHA1Hash();
         }
     }
 }
