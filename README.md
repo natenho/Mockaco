@@ -1,5 +1,5 @@
 <h1>
-    <img src="https://github.com/natenho/Mockaco/raw/master/src/Mockaco/Resources/mockaco-logo.png" width="64px" height="64px" alt="Mockaco">
+    <img src="https://github.com/natenho/Mockaco/raw/master/src/Mockaco/Resources/mockaco-logo.svg" width="64px" height="64px" alt="Mockaco">
     Mockaco 
 </h1>
 
