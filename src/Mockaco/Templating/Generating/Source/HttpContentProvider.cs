@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mockaco.Templating.Generating.Source
 {
-    public class HttpSourceContentProvider : ISourceContentProvider
+    internal class HttpContentProvider : ISourceContentProvider
     {
         public async Task<Stream> GetStreamAsync(Uri sourceUri, CancellationToken cancellationToken)
         {

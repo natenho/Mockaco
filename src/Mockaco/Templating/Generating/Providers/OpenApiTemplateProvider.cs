@@ -62,7 +62,7 @@ namespace Mockaco.Templating.Generating.Providers
             {
                 template.Name = Guid.NewGuid().ToString("N");
                 _logger.LogWarning(
-                    "The OperationId for request {method} {route} hasn't been declared. Using generated template name: {templateName}",
+                    "The OperationId for request {Method} {Route} hasn't been declared. Using generated template name: {TemplateName}",
                     template.Request.Method, template.Request.Route, template.Name);
             }
         }
@@ -82,8 +82,6 @@ namespace Mockaco.Templating.Generating.Providers
                     {
                         responseTemplate.Body = JValue.CreateString(content.Value.Example.ToString());
                     }
-                            
-                    //TODO: build response body
                 }
             }
             else
@@ -104,10 +102,10 @@ namespace Mockaco.Templating.Generating.Providers
 
         private void LogDiagnostics(OpenApiDiagnostic diagnostic)
         {
-            _logger.LogDebug("OpenApi specification version: {openApiVersion}", Enum.GetName(diagnostic.SpecificationVersion));
+            _logger.LogDebug("OpenApi specification version: {OpenApiSpecVersion}", Enum.GetName(diagnostic.SpecificationVersion));
             foreach (var diagnosticError in diagnostic.Errors)
             {
-                _logger.LogWarning("OpenApi parser diagnostic error: {error}", diagnosticError);
+                _logger.LogWarning("OpenApi parser diagnostic error: {Error}", diagnosticError);
             }
         }
     }

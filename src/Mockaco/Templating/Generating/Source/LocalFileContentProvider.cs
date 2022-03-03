@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Mockaco.Templating.Generating.Source
 {
-    public class LocalFileContentProvider : ISourceContentProvider
+    internal class LocalFileContentProvider : ISourceContentProvider
     {
         public Task<Stream> GetStreamAsync(Uri sourceUri, CancellationToken cancellationToken)
         {

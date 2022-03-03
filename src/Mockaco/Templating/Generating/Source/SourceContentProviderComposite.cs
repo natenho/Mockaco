@@ -21,7 +21,7 @@ namespace Mockaco.Templating.Generating.Source
         private void RegisterDefaultProviders()
         {
             Register(uri => uri.Scheme.Equals(Uri.UriSchemeFile) || Path.IsPathFullyQualified(uri.OriginalString), typeof(LocalFileContentProvider));
-            Register(uri => uri.Scheme.Equals(Uri.UriSchemeHttp) || uri.Scheme.Equals(Uri.UriSchemeHttps), typeof(HttpSourceContentProvider));
+            Register(uri => uri.Scheme.Equals(Uri.UriSchemeHttp) || uri.Scheme.Equals(Uri.UriSchemeHttps), typeof(HttpContentProvider));
         }
 
         private ISourceContentProvider Create(Uri sourceUri)
