@@ -14,7 +14,9 @@ namespace Mockaco
         public List<string> References { get; set; }
 
         public List<string> Imports { get; set; }
-        
+
+        public int MatchedRoutesCacheDuration { get; set; }
+
         public MockacoOptions()
         {
             DefaultHttpStatusCode = HttpStatusCode.OK;

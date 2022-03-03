@@ -1,5 +1,5 @@
 <h1>
-    <img src="https://image.flaticon.com/icons/svg/1574/1574279.svg" width="64px" height="64px" alt="Mockaco">
+    <img src="https://github.com/natenho/Mockaco/raw/master/src/Mockaco/Resources/mockaco-logo.svg" width="64px" height="64px" alt="Mockaco">
     Mockaco 
 </h1>
 
@@ -41,6 +41,14 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - [Scripting](#scripting)
     + [Example: Accessing request data](#example-accessing-request-data)
     + [Example: Generating fake data](#example-generating-fake-data)
+- [Verification](#verification)
+    + [Example: Verifying call to mocked endpoint](#example-verifying-call-to-mocked-endpoint)
+      + [Verify request without body](#verify-request-without-body)
+      + [Verify request with body](#verify-request-with-body)
+    + [Configure custom name of verification endpoint](#configure-custom-name-of-verification-endpoint)
+    + [Configure the duration of cache storing last request for verification](#configure-the-time-of-cache-storing-last-request-for-verification)
+    + [Verification summary](#verification-summary)
+
 
 # Get Started
 
@@ -102,7 +110,7 @@ This example contains a request/response template, meaning "Whenever you receive
 	
 ## Sending a request and getting the mocked response
 
-```http
+```
 curl -iX GET http://localhost:5000/ping
 
 HTTP/1.1 200 OK
@@ -283,7 +291,7 @@ Sets the response body indentation for some structured content-types. If ommited
 
 Result:
 
-```http
+```
 curl -iX GET http://localhost:5000
 
 HTTP/1.1 200 OK
@@ -423,6 +431,98 @@ There is a ```Faker``` object available to generate fake data.
 
 The built-in fake data is generated via [Bogus](https://github.com/bchavez/Bogus).
 The faker can also generate localized data using ```Accept-Language``` HTTP header. Defaults to ```en``` (english) fake data.
+
+# Verification
+
+There is a default endpoint provided that let's you verify the  last call for each mocked endpoint. The default path for this endpoint is ```http://localhost:5000/_mockaco/verification?route={path to verify}```.
+
+## Example: Verifying call to mocked endpoint
+
+### Verify request without body
+
+- If you have just called ```http://localhost:5000/hello/Jane Doe```, the verification endpoint
+called in the following way: ```http://localhost:5000/_mockaco/verification?route=/hello/Jane Doe``` will respond like so: 
+```
+{
+    "route": "/hello/Hello There",
+    "timestamp": "14:15",
+    "body": ""
+}
+```
+
+### Verify request with body
+
+- If you have just called ```http://localhost:5000/hello/Jane Doe```, with the following body:
+```
+{
+    "username": "Jane1",
+    "lastname": "Doe1"
+}
+```
+the verification endpoint called in the following way: ```http://localhost:5000/_mockaco/verification?route=/hello/Jane Doe``` will respond like so: 
+```
+{
+    "route": "/hello/Jane Doe",
+    "timestamp": "14:39",
+    "body": "{\r\n    \"username\": \"Jane1\",\r\n    \"lastname\": \"Doe1\"\r\n}"
+}
+```
+
+Both JSON body and x-www-form-urlencoded body are supported.
+
+## Configure custom name of verification endpoint
+
+You can configure the default name of verification enpoint by modifying ```Mockaco.VerificationEndpointName``` and ```Mockaco.VerificationEndpointPrefix``` fields in ``appsettings.json`` file. So if you will rename it like so:
+
+```
+"Mockaco": {
+    ...
+    "VerificationEndpointName": "customVerify",
+    "VerificationEndpointPrefix": "_internal"
+  },
+```
+
+You will be able to access the verification endpoint on ```http://localhost:5000/_internal/customVerify```
+
+## Configure the duration of cache storing last request for verification
+
+Each request with the exact time of being ivoked, body and path is being stored in the internal .Net cache for 60 minutes. You can configure this time by changing
+
+```
+"Mockaco": {
+    ...
+    "MatchedRoutesCacheDuration": 60, 
+    ...
+  },
+```
+in ```appsettings.json```.
+
+## Verification summary
+
+Let's assume that you have the following endpoints mocked:
+```
+http://localhost:5000/hello/{message}
+http://localhost:5000/test
+```
+
+With the verification functionality you can check the last performed call for each of these 2 endpoints and different variations of {message}, so if you called these 2 endpoints in the following ways:
+
+```
+curl --location --request GET 'http://localhost:5000/hello/Jane Doe'
+curl --location --request GET 'http://localhost:5000/hello/Marzipan'
+curl --location --request GET 'http://localhost:5000/hello/There!'
+curl --location --request GET 'http://localhost:5000/test'
+```
+
+You can perform these checks:
+
+```
+http://localhost:5000/_mockaco/verification?route=/hello/Jane Doe
+http://localhost:5000/_mockaco/verification?route=/hello/Marzipan
+http://localhost:5000/_mockaco/verification?route=/hello/There!
+http://localhost:5000/_mockaco/verification?route=/test
+```
+You cannot perform verification based on the generic url like ```http://localhost:5000/_mockaco/verification?route=/hello/{message}```
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 
