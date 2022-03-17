@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco", "src\Mockaco\Mockaco.csproj", "{8BAA1EC5-0BF5-4DA2-87F7-ED0C7B652517}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Tests", "test\Mockaco.Tests\Mockaco.Tests.csproj", "{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mockaco.AspNetCore", "src\Mockaco.AspNetCore\Mockaco.AspNetCore.csproj", "{7766C592-9887-4162-8B9C-51003ED30335}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,12 @@ Global
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Nuget|Any CPU.ActiveCfg = Release|Any CPU
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Nuget|Any CPU.ActiveCfg = Debug|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Nuget|Any CPU.Build.0 = Debug|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7766C592-9887-4162-8B9C-51003ED30335}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

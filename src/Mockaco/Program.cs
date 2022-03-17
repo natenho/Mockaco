@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -16,13 +14,6 @@ namespace Mockaco
         public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
-
-                await mockProvider.WarmUp();
-            }
 
             await host.RunAsync();
         }

@@ -1,0 +1,109 @@
+﻿Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
+Microsoft.Extensions.DependencyInjection.MockacoServiceCollection
+Mockaco.IFakerFactory
+Mockaco.IFakerFactory.GetDefaultFaker() -> Bogus.Faker
+Mockaco.IFakerFactory.GetFaker(System.Collections.Generic.IEnumerable<string> acceptLanguages) -> Bogus.Faker
+Mockaco.IGlobalVariableStorage
+Mockaco.IGlobalVariableStorage.Clear() -> void
+Mockaco.IGlobalVariableStorage.DisableWriting() -> void
+Mockaco.IGlobalVariableStorage.EnableWriting() -> void
+Mockaco.IGlobalVariableStorage.this[string name].get -> object
+Mockaco.IGlobalVariableStorage.this[string name].set -> void
+Mockaco.IRawTemplate
+Mockaco.IRawTemplate.Content.get -> string
+Mockaco.IRawTemplate.Hash.get -> string
+Mockaco.IRawTemplate.Name.get -> string
+Mockaco.IRequestBodyFactory
+Mockaco.IRequestBodyFactory.ReadBodyAsJson(Microsoft.AspNetCore.Http.HttpRequest httpRequest) -> System.Threading.Tasks.Task<Newtonsoft.Json.Linq.JToken>
+Mockaco.IScriptContext
+Mockaco.IScriptContext.AttachRequest(Microsoft.AspNetCore.Http.HttpRequest httpRequest) -> System.Threading.Tasks.Task
+Mockaco.IScriptContext.AttachResponse(Microsoft.AspNetCore.Http.HttpResponse httpResponse, Mockaco.ResponseTemplate responseTemplate) -> System.Threading.Tasks.Task
+Mockaco.IScriptContext.AttachRouteParameters(Microsoft.AspNetCore.Http.HttpRequest httpRequest, Mockaco.Mock route) -> System.Threading.Tasks.Task
+Mockaco.IScriptContext.Faker.get -> Bogus.Faker
+Mockaco.IScriptContext.Global.get -> Mockaco.IGlobalVariableStorage
+Mockaco.IScriptContext.Request.get -> Mockaco.ScriptContextRequest
+Mockaco.IScriptContext.Request.set -> void
+Mockaco.IScriptContext.Response.get -> Mockaco.ScriptContextResponse
+Mockaco.IScriptContext.Response.set -> void
+Mockaco.Mock
+Mockaco.Mock.HasCondition.get -> bool
+Mockaco.Mock.HasCondition.set -> void
+Mockaco.Mock.Method.get -> string
+Mockaco.Mock.Method.set -> void
+Mockaco.Mock.Mock(string method, string route, Mockaco.IRawTemplate rawTemplate, bool hasCondition) -> void
+Mockaco.Mock.RawTemplate.get -> Mockaco.IRawTemplate
+Mockaco.Mock.RawTemplate.set -> void
+Mockaco.Mock.Route.get -> string
+Mockaco.Mock.Route.set -> void
+Mockaco.MockacoOptions
+Mockaco.MockacoOptions.DefaultHttpContentType.get -> string
+Mockaco.MockacoOptions.DefaultHttpContentType.set -> void
+Mockaco.MockacoOptions.DefaultHttpStatusCode.get -> System.Net.HttpStatusCode
+Mockaco.MockacoOptions.DefaultHttpStatusCode.set -> void
+Mockaco.MockacoOptions.ErrorHttpStatusCode.get -> System.Net.HttpStatusCode
+Mockaco.MockacoOptions.ErrorHttpStatusCode.set -> void
+Mockaco.MockacoOptions.Imports.get -> System.Collections.Generic.List<string>
+Mockaco.MockacoOptions.Imports.set -> void
+Mockaco.MockacoOptions.MatchedRoutesCacheDuration.get -> int
+Mockaco.MockacoOptions.MatchedRoutesCacheDuration.set -> void
+Mockaco.MockacoOptions.MockacoOptions() -> void
+Mockaco.MockacoOptions.References.get -> System.Collections.Generic.List<string>
+Mockaco.MockacoOptions.References.set -> void
+Mockaco.MockacoOptions.TemplateFileProvider.get -> Mockaco.TemplateFileProviderOptions
+Mockaco.MockacoOptions.TemplateFileProvider.set -> void
+Mockaco.MockacoOptions.VerificationEndpointName.get -> string
+Mockaco.MockacoOptions.VerificationEndpointName.set -> void
+Mockaco.MockacoOptions.VerificationEndpointPrefix.get -> string
+Mockaco.MockacoOptions.VerificationEndpointPrefix.set -> void
+Mockaco.ResponseTemplate
+Mockaco.ResponseTemplate.Body.get -> Newtonsoft.Json.Linq.JToken
+Mockaco.ResponseTemplate.Body.set -> void
+Mockaco.ResponseTemplate.Delay.get -> int?
+Mockaco.ResponseTemplate.Delay.set -> void
+Mockaco.ResponseTemplate.File.get -> string
+Mockaco.ResponseTemplate.File.set -> void
+Mockaco.ResponseTemplate.Headers.get -> System.Collections.Generic.IDictionary<string, string>
+Mockaco.ResponseTemplate.Headers.set -> void
+Mockaco.ResponseTemplate.Indented.get -> bool?
+Mockaco.ResponseTemplate.Indented.set -> void
+Mockaco.ResponseTemplate.ResponseTemplate() -> void
+Mockaco.ResponseTemplate.Status.get -> System.Net.HttpStatusCode
+Mockaco.ResponseTemplate.Status.set -> void
+Mockaco.ScriptContext
+Mockaco.ScriptContext.AttachRequest(Microsoft.AspNetCore.Http.HttpRequest httpRequest) -> System.Threading.Tasks.Task
+Mockaco.ScriptContext.AttachResponse(Microsoft.AspNetCore.Http.HttpResponse httpResponse, Mockaco.ResponseTemplate responseTemplate) -> System.Threading.Tasks.Task
+Mockaco.ScriptContext.AttachRouteParameters(Microsoft.AspNetCore.Http.HttpRequest httpRequest, Mockaco.Mock mock) -> System.Threading.Tasks.Task
+Mockaco.ScriptContext.Faker.get -> Bogus.Faker
+Mockaco.ScriptContext.Global.get -> Mockaco.IGlobalVariableStorage
+Mockaco.ScriptContext.Request.get -> Mockaco.ScriptContextRequest
+Mockaco.ScriptContext.Request.set -> void
+Mockaco.ScriptContext.Response.get -> Mockaco.ScriptContextResponse
+Mockaco.ScriptContext.Response.set -> void
+Mockaco.ScriptContext.ScriptContext(Mockaco.IFakerFactory fakerFactory, Mockaco.IRequestBodyFactory requestBodyFactory, Mockaco.IGlobalVariableStorage globalVarialeStorage) -> void
+Mockaco.ScriptContextRequest
+Mockaco.ScriptContextRequest.Body.get -> Newtonsoft.Json.Linq.JToken
+Mockaco.ScriptContextRequest.Header.get -> System.Collections.Generic.IReadOnlyDictionary<string, string>
+Mockaco.ScriptContextRequest.Query.get -> System.Collections.Generic.IReadOnlyDictionary<string, string>
+Mockaco.ScriptContextRequest.Route.get -> System.Collections.Generic.IReadOnlyDictionary<string, string>
+Mockaco.ScriptContextRequest.ScriptContextRequest(System.Uri url, System.Collections.Generic.IReadOnlyDictionary<string, string> route, System.Collections.Generic.IReadOnlyDictionary<string, string> query, System.Collections.Generic.IReadOnlyDictionary<string, string> header, Newtonsoft.Json.Linq.JToken body) -> void
+Mockaco.ScriptContextRequest.Url.get -> System.Uri
+Mockaco.ScriptContextResponse
+Mockaco.ScriptContextResponse.Body.get -> Newtonsoft.Json.Linq.JToken
+Mockaco.ScriptContextResponse.Header.get -> System.Collections.Generic.IReadOnlyDictionary<string, string>
+Mockaco.ScriptContextResponse.ScriptContextResponse(Mockaco.StringDictionary header, Newtonsoft.Json.Linq.JToken body) -> void
+Mockaco.StringDictionary
+Mockaco.StringDictionary.Add(string key, string value) -> void
+Mockaco.StringDictionary.Replace(string key, string value) -> void
+Mockaco.StringDictionary.StringDictionary() -> void
+Mockaco.StringDictionary.this[string key].get -> string
+Mockaco.StringDictionary.this[string key].set -> void
+Mockaco.TemplateFileProviderOptions
+Mockaco.TemplateFileProviderOptions.Path.get -> string
+Mockaco.TemplateFileProviderOptions.Path.set -> void
+Mockaco.TemplateFileProviderOptions.TemplateFileProviderOptions() -> void
+override Mockaco.Mock.ToString() -> string
+static Microsoft.AspNetCore.Builder.MockacoApplicationBuilder.UseMockaco(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
+static Microsoft.AspNetCore.Builder.MockacoApplicationBuilder.UseMockaco(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, System.Action<Microsoft.AspNetCore.Builder.IApplicationBuilder> configure) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
+static Microsoft.Extensions.DependencyInjection.MockacoServiceCollection.AddMockaco(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.Extensions.DependencyInjection.MockacoServiceCollection.AddMockaco(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration config) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.Extensions.DependencyInjection.MockacoServiceCollection.AddMockaco(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Mockaco.MockacoOptions> config) -> Microsoft.Extensions.DependencyInjection.IServiceCollection

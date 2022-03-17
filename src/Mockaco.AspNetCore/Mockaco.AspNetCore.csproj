@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	<LangVersion>latest</LangVersion>
+	<AssemblyName>Mockaco.AspNetCore</AssemblyName>
+	<RootNamespace>Mockaco</RootNamespace>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Configurations>Debug;Release;Nuget</Configurations>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<IsPackable>true</IsPackable>
+	<PackageOutputPath>./nupkg</PackageOutputPath>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<Authors>natenho</Authors>
+	<Description>ASP.NET Core pipeline to mock HTTP requests/responses, useful to stub services and simulate dynamic API responses, leveraging ASP.NET Core features, built-in fake data generation and pure C# scripting</Description>
+	<PackageProjectUrl>https://github.com/natenho/Mockaco</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/natenho/Mockaco</RepositoryUrl>
+	<PackageTags>mock http aspnetcore</PackageTags>
+	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	<PackageIcon>mockaco-icon.png</PackageIcon>
+	<Product>Mockaco</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Bogus" Version="33.0.2" />
+	<PackageReference Include="GitVersion.MsBuild" Version="5.6.10">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="MAB.DotIgnore" Version="3.0.2" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	<PackageReference Include="Polly" Version="7.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Include="Resources\mockaco-icon.png">
+      <Pack>True</Pack>
+	  <PackagePath>/</PackagePath>
+	</None>
+  </ItemGroup>
+
+</Project>
