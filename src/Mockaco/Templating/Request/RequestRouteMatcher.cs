@@ -11,12 +11,9 @@ namespace Mockaco
         {
             var routeMatcher = new RouteMatcher();
 
-            if (string.IsNullOrWhiteSpace(mock?.Route))
-            {
-                return Task.FromResult(routeMatcher.IsMatch(DefaultRoute, httpRequest.Path));
-            }
-
-            return Task.FromResult(routeMatcher.IsMatch(mock.Route, httpRequest.Path));
+            return Task.FromResult(string.IsNullOrWhiteSpace(mock?.Route) ? 
+                routeMatcher.IsMatch(DefaultRoute, httpRequest.Path, httpRequest.Query) : 
+                routeMatcher.IsMatch(mock.Route, httpRequest.Path, httpRequest.Query));
         }
     }
 }

@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.Http
         {
             var routeMatcher = new RouteMatcher();
 
-            return routeMatcher.Match(mock.Route, request.Path);
+            return routeMatcher.Match(mock.Route, request.Path, request.Query);
         }
 
         public static bool HasXmlContentType(this HttpRequest request)
