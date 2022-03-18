@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  DOCKER_HUB_USERNAME: natenho
 
 jobs:
   build:
@@ -31,15 +37,23 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --verbosity normal src/**
       - name: Test
-        run: dotnet test --configuration Release --verbosity normal test/**
+        run: dotnet test --configuration Release --verbosity normal -l trx test/**
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: "success() || failure()"
+        with:
+          name: Unit test results
+          path: '**/*.trx'
+          reporter: dotnet-trx
       - name: Bump version and push tag
-        if: "!contains(github.event.head_commit.message, 'skip-release')"
+        if: "github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'skip-release')"
         id: tag_version
         uses: mathieudutour/github-tag-action@v5.6
         with:
           custom_tag: ${{ steps.gitversion.outputs.semVer }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create a GitHub release
+        if: "github.ref == 'refs/heads/master'"
         id: github_release
         uses: ncipollo/release-action@v1
         with:
@@ -49,7 +63,7 @@ jobs:
       - name: Create nupkg
         run: dotnet pack --configuration Nuget --output ./nupkg
       - name: Publish nupkg
-        if: "!contains(github.event.head_commit.message, 'skip-nuget')"
+        if: "github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'skip-nuget')"
         run: dotnet nuget push **/*.nupkg --api-key ${{secrets.NUGET_AUTH_TOKEN}} --source https://api.nuget.org/v3/index.json --skip-duplicate
       - name: Cache Docker layers
         uses: actions/cache@v2
@@ -60,8 +74,9 @@ jobs:
             ${{ runner.os }}-buildx-
       - name: Login to Docker Hub
         uses: docker/login-action@v1
+        if: "github.ref == 'refs/heads/master'"
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          username: ${{ env.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Setup Docker Build
         id: buildx
@@ -72,8 +87,8 @@ jobs:
         with:
           context: ./
           file: ./src/Mockaco/Docker/Dockerfile
-          push: ${{ !contains(github.event.head_commit.message, 'skip-docker') }}
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ secrets.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.gitversion.outputs.semVer }}
+          push: ${{ github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'skip-docker') }}
+          tags: ${{ env.DOCKER_HUB_USERNAME }}/mockaco:latest,${{ env.DOCKER_HUB_USERNAME }}/mockaco:${{ steps.gitversion.outputs.semVer }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Docker Image digest
