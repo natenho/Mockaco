@@ -74,9 +74,9 @@ namespace Mockaco
 
             app.MapWhen(context => !context.Request.Path.StartsWithSegments($"/{verificationEndpointPrefix}/{verificationEndpointName}"), appBuilder =>
             {
-                appBuilder.UseMiddleware<ErrorHandlingMiddleware>()
-                    .UseMiddleware<ResponseDelayMiddleware>()
+                appBuilder.UseMiddleware<ErrorHandlingMiddleware>()                    
                     .UseMiddleware<RequestMatchingMiddleware>()
+                    .UseMiddleware<ResponseDelayMiddleware>()
                     .UseMiddleware<ResponseMockingMiddleware>()
                     .UseMiddleware<CallbackMiddleware>();
             });
