@@ -23,11 +23,13 @@ namespace Mockaco.Templating.Generating.Store
 
         private string RootDir => _options.Value.RootDir;
         
-        public Task SaveAsync(GeneratedTemplate template, CancellationToken cancellationToken = default)
+        public async Task SaveAsync(GeneratedTemplate template, CancellationToken cancellationToken = default)
         {
             var templateFileName = GetFileName(template);
             Directory.CreateDirectory(Path.GetDirectoryName(templateFileName) ?? string.Empty);
-            return File.WriteAllBytesAsync(templateFileName, GetTemplateContent(template), cancellationToken);
+            await File.WriteAllBytesAsync(templateFileName, GetTemplateContent(template), cancellationToken);
+
+            _logger.LogInformation("Generated {template} for {method} {route}", templateFileName, template.Request.Method, template.Request.Route);
         }
 
         private byte[] GetTemplateContent(GeneratedTemplate template)
