@@ -21,54 +21,57 @@ namespace Mockaco
         public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            await BuildCommandLine(host).UseDefaults().Build().InvokeAsync(args);
-        }
 
-        private static CommandLineBuilder BuildCommandLine(IHost host)
-        {
-            var root = new RootCommand();
-            foreach (var cmd in host.Services.GetService<IEnumerable<Command>>() ?? Array.Empty<Command>())
+            var commandLine = CreateCommandLineBuilder(args, host)
+                .UseDefaults()
+                .Build();
+
+            if (commandLine.IsUsingCommand(args))
             {
-                root.AddCommand(cmd);
+                await commandLine.InvokeAsync(args);
+                return;
             }
-            
-            root.Handler = CommandHandler.Create(RunServer(host));
-            return new CommandLineBuilder(root);
-        }
 
-        private static Func<CancellationToken, Task> RunServer(IHost host)
-        {
-            return async (cancelationToken) =>
+            using (var scope = host.Services.CreateScope())
             {
-                using (var scope = host.Services.CreateScope())
-                {
-                    var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
+                var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
 
-                    await mockProvider.WarmUp();
-                }
+                await mockProvider.WarmUp();
+            }
 
-                await host.RunAsync(cancelationToken);
-            };
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder()
+            Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.ConfigureAppConfiguration((_, configuration) =>
                     {
                         var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                         configuration.SetBasePath(Path.Combine(assemblyLocation, "Settings"));
-                        
+
                         var switchMappings = new Dictionary<string, string>() {
                             {"--path", "Mockaco:TemplateFileProvider:Path" },
-                            {"--logs", "Serilog:WriteTo:0:Args:path" }                            
+                            {"--logs", "Serilog:WriteTo:0:Args:path" }
                         };
 
                         configuration.AddCommandLine(args, switchMappings);
-                    })                    
+                    })
                     .UseSerilog((context, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(context.Configuration))
                     .UseStartup<Startup>();
                 });
+
+        private static CommandLineBuilder CreateCommandLineBuilder(string[] args, IHost host)
+        {
+            var rootCommand = new RootCommand();
+
+            foreach (var cmd in host.Services.GetServices<Command>())
+            {
+                rootCommand.AddCommand(cmd);
+            }
+
+            return new CommandLineBuilder(rootCommand);
+        }
     }
 }
