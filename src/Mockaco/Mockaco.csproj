@@ -1,61 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\..</DockerfileContext>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Configurations>Debug;Release;Nuget</Configurations>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..</DockerfileContext>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<Configurations>Debug;Release;Nuget</Configurations>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-    <PackAsTool>true</PackAsTool>
-    <ToolCommandName>mockaco</ToolCommandName>
-    <PackageOutputPath>./nupkg</PackageOutputPath>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Authors>natenho</Authors>
-    <Description>HTTP mock server, useful to stub services and simulate dynamic API responses, leveraging ASP.NET Core features, built-in fake data generation and pure C# scripting</Description>
-    <PackageProjectUrl>https://github.com/natenho/Mockaco</PackageProjectUrl>    
-    <RepositoryUrl>https://github.com/natenho/Mockaco</RepositoryUrl>
-    <PackageTags>mock http server</PackageTags>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIcon>mockaco-icon.png</PackageIcon>
-    <Product>Mockaco</Product>       
-  </PropertyGroup>
+	<PropertyGroup>
+		<IsPackable>true</IsPackable>
+		<PackAsTool>true</PackAsTool>
+		<ToolCommandName>mockaco</ToolCommandName>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Authors>natenho</Authors>
+		<Description>HTTP mock server, useful to stub services and simulate dynamic API responses, leveraging ASP.NET Core features, built-in fake data generation and pure C# scripting</Description>
+		<PackageProjectUrl>https://github.com/natenho/Mockaco</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/natenho/Mockaco</RepositoryUrl>
+		<PackageTags>mock http server</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageIcon>mockaco-icon.png</PackageIcon>
+		<Product>Mockaco</Product>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.10">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>   
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />    
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-	<PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup Condition="$(Configuration) != 'Debug'">
-    <Content Remove="Mocks\**" />
-    <None Include="Mocks\hello.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\mockaco-icon.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <Content Remove="Settings\**" />
-    <None Include="Settings\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Mockaco.AspNetCore\Mockaco.AspNetCore.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nuget|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="5.6.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="5.0.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
+		<PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(Configuration) != 'Debug'">
+		<Content Remove="Mocks\**" />
+		<None Include="Mocks\hello.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="Resources\mockaco-icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<Content Remove="Settings\**" />
+		<None Include="Settings\**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Mockaco.AspNetCore\Mockaco.AspNetCore.csproj" />
+	</ItemGroup>
 
 </Project>
