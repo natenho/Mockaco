@@ -48,6 +48,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
     + [Configure custom name of verification endpoint](#configure-custom-name-of-verification-endpoint)
     + [Configure the duration of cache storing last request for verification](#configure-the-time-of-cache-storing-last-request-for-verification)
     + [Verification summary](#verification-summary)
+- [Generators](#generators)
 
 
 # Get Started
@@ -523,6 +524,27 @@ http://localhost:5000/_mockaco/verification?route=/hello/There!
 http://localhost:5000/_mockaco/verification?route=/test
 ```
 You cannot perform verification based on the generic url like ```http://localhost:5000/_mockaco/verification?route=/hello/{message}```
+
+# Generator
+
+Genarator feature allows to generate mock templates based on provided specification eg. OpenApi, simply using `generate` command.
+
+``
+Mockaco generate [url/path to the specification] --provider=[provider name]
+``
+
+Example:
+
+``
+Mockaco generate https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/examples/v3.0/petstore.json --provider=openapi
+``
+
+The above command will generate mocks based on Petstore OpenAPI specification example.
+
+### Supported specifications:
+- [OpenApi](https://spec.openapis.org/oas/latest.html)
+
+
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 

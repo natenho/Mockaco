@@ -16,7 +16,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOptions<TemplateFileProviderOptions>()
                     .Configure<IOptions<MockacoOptions>>((options, parent) => options = parent.Value.TemplateFileProvider)
                     .Services
-                .AddCommonServices();
+                .AddCommonServices()
+                .AddTemplatesGenerating();
 
         public static IServiceCollection AddMockaco(this IServiceCollection services, IConfiguration config) =>
             services

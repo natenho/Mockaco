@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.Builder
             app.UseMiddleware<ErrorHandlingMiddleware>();
             configure(app);
             app
-                .UseMiddleware<ResponseDelayMiddleware>()
                 .UseMiddleware<RequestMatchingMiddleware>()
+                .UseMiddleware<ResponseDelayMiddleware>()
                 .UseMiddleware<ResponseMockingMiddleware>()
                 .UseMiddleware<CallbackMiddleware>();
 
