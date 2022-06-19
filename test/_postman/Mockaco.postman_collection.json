@@ -1,0 +1,85 @@
+{
+	"info": {
+		"_postman_id": "53119370-0818-4475-9413-cd931b81d1f5",
+		"name": "Mockaco",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Hello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://host.docker.internal:5000/hello/fulano",
+					"protocol": "http",
+					"host": [
+						"host",
+						"docker",
+						"internal"
+					],
+					"port": "5000",
+					"path": [
+						"hello",
+						"fulano"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify hello",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://host.docker.internal:5000/_mockaco/verification?route=/hello/fulano",
+					"protocol": "http",
+					"host": [
+						"host",
+						"docker",
+						"internal"
+					],
+					"port": "5000",
+					"path": [
+						"_mockaco",
+						"verification"
+					],
+					"query": [
+						{
+							"key": "route",
+							"value": "/hello/fulano"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

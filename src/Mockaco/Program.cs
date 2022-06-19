@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection; 
 
 namespace Mockaco
 {
@@ -30,13 +27,6 @@ namespace Mockaco
             {
                 await commandLine.InvokeAsync(args);
                 return;
-            }
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var mockProvider = scope.ServiceProvider.GetService<IMockProvider>();
-
-                await mockProvider.WarmUp();
             }
 
             await host.RunAsync();
