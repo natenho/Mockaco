@@ -26,16 +26,11 @@ namespace Mockaco.Tests.Middlewares
         }
 
         [Theory]
-        [InlineData(0, 1000, 1000)]
-        [InlineData(500, 1000, 1000)]
-        [InlineData(1000, 1000, 1000)]
-        [InlineData(1500, 1000, 1500)]
-        [InlineData(2000, 1000, 2000)]
-        public async Task Compensates_Request_Duration(int requestTime, int delay, int expectedDelay)
+        [InlineData(1000, 1000)]
+        [InlineData(2500, 2500)]
+        [InlineData(3000, 3000)]
+        public async Task Modifies_Request_Duration(int delay, int expectedDelay)
         {
-            Moq.Mock.Get(_next).Setup(n => n.Invoke(It.IsAny<HttpContext>()))
-                .Returns(async () => await Task.Delay(requestTime));
-
             Moq.Mock.Get(_mockacoContext).Setup(c => c.TransformedTemplate)
                 .Returns(new Template() { Response = new ResponseTemplate() { Delay = delay } });
 
