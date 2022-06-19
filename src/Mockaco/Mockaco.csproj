@@ -27,17 +27,20 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+		<WarningsNotAsErrors></WarningsNotAsErrors>
+		<NoWarn>1701;1702;NU5104</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+		<WarningsNotAsErrors></WarningsNotAsErrors>
+		<NoWarn>1701;1702;NU5104</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Nuget|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<WarningsNotAsErrors>NU5104</WarningsNotAsErrors>
+		<WarningsNotAsErrors></WarningsNotAsErrors>
+		<NoWarn>1701;1702;NU5104</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
