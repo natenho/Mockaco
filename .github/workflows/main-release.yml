@@ -21,10 +21,10 @@ jobs:
         uses: actions/checkout@v1
         with:
           fetch-depth: 0
-      - name: Setup .NET 5
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '5.0.x'
+          dotnet-version: '6.0.x'
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
         with:
