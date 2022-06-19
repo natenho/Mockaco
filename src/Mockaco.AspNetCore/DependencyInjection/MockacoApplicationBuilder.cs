@@ -9,6 +9,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static IApplicationBuilder UseMockaco(this IApplicationBuilder app, Action<IApplicationBuilder> configure)
         {
+            app.UseRouting();
             var options = app.ApplicationServices.GetRequiredService<IOptions<MockacoOptions>>().Value;
             app.UseEndpoints(endpoints => endpoints.Map($"/{options.VerificationEndpointPrefix}/{options.VerificationEndpointName}", VerifyerExtensions.Verify));
 

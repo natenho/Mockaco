@@ -33,7 +33,6 @@ namespace Mockaco
             logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
             
             app
-                .UseRouting()
                 .UseCors()
                 .UseMockaco();
         }
