@@ -16,8 +16,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOptions<TemplateFileProviderOptions>()
                     .Configure<IOptions<MockacoOptions>>((options, parent) => options = parent.Value.TemplateFileProvider)
                     .Services
-                .AddCommonServices()
-                .AddTemplatesGenerating();
+                .AddCommonServices();
+
 
         public static IServiceCollection AddMockaco(this IServiceCollection services, IConfiguration config) =>
             services
@@ -67,6 +67,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddTransient<IResponseBodyStrategy, XmlResponseBodyStrategy>()
                 .AddTransient<IResponseBodyStrategy, DefaultResponseBodyStrategy>()
 
-                .AddTransient<ITemplateTransformer, TemplateTransformer>();
+                .AddTransient<ITemplateTransformer, TemplateTransformer>()
+
+                .AddTemplatesGenerating();
     }
 }

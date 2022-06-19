@@ -42,7 +42,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 cmd.Handler = CommandHandler.Create<GeneratingOptions, IConsole, CancellationToken>(
                     provider.GetRequiredService<GeneratorRunner>().ExecuteAsync);
                 
-
                 return cmd;
             });
             
