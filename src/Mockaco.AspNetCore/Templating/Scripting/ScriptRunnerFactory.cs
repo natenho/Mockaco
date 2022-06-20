@@ -5,8 +5,8 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -15,6 +15,7 @@ namespace Mockaco
         private readonly IMemoryCache _cache;
         private readonly ILogger<ScriptRunnerFactory> _logger;
         private readonly IOptionsMonitor<MockacoOptions> _options;
+        private MissingResolver _missingResolver;
 
         public ScriptRunnerFactory(ILogger<ScriptRunnerFactory> logger, IOptionsMonitor<MockacoOptions> options)
         {
@@ -50,8 +51,11 @@ namespace Mockaco
         {
             var stopWatch = Stopwatch.StartNew();
 
+            if (_missingResolver == null) _missingResolver = new MissingResolver(_cache);
+
             var scriptOptions = ScriptOptions
                 .Default
+                .WithMetadataResolver(_missingResolver)
                 .AddReferences(
                     typeof(Faker).Assembly,
                     typeof(ScriptRunnerFactory).Assembly)
@@ -79,6 +83,54 @@ namespace Mockaco
 
             return runner;
         }
+
+        /// <summary>
+        /// This class is used to reduce high memory usage during startup
+        /// </summary>
+        private class MissingResolver : MetadataReferenceResolver
+        {
+            public MissingResolver(IMemoryCache cache)
+            {
+                _cache = cache;
+            }
+
+            private readonly IMemoryCache _cache;
+
+            public override bool Equals(object other)
+            {
+                return ScriptMetadataResolver.Default.Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return ScriptMetadataResolver.Default.GetHashCode();
+            }
+
+            public override bool ResolveMissingAssemblies => ScriptMetadataResolver.Default.ResolveMissingAssemblies;
+
+            public override ImmutableArray<PortableExecutableReference> ResolveReference(string reference, string baseFilePath, MetadataReferenceProperties properties)
+            {
+                var key = $"ResolveReference {reference} {baseFilePath} {properties.GetHashCode()}";
+
+                return _cache.GetOrCreate(key, (e) =>
+                {
+                    e.SlidingExpiration = TimeSpan.FromSeconds(10);
+                    return ScriptMetadataResolver.Default.ResolveReference(reference, baseFilePath, properties);
+                });
+            }
+
+            public override PortableExecutableReference ResolveMissingAssembly(MetadataReference definition, AssemblyIdentity referenceIdentity)
+            {
+                var key = $"ResolveMissingAssembly {definition.Display} {referenceIdentity}";
+
+                return _cache.GetOrCreate(key, (e) =>
+                {
+                    e.SlidingExpiration = TimeSpan.FromSeconds(10);
+                    return ScriptMetadataResolver.Default.ResolveMissingAssembly(definition, referenceIdentity);
+                });
+            }
+        }
+
     }
 }
 
