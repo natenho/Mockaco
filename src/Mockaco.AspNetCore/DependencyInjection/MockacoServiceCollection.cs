@@ -32,6 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddCommonServices(this IServiceCollection services) =>
             services
+                .AddRouting()
                 .AddMemoryCache()
                 .AddHttpClient()
                 .AddInternalServices()
