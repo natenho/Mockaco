@@ -16,6 +16,8 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - State support - stateful mock support allow a mock to be returned based on a global variable previously set by another mock
 - Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/main/release-notes/5.0/5.0-supported-os.md)
 
+[![Mocking APIs with Mockaco | .NET 7](https://user-images.githubusercontent.com/4236481/195997781-b730959e-8d6d-432c-b35a-3adb580abc41.png)](https://www.youtube.com/watch?v=QBnXCgZFzM0 "Mocking APIs with Mockaco | .NET 7")
+
 # Table of Contents
 
 - [Get Started](#get-started)
@@ -544,7 +546,7 @@ The above command will generate mocks based on Petstore OpenAPI specification ex
 ### Supported specifications:
 - [OpenApi](https://spec.openapis.org/oas/latest.html)
 
-
+--
 
 Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 
