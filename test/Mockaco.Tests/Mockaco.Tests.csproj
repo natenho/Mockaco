@@ -6,21 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Templating\Response\mockaco.jpg" />
-    <None Remove="Templating\Transforms_Plain_Json_Template.json" />
-    <None Remove="Templating\Transforms_Scripted_Json_Template.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Templating\Response\mockaco.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templating\Transforms_Scripted_Json_Template.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="Templating\Transforms_Plain_Json_Template.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -43,6 +29,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mockaco\Mockaco.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templating\Transforms_Plain_Json_Template.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templating\Transforms_Scripted_Json_Template.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
