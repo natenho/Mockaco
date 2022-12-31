@@ -1,4 +1,5 @@
-﻿Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
+﻿Bogus.PhoneNumberExtensions
+Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
 Microsoft.Extensions.DependencyInjection.MockacoServiceCollection
 Mockaco.IFakerFactory
 Mockaco.IFakerFactory.GetDefaultFaker() -> Bogus.Faker
@@ -102,6 +103,7 @@ Mockaco.TemplateFileProviderOptions.Path.get -> string
 Mockaco.TemplateFileProviderOptions.Path.set -> void
 Mockaco.TemplateFileProviderOptions.TemplateFileProviderOptions() -> void
 override Mockaco.Mock.ToString() -> string
+static Bogus.PhoneNumberExtensions.BrazilianPhoneNumber(this Bogus.DataSets.PhoneNumbers phoneNumbers) -> string
 static Microsoft.AspNetCore.Builder.MockacoApplicationBuilder.UseMockaco(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.Builder.MockacoApplicationBuilder.UseMockaco(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, System.Action<Microsoft.AspNetCore.Builder.IApplicationBuilder> configure) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.Extensions.DependencyInjection.MockacoServiceCollection.AddMockaco(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
