@@ -1,5 +1,4 @@
-﻿using Bogus;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Caching.Memory;
@@ -57,7 +56,7 @@ namespace Mockaco
                 .Default
                 .WithMetadataResolver(_missingResolver)
                 .AddReferences(
-                    typeof(Faker).Assembly,
+                    typeof(Bogus.Faker).Assembly,
                     typeof(ScriptRunnerFactory).Assembly)
                 .AddReferences(_options.CurrentValue.References)
                 .AddImports(
@@ -65,7 +64,8 @@ namespace Mockaco
                     "System.Linq",
                     "System.Collections.Generic",
                     "System.Text.RegularExpressions",
-                    typeof(Faker).Namespace,
+                    typeof(Bogus.Faker).Namespace,
+                    typeof(Bogus.DataSets.System).Namespace,
                     typeof(ScriptRunnerFactory).Namespace,
                     "Newtonsoft.Json",
                     "Newtonsoft.Json.Linq")
