@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Mockaco;
+using Mockaco.AdminApi;
 using Mockaco.Verifyer;
 
 namespace Microsoft.AspNetCore.Builder
@@ -12,6 +13,8 @@ namespace Microsoft.AspNetCore.Builder
             app.UseRouting();
             var options = app.ApplicationServices.GetRequiredService<IOptions<MockacoOptions>>().Value;
             app.UseEndpoints(endpoints => endpoints.Map($"/{options.VerificationEndpointPrefix}/{options.VerificationEndpointName}", VerifyerExtensions.Verify));
+
+            app.UseEndpoints(endpoints => endpoints.Map($"/{options.AdminApiEndpointPrefix}/{options.AdminApiEndpointName}/{{action}}", AdminApiExtensions.Handler));
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
             configure(app);

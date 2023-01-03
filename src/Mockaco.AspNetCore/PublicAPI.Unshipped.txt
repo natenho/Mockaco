@@ -1,6 +1,20 @@
 ﻿Bogus.PhoneNumberExtensions
 Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
 Microsoft.Extensions.DependencyInjection.MockacoServiceCollection
+Mockaco.AdminApi.AdminApiRequest
+Mockaco.AdminApi.AdminApiRequest.AdminApiRequest() -> void
+Mockaco.AdminApi.AdminApiRequest.Content.get -> string
+Mockaco.AdminApi.AdminApiRequest.Content.set -> void
+Mockaco.AdminApi.AdminApiRequest.Name.get -> string
+Mockaco.AdminApi.AdminApiRequest.Name.set -> void
+Mockaco.AdminApi.AdminApiResult
+Mockaco.AdminApi.AdminApiResult.AdminApiResult() -> void
+Mockaco.AdminApi.AdminApiResult.Data.get -> object
+Mockaco.AdminApi.AdminApiResult.Data.set -> void
+Mockaco.AdminApi.AdminApiResult.Message.get -> string
+Mockaco.AdminApi.AdminApiResult.Message.set -> void
+Mockaco.AdminApi.AdminApiResult.Status.get -> bool
+Mockaco.AdminApi.AdminApiResult.Status.set -> void
 Mockaco.IFakerFactory
 Mockaco.IFakerFactory.GetDefaultFaker() -> Bogus.Faker
 Mockaco.IFakerFactory.GetFaker(System.Collections.Generic.IEnumerable<string> acceptLanguages) -> Bogus.Faker
@@ -37,6 +51,12 @@ Mockaco.Mock.RawTemplate.set -> void
 Mockaco.Mock.Route.get -> string
 Mockaco.Mock.Route.set -> void
 Mockaco.MockacoOptions
+Mockaco.MockacoOptions.AdminApiEndpointName.get -> string
+Mockaco.MockacoOptions.AdminApiEndpointName.set -> void
+Mockaco.MockacoOptions.AdminApiEndpointPrefix.get -> string
+Mockaco.MockacoOptions.AdminApiEndpointPrefix.set -> void
+Mockaco.MockacoOptions.AdminApiSecretKey.get -> string
+Mockaco.MockacoOptions.AdminApiSecretKey.set -> void
 Mockaco.MockacoOptions.DefaultHttpContentType.get -> string
 Mockaco.MockacoOptions.DefaultHttpContentType.set -> void
 Mockaco.MockacoOptions.DefaultHttpStatusCode.get -> System.Net.HttpStatusCode

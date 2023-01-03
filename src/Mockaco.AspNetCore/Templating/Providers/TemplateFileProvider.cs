@@ -23,13 +23,13 @@ namespace Mockaco
         private const string DefaultTemplateSearchPattern = "*.json";
 
         private readonly ILogger<TemplateFileProvider> _logger;
-        
+
         private readonly IMemoryCache _memoryCache;
         private PhysicalFileProvider _fileProvider;
         private CancellationTokenSource _resetCacheToken = new CancellationTokenSource();
 
         public TemplateFileProvider(IOptionsMonitor<TemplateFileProviderOptions> options, IWebHostEnvironment webHostEnvironment, IMemoryCache memoryCache, ILogger<TemplateFileProvider> logger)
-        {            
+        {
             _memoryCache = memoryCache;
             _logger = logger;
 
@@ -51,17 +51,17 @@ namespace Mockaco
                     return;
                 }
 
-                var fullPath = Path.IsPathRooted(path) 
-                    ? path 
+                var fullPath = Path.IsPathRooted(path)
+                    ? path
                     : Path.Combine(Directory.GetCurrentDirectory(), path);
-                
+
                 var fileProvider = new PhysicalFileProvider(fullPath, ExclusionFilters.Hidden | ExclusionFilters.System);
 
                 _fileProvider?.Dispose();
                 _fileProvider = fileProvider;
 
                 _logger.LogInformation("Mock path: {fullPath}", fullPath);
-            }            
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error setting mock root path");
@@ -110,6 +110,39 @@ namespace Mockaco
 
                     return LoadTemplatesFromDirectory();
                 });
+        }
+
+        public void Update(string name, string content)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (string.IsNullOrEmpty(content))
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            var fullPath = Path.Combine(_fileProvider.Root, name);
+
+            File.WriteAllText(fullPath, content);
+        }
+
+        public void Remove(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            var fullPath = Path.Combine(_fileProvider.Root, name);
+
+            if (!File.Exists(fullPath))
+            {
+                throw new FileNotFoundException();
+            }
+
+            File.Delete(fullPath);
         }
 
         private void PostEvictionCallback(object key, object value, EvictionReason reason, object state)
