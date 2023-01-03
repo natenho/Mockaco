@@ -8,5 +8,7 @@ namespace Mockaco
         event EventHandler OnChange;
 
         IEnumerable<IRawTemplate> GetTemplates();
+        void Remove(string name);
+        void Update(string name, string content);
     }
 }

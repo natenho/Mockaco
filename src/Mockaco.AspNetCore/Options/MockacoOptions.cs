@@ -6,7 +6,7 @@ namespace Mockaco
     {
         public HttpStatusCode DefaultHttpStatusCode { get; set; }
 
-        public HttpStatusCode ErrorHttpStatusCode { get; set; }       
+        public HttpStatusCode ErrorHttpStatusCode { get; set; }
 
         public string DefaultHttpContentType { get; set; }
 
@@ -19,6 +19,12 @@ namespace Mockaco
         public string VerificationEndpointPrefix { get; set; }
 
         public string VerificationEndpointName { get; set; }
+
+        public string AdminApiEndpointPrefix { get; set; }
+
+        public string AdminApiEndpointName { get; set; }
+        public string AdminApiSecretKey { get; set; }
+
 
         public TemplateFileProviderOptions TemplateFileProvider { get; set; }
 
@@ -33,6 +39,8 @@ namespace Mockaco
             VerificationEndpointPrefix = "_mockaco";
             VerificationEndpointName = "verification";
             TemplateFileProvider = new();
+            AdminApiEndpointPrefix = "_mockaco";
+            AdminApiEndpointName = "api";
         }
     }
 }
