@@ -11,6 +11,8 @@ namespace Microsoft.AspNetCore.Builder
         {
             app.UseRouting();
             var options = app.ApplicationServices.GetRequiredService<IOptions<MockacoOptions>>().Value;
+            var optionsChaos = app.ApplicationServices.GetRequiredService<IOptions<ChaosOptions>>().Value;
+
             app.UseEndpoints(endpoints => endpoints.Map($"/{options.VerificationEndpointPrefix}/{options.VerificationEndpointName}", VerifyerExtensions.Verify));
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -18,6 +20,7 @@ namespace Microsoft.AspNetCore.Builder
             app
                 .UseMiddleware<RequestMatchingMiddleware>()
                 .UseMiddleware<ResponseDelayMiddleware>()
+                .UseMiddleware<ChaosMiddleware>()
                 .UseMiddleware<ResponseMockingMiddleware>()
                 .UseMiddleware<CallbackMiddleware>();
 
