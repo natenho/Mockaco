@@ -22,6 +22,8 @@ namespace Mockaco
 
         public TemplateFileProviderOptions TemplateFileProvider { get; set; }
 
+        public ChaosOptions Chaos { get; set; }
+
         public MockacoOptions()
         {
             DefaultHttpStatusCode = HttpStatusCode.OK;
@@ -33,6 +35,7 @@ namespace Mockaco
             VerificationEndpointPrefix = "_mockaco";
             VerificationEndpointName = "verification";
             TemplateFileProvider = new();
+            Chaos = new();
         }
     }
 }

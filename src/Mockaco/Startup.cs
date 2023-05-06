@@ -23,6 +23,7 @@ namespace Mockaco
             services
                 .AddCors()
                 .AddMockaco(_configuration.GetSection("Mockaco"));
+
         }
 
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)

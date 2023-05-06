@@ -1,12 +1,14 @@
 {
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Mockaco": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "hello/fernando",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5000"
     }
-  }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json"
 }

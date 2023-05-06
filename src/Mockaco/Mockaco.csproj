@@ -76,4 +76,10 @@
 		<ProjectReference Include="..\Mockaco.AspNetCore\Mockaco.AspNetCore.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="Settings\appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>

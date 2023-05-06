@@ -15,6 +15,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
 - Callback support - trigger another service call when a request hits your mocked API
 - State support - stateful mock support allow a mock to be returned based on a global variable previously set by another mock
 - Portable - runs in any [.NET Core compatible environment](https://github.com/dotnet/core/blob/main/release-notes/5.0/5.0-supported-os.md)
+- Fault and Delay Injection (Chaos Engineering)
 
 [![Mocking APIs with Mockaco | .NET 7](https://user-images.githubusercontent.com/4236481/195997781-b730959e-8d6d-432c-b35a-3adb580abc41.png)](https://www.youtube.com/watch?v=QBnXCgZFzM0 "Mocking APIs with Mockaco | .NET 7")
 
@@ -51,7 +52,7 @@ Mockaco is an HTTP-based API mock server with fast setup.
     + [Configure the duration of cache storing last request for verification](#configure-the-time-of-cache-storing-last-request-for-verification)
     + [Verification summary](#verification-summary)
 - [Generators](#generators)
-
+- [Chaos Engineering](#chaos-engineering) 
 
 # Get Started
 
@@ -553,3 +554,58 @@ Icon made by [Freepik](https://www.freepik.com/ "Freepik") from [www.flaticon.co
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnatenho%2FMockaco.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnatenho%2FMockaco?ref=badge_large)
+
+# Chaos Engineering
+
+Enabling chaos engineering, behavior different from what is expected will be randomly inserted into the calls, such as errors and delays, with this it is possible to verify how the client behaves in unforeseen situations.
+
+## How to enable Chaos Engineering
+
+To enable chaos it is necessary to set the 'Enabled' variable to 'true' as shown in the example below:
+
+```
+"Mockaco": {
+    ...
+    "Chaos": {
+        "Enabled": true,
+    }, 
+    ...
+  },
+```
+in ```appsettings.json```.
+
+## Types of answers with chaos
+
+- Behavior: Return HTTP Error 503 (Service Unavailable)
+- Exception: Return HTTP Error 500 (Internal Server Erro)
+- Latency: Randomly add delay time to a call
+- Result: Return HTTP Error 400 (Bad Request)
+- Timeout: Waits a while and returns error 408 (Request Timeout)
+
+## How to define paramenters Chaos Engenering
+
+Parameters are defined inside the Chaos key
+
+```
+"Mockaco": {
+    ...
+    "Chaos": {
+        "Enabled": true,
+        "ChaosRate": 20,
+        "MinimumLatencyTime": 500,
+        "MaximumLatencyTime": 3000,
+        "TimeBeforeTimeout": 10000
+    }, 
+    ...
+  },
+```
+in ```appsettings.json```.
+
+
+|Parameter|Description|Default|
+||||
+|Enabled|Option to enable and disable chaos (true / false)|true|
+|ChaosRate|Percentage of calls affected by chaos (0 - 100) |20|
+|MinimumLatencyTime|Minimum latency in milliseconds when the latency strategy is drawn|500|
+|MaximumLatencyTime|Maximum latency in milliseconds when the latency strategy is drawn|3000|
+|TimeBeforeTimeout|Time in milliseconds before timeout error|10000|
