@@ -1,4 +1,4 @@
-# Mocking XML request/response
+# Mocking XML responses
 
 Mockaco is able to parse XML request and make its elements available to be used in the response and/or callback templates.
 

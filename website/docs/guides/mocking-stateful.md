@@ -1,4 +1,4 @@
-# Stateful Mocks
+# Stateful mocks
 
 Mockaco can persist states to allow mocking multiple behaviors for the same endpoint.
 These states are simple global variables persisted in memory and available for all active mocks.

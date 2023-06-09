@@ -1,0 +1,8 @@
+{
+  "label": "Quick Start",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Mockaco is an HTTP-based API mock server with fast setup."
+  }
+}
