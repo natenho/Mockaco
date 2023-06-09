@@ -1,4 +1,4 @@
-name: Test deployment
+name: Deploy to GitHub Pages (Test)
 
 on:
   pull_request:
