@@ -1,4 +1,4 @@
-# Mocking binary/raw request/response
+# Mocking binary/raw responses
 
 Mockaco is able to respond raw file contents, so it's possible to return a file, image or any static file content.
 

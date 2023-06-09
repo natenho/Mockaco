@@ -1,0 +1,8 @@
+{
+  "label": "callback object",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Prepare the mock to call another API whenever a request arrives."
+  }
+}
