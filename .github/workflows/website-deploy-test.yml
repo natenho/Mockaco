@@ -5,13 +5,14 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    working-directory: ./website
+
 jobs:
   test-deploy:
     name: Test deployment
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./website
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
