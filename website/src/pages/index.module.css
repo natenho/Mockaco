@@ -8,6 +8,9 @@
   text-align: left;
   position: relative;
   overflow: hidden;
+
+  background-image: url("palm-tree.svg");
+  background-repeat: repeat-x;  
 }
 
 @media screen and (max-width: 996px) {
