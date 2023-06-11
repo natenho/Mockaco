@@ -54,7 +54,12 @@ namespace Mockaco
                 var fullPath = Path.IsPathRooted(path) 
                     ? path 
                     : Path.Combine(Directory.GetCurrentDirectory(), path);
-                
+
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
+
                 var fileProvider = new PhysicalFileProvider(fullPath, ExclusionFilters.Hidden | ExclusionFilters.System);
 
                 _fileProvider?.Dispose();
