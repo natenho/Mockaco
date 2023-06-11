@@ -16,6 +16,9 @@ namespace Mockaco
 
         public int MatchedRoutesCacheDuration { get; set; }
 
+        public string MockacoEndpoint { get; set; }
+
+        // Deprecated (use MockacoEndpoint instead)
         public string VerificationEndpointPrefix { get; set; }
 
         public string VerificationEndpointName { get; set; }
@@ -30,7 +33,7 @@ namespace Mockaco
             References = new List<string>();
             Imports = new List<string>();
             MatchedRoutesCacheDuration = 60;
-            VerificationEndpointPrefix = "_mockaco";
+            MockacoEndpoint = "_mockaco";
             VerificationEndpointName = "verification";
             TemplateFileProvider = new();
         }
