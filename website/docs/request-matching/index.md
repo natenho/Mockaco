@@ -14,4 +14,4 @@ This process ensures that Mockaco handles incoming requests and provides appropr
 
 The request matching is based on the `request` object defined in the mock template.
 
-Please refer to [request object reference](/docs/reference/request) for further details on how to use each criteria.
+Please refer to [request object reference](/docs/category/request-object) for further details on how to use each criteria.
