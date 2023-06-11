@@ -36,6 +36,8 @@ Default: `[]`
 
 Set the cache duration in minutes to be used by the verification endpoint.
 
+Default: `60`
+
 ## `MockacoEndpoint`
 
 The exclusive endpoint to access internal features.
