@@ -265,8 +265,9 @@ __pycache__/
 **/.dockerignore
 **/*.md
 .github/
-doc/
+nupkg/
 test/
+website/
 **/*.log
 src/Mockaco/Mocks*/**/*.*
 !src/Mockaco/Mocks/hello.json
