@@ -11,10 +11,10 @@ If omitted, empty or null, defaults to base route (/).
 ```json
 {
   "request": {
-	"route": "customers/{id}/accounts/{account_id}"
+	  "route": "customers/{id}/accounts/{account_id}"
   },
   "response": {
-	"status": "OK"
+	  "status": "OK"
   }
 }
 ```

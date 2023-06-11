@@ -11,10 +11,31 @@ If omitted, empty or null, defaults to ```true```.
 ```json
 {
   "request": {
-	"condition": "<#= DateTime.Now.Second % 2 == 0 #>"
+    "method": "GET",
+    "route": "customers/{id}/accounts/{account_id}",
+	  "condition": "<#= DateTime.Now.Second % 2 == 0 #>"
   },
   "response": {
-	"status": "OK"
+    "body": "Match!"
   }
 }
 ```
+
+In the example above, the mock will be returned for `GET customers/1234/accounts/123ABC`, leveraging `condition` [scripting](/docs/scripting) to ensure that the mock matches only if the current time has an even second.
+
+The condition can also be used to match based on query parameters:
+
+```json
+{
+  "request": {
+    "method": "GET",
+    "route": "any/{myVar}",
+	  "condition": "<#= Request.Query["foo"]?.ToString() == "bar" #>"
+  },
+  "response": {
+    "body": "Hello!"
+  }
+}
+```
+
+The mock will be returned for `GET any/xxx?foo=bar`

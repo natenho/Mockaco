@@ -10,10 +10,10 @@ If omitted, defaults to ```GET```.
 ```json
 {
   "request": {
-	"method": "GET"
+	  "method": "GET"
   },
   "response": {
-	"status": "OK"
+	  "status": "OK"
   }
 }
 ```
