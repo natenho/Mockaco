@@ -52,7 +52,7 @@ namespace Mockaco.Tests.Templating.Request
 
             bodyStrategy.Invoking(async _ => await _.ReadBodyAsJson(httpRequest.Object))
                 .Should()
-                .Throw<JsonReaderException>();
+                .ThrowAsync<JsonReaderException>();
         }
 
         [Theory]

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Mockaco;
+using Mockaco.HealthChecks;
 using Mockaco.Settings;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -30,12 +32,21 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Configure<MockacoOptions>(config)
                 .Configure<TemplateFileProviderOptions>(config.GetSection("TemplateFileProvider"));
 
-        private static IServiceCollection AddCommonServices(this IServiceCollection services) =>
+        private static IServiceCollection AddCommonServices(this IServiceCollection services)
+        {
             services
                 .AddMemoryCache()
                 .AddHttpClient()
                 .AddInternalServices()
                 .AddHostedService<MockProviderWarmUp>();
+
+            services
+                .AddSingleton<StartupHealthCheck>()
+                .AddHealthChecks()
+                    .AddCheck<StartupHealthCheck>("Startup", tags: new[] { "ready" });
+
+            return services;
+        }
 
         private static IServiceCollection AddInternalServices(this IServiceCollection services) =>
             services

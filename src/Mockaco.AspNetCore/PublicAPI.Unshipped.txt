@@ -1,6 +1,11 @@
 ﻿Bogus.PhoneNumberExtensions
 Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
 Microsoft.Extensions.DependencyInjection.MockacoServiceCollection
+Mockaco.HealthChecks.StartupHealthCheck
+Mockaco.HealthChecks.StartupHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult>
+Mockaco.HealthChecks.StartupHealthCheck.StartupCompleted.get -> bool
+Mockaco.HealthChecks.StartupHealthCheck.StartupCompleted.set -> void
+Mockaco.HealthChecks.StartupHealthCheck.StartupHealthCheck() -> void
 Mockaco.IFakerFactory
 Mockaco.IFakerFactory.GetDefaultFaker() -> Bogus.Faker
 Mockaco.IFakerFactory.GetFaker(System.Collections.Generic.IEnumerable<string> acceptLanguages) -> Bogus.Faker
@@ -47,6 +52,8 @@ Mockaco.MockacoOptions.Imports.get -> System.Collections.Generic.List<string>
 Mockaco.MockacoOptions.Imports.set -> void
 Mockaco.MockacoOptions.MatchedRoutesCacheDuration.get -> int
 Mockaco.MockacoOptions.MatchedRoutesCacheDuration.set -> void
+Mockaco.MockacoOptions.MockacoEndpoint.get -> string
+Mockaco.MockacoOptions.MockacoEndpoint.set -> void
 Mockaco.MockacoOptions.MockacoOptions() -> void
 Mockaco.MockacoOptions.References.get -> System.Collections.Generic.List<string>
 Mockaco.MockacoOptions.References.set -> void

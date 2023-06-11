@@ -53,7 +53,7 @@ You will be able to access the verification endpoint on ```http://localhost:5000
 
 ## Configure the duration of cache storing last request for verification
 
-Each request with the exact time of being ivoked, body and path is being stored in the internal .Net cache for 60 minutes. You can configure this time by changing
+Each request with the exact time of being invoked, body and path is being stored in the internal .Net cache for 60 minutes. You can configure this time by changing
 
 ```
 "Mockaco": {

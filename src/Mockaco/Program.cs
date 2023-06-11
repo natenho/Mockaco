@@ -48,9 +48,9 @@ namespace Mockaco
 
                         configuration.AddCommandLine(args, switchMappings);
                     })
-                    .UseSerilog((context, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(context.Configuration))
                     .UseStartup<Startup>();
-                });
+                })
+            .UseSerilog((context, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(context.Configuration));
 
         private static CommandLineBuilder CreateCommandLineBuilder(string[] args, IHost host)
         {

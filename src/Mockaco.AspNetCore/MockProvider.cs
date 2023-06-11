@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Mockaco.HealthChecks;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System;
@@ -18,6 +20,7 @@ namespace Mockaco
         private readonly ITemplateProvider _templateProvider;
         private readonly ITemplateTransformer _templateTransformer;
         private readonly IGlobalVariableStorage _globalVariableStorage;
+        private readonly StartupHealthCheck _healthCheck;
         private readonly ILogger<MockProvider> _logger;
 
         public MockProvider
@@ -26,6 +29,7 @@ namespace Mockaco
             ITemplateProvider templateProvider, 
             ITemplateTransformer templateTransformer, 
             IGlobalVariableStorage globalVariableStorage,
+            StartupHealthCheck healthCheck,
             ILogger<MockProvider> logger)
         {
             _cache = new List<Mock>();
@@ -36,6 +40,7 @@ namespace Mockaco
 
             _templateTransformer = templateTransformer;
             _globalVariableStorage = globalVariableStorage;
+            _healthCheck = healthCheck;
             _logger = logger;
         }
 
@@ -113,6 +118,8 @@ namespace Mockaco
             _cache.Clear();
 
             _cache = mocks.OrderByDescending(r => r.HasCondition).ToList();
+
+            _healthCheck.StartupCompleted = true;
 
             _logger.LogTrace("{0} finished in {1} ms", nameof(WarmUp), stopwatch.ElapsedMilliseconds);
         }
