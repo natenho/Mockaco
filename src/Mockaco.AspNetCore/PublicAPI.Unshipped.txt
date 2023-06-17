@@ -48,6 +48,8 @@ Mockaco.MockacoOptions.DefaultHttpStatusCode.get -> System.Net.HttpStatusCode
 Mockaco.MockacoOptions.DefaultHttpStatusCode.set -> void
 Mockaco.MockacoOptions.ErrorHttpStatusCode.get -> System.Net.HttpStatusCode
 Mockaco.MockacoOptions.ErrorHttpStatusCode.set -> void
+Mockaco.MockacoOptions.HiddenHeaders.get -> System.Collections.Generic.List<string>
+Mockaco.MockacoOptions.HiddenHeaders.set -> void
 Mockaco.MockacoOptions.Imports.get -> System.Collections.Generic.List<string>
 Mockaco.MockacoOptions.Imports.set -> void
 Mockaco.MockacoOptions.MatchedRoutesCacheDuration.get -> int
