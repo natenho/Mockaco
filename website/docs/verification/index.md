@@ -72,7 +72,7 @@ You can configure to not display headers that are not relevant to your test. By 
 ```
 "Mockaco": {
     ...
-    "HiddenHeaders": [        
+    "VerificationIgnoredHeaders": [        
         "Postman-Token",
         "Some-Irrelevant-Header",
     ],
