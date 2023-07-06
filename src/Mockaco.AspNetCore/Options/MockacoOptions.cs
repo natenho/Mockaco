@@ -12,6 +12,8 @@ namespace Mockaco
 
         public List<string> References { get; set; }
 
+        public List<string> VerificationIgnoredHeaders { get; set; }
+        
         public List<string> Imports { get; set; }
 
         public int MatchedRoutesCacheDuration { get; set; }

@@ -36,6 +36,50 @@ the verification endpoint called in the following way: ```http://localhost:5000/
 
 Both JSON body and x-www-form-urlencoded body are supported.
 
+### Verify request with headers
+If you have just called ```http://localhost:5000/hello/Jane Doe```, with the following headers:
+```
+    x-user-id:someone@email.com
+    Authorization:some-bearer-token
+    endtoend:b9802abd-106f-4d50-b68e-de3198777456
+```
+the verification endpoint called in the following way: ```http://localhost:5000/_mockaco/verification?route=/hello/Jane Doe``` will respond like so: 
+```
+{
+    "route": "/hello/Jane Doe",
+    "timestamp": "14:41",
+    "headers": [
+        {
+            "key": "x-user-id",
+            "value": "someone@email.com"
+        },
+        {
+            "key": "Authorization",
+            "value": "some-bearer-token"
+        },
+        {
+            "key": "endtoend",
+            "value": "b9802abd-106f-4d50-b68e-de3198777456"
+        }
+    ],
+    "body": ""
+}
+```
+
+### Configure hidden headers in verification endpoint
+You can configure to not display headers that are not relevant to your test. By default the following headers will not be displayed:  ```Accept, Connection, Host, User-Agent, Accept-Encoding, Postman-Token, Content-Type, Content-Length.```
+
+```
+"Mockaco": {
+    ...
+    "VerificationIgnoredHeaders": [        
+        "Postman-Token",
+        "Some-Irrelevant-Header",
+    ],
+    ...
+  },
+```
+
 
 ## Configure custom name of verification endpoint
 

@@ -48,6 +48,7 @@ namespace Mockaco
                     {
                         Route = httpContext.Request.Path.Value,
                         Timestamp = $"{DateTime.Now.ToString("t")}",
+                        Headers = LoadHeaders(httpContext, options.Value.VerificationIgnoredHeaders),
                         Body = await httpContext.Request.ReadBodyStream()
                     }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
 
@@ -108,6 +109,13 @@ namespace Mockaco
             {
                 _logger.LogDebug("Body: {body}", body);
             }
+        }
+
+        private static IEnumerable<object> LoadHeaders(HttpContext httpContext, IEnumerable<string> verificationIgnoredHeaders)
+        {            
+            return from header in httpContext.Request.Headers.ToList()
+                   where !verificationIgnoredHeaders.Any(opt => opt == header.Key)
+                   select new { header.Key, Value = header.Value[0] };
         }
     }
 }
