@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -43,12 +40,18 @@ namespace Mockaco
             }
 
             await conditionMatcherScriptContext.AttachRouteParameters(httpRequest, mock);
+            try
+            {
+                var template = await _templateTransformer.Transform(mock.RawTemplate, conditionMatcherScriptContext);
 
-            var template = await _templateTransformer.Transform(mock.RawTemplate, conditionMatcherScriptContext);
+                var isMatch = template.Request?.Condition ?? true;
 
-            var isMatch = template.Request?.Condition ?? true;
-
-            return isMatch;
+                return isMatch;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         //TODO Remove redundant code

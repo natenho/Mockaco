@@ -68,16 +68,16 @@ namespace Mockaco.Tests.Templating
             transformedTemplate.Response.Headers.Should()
                 .HaveCount(2);
 
-            transformedTemplate.Response.Body["id"].ToString().Should()
+            transformedTemplate.Response.Body["id"]?.ToString().Should()
                 .Be("1");
 
-            transformedTemplate.Response.Body["message"].ToString().Should()
+            transformedTemplate.Response.Body["message"]?.ToString().Should()
                 .Be("Hello world");
 
-            transformedTemplate.Response.Body["createdAt"].Type.Should()
+            transformedTemplate.Response.Body["createdAt"]?.Type.Should()
                .Be(JTokenType.Date);
 
-            transformedTemplate.Response.Body["createdAt"].Value<DateTime>().Should()
+            transformedTemplate.Response.Body["createdAt"]?.Value<DateTime>().Should()
                .Be(new DateTime(2012, 04, 23, 18, 25, 43, 511, DateTimeKind.Utc));
 
             transformedTemplate.Callback.Method.Should()
@@ -98,19 +98,19 @@ namespace Mockaco.Tests.Templating
             transformedTemplate.Callback.Headers.Should()
                 .HaveCount(2);
 
-            transformedTemplate.Callback.Body["key"].ToString().Should()
+            transformedTemplate.Callback.Body["key"]?.ToString().Should()
                .Be("2");
 
-            transformedTemplate.Callback.Body["key"].Type.Should()
+            transformedTemplate.Callback.Body["key"]?.Type.Should()
                .Be(JTokenType.Integer);
 
-            transformedTemplate.Callback.Body["topic"].ToString().Should()
+            transformedTemplate.Callback.Body["topic"]?.ToString().Should()
                 .Be("Hello callback");
 
-            transformedTemplate.Callback.Body["updatedAt"].Type.Should()
+            transformedTemplate.Callback.Body["updatedAt"]?.Type.Should()
                .Be(JTokenType.Date);
 
-            transformedTemplate.Callback.Body["updatedAt"].Value<DateTime>().Should()
+            transformedTemplate.Callback.Body["updatedAt"]?.Value<DateTime>().Should()
                .Be(new DateTime(2003, 02, 01, 19, 00, 00, DateTimeKind.Utc));
         }
 
