@@ -12,10 +12,8 @@ namespace Mockaco
                 {
                     return value;
                 }
-                else
-                {
-                    return default;
-                }
+
+                return string.Empty;
             }
             set
             {
