@@ -1,6 +1,6 @@
 dotnet restore --verbosity normal
 dotnet build --configuration Release --verbosity normal .\src\Mockaco\Mockaco.csproj
-dotnet test --configuration Release --verbosity normal .\test\Mockaco.Tests\Mockaco.Tests.csproj
+dotnet test --configuration Release --verbosity normal .\test\Mockaco.AspNetCore.Tests\Mockaco.AspNetCore.Tests.csproj
 dotnet pack --configuration Nuget --output ./nupkg
 docker build -f ./src/Mockaco/Docker/Dockerfile -t mockaco:local .
 
