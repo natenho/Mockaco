@@ -75,7 +75,7 @@ const config = {
             sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Docs',
-          },          
+          },
           {to: 'videos', label: 'Videos', position: 'left'},
           {
             href: 'https://github.com/natenho/mockaco',
@@ -103,6 +103,14 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+      algolia: {
+        appId: 'XIH8B6F8KL',
+        apiKey: 'cc22bf63eb102dea42451bc77e907dae',
+        indexName: 'mockaco',
+        contextualSearch: true,
+        searchParameters: {},
+        searchPagePath: 'search',
       },
     }),
 };
