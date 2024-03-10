@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Mockaco.Tests")]
+[assembly: InternalsVisibleTo("Mockaco.AspNetCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
