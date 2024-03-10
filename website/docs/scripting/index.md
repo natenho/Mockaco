@@ -1,6 +1,6 @@
 # Scripting
 
-Every part of the mock file is scriptable, so you can add code to programatically generate parts of the template.
+Every part of the mock file is scriptable, so you can add code to programmatically generate parts of the template.
 
 Use C# code surrounded by ```<#=``` and ```#>```.
 
@@ -11,13 +11,11 @@ Although it pays off, in the other hand, the invalid JSON file may be a little h
 
 :::
 
-
 The mock code and generation will run for each request.
 
 It's possible to access request data within the response template. In the same way, response data can be used within the callback request template.
 
 The scripts are compiled and executed via [Roslyn](https://github.com/dotnet/roslyn/wiki/Scripting-API-Samples).
-
 
 ### Example
 ```json

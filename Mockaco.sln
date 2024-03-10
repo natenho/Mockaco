@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Tests", "test\Mockaco.Tests\Mockaco.Tests.csproj", "{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.Tests", "test\Mockaco.AspNetCore.Tests\Mockaco.AspNetCore.Tests.csproj", "{EE57B1B4-29D2-4AE3-8F23-5E622302C30F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mockaco.AspNetCore", "src\Mockaco.AspNetCore\Mockaco.AspNetCore.csproj", "{7766C592-9887-4162-8B9C-51003ED30335}"
 EndProject

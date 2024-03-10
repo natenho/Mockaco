@@ -30,7 +30,7 @@ The condition can also be used to match based on query parameters:
   "request": {
     "method": "GET",
     "route": "any/{myVar}",
-	  "condition": "<#= Request.Query["foo"]?.ToString() == "bar" #>"
+	  "condition": "<#= Request.Query["foo"] == "bar" #>"
   },
   "response": {
     "body": "Hello!"

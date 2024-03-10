@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --verbosity normal src/Mockaco/Mockaco.csproj
       - name: Test
-        run: dotnet test --configuration Release --verbosity normal test/Mockaco.Tests/Mockaco.Tests.csproj
+        run: dotnet test --configuration Release --verbosity normal test/Mockaco.AspNetCore.Tests/Mockaco.AspNetCore.Tests.csproj
       - name: Bump version and push tag
         if: "github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'skip-release')"
         id: tag_version
