@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
-using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Mockaco
 {
@@ -28,12 +26,12 @@ namespace Mockaco
         }
 
         public async Task<Template> Transform(IRawTemplate rawTemplate, IScriptContext scriptContext)
-        {            
+        {
             scriptContext.Global.DisableWriting();
 
             var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
 
-            return JsonConvert.DeserializeObject<Template>(transformedTemplate);           
+            return JsonConvert.DeserializeObject<Template>(transformedTemplate);
         }
 
         private async Task<string> Transform(string input, IScriptContext scriptContext)
@@ -57,23 +55,11 @@ namespace Mockaco
                     case State.Directive:
                         break;
                     case State.Expression:
-
-                        object expressionResult;
-
-                        try
-                        {
-                            expressionResult = await Run(tokeniser.Value, scriptContext);
-                        }
-                        catch (Exception)
-                        {
-                            expressionResult = string.Empty;
-                        }
-
+                        var expressionResult = await Run(tokeniser.Value, scriptContext);
                         output.Append(expressionResult);
-
                         break;
                     case State.Block:
-                        await Run(tokeniser.Value, scriptContext);                             
+                        await Run(tokeniser.Value, scriptContext);
                         break;
                     case State.Helper:
                         break;
@@ -95,21 +81,19 @@ namespace Mockaco
 
         private async Task<object> Run(string code, IScriptContext scriptContext)
         {
-            object result = null;
-
             try
             {
-                result = await _scriptRunnerFactory.Invoke<IScriptContext, object>(scriptContext, code);
+                var result = await _scriptRunnerFactory.Invoke<IScriptContext, object>(scriptContext, code);
 
                 _logger.LogDebug("Processed script {code} with result {result}", code, result);
+
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Processed script {code} with error", code);
+                throw;
             }
-
-            return result;
         }
-
     }
 }
