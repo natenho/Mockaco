@@ -47,7 +47,7 @@ namespace Mockaco.Tests.Middlewares
             var bodyAsJToken = JToken.Parse(body);
 
             bodyAsJToken.Should().NotBeNullOrEmpty();
-            bodyAsJToken.SelectToken("$[0].Exception.ClassName").ToString().Should().Be(anyException.GetType().FullName);
+            bodyAsJToken.SelectToken("$[0].Exception.Type").ToString().Should().Be(anyException.GetType().Name);
             bodyAsJToken.SelectToken("$[0].Exception.Message").ToString().Should().Be(anyException.Message);
             httpContext.Response.StatusCode.Should().Be(501);
             httpContext.Response.ContentType.Should().Be("application/json");

@@ -11,10 +11,10 @@ namespace System
         private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
-            Converters = [
-                new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()}, 
-                new SimpleExceptionConverter() 
-            ],
+            Converters = new JsonConverter[] {
+                new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()},
+                new SimpleExceptionConverter()
+            },
             NullValueHandling = NullValueHandling.Ignore
         };
 
