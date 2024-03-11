@@ -1,11 +1,13 @@
 # Configuration
 
-The configuration for Mockaco can be easily customized using the appsettings*.json files located within the Settings folder. These files allow you to configure various options provided by ASP.NET Core.
+### App Settings
+
+The configuration for Mockaco can be easily customized using the appsettings*.json files located within the Settings folder. These files allow you to configure various options [provided by ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration).
 
 Here are the different appsettings*.json files and their purposes:
 
 - *appsettings.Production.json*: Use this file to customize Mockaco when running it as an executable or dotnet tool.
-- *appsettings.Docker.json*: This file is specifically used to customize Mockaco when running it within a Docker container.
+- *appsettings.Docker.json*: This file is specifically used to customize Mockaco when running in a Docker container.
 - *appsettings.Development.json*: When running Mockaco in debug mode, such as inside Visual Studio, you can use this file to customize its behavior. This environment is typically set through the launchSettings.json file.
 
 These appsettings*.json files provide a convenient way to adjust Mockaco's settings based on the specific environment in which it is running.
@@ -19,6 +21,22 @@ For instance you could override the default URLs Mockaco will listen to, just by
   "Urls": "http://+:8080;https://+:8443"
 }
 ```
+
+### Environment variables
+
+You can also use **environment variables** to override the configuration. For example, you can set the `ASPNETCORE_URLS` environment variable to `http://+:8080;https://+:8443` to achieve the same result as the appsettings.json example.
+
+Another way to set the configuration is through command line arguments.
+
+### Command line
+
+To pass mockaco specific options through **command line**, you can use the `--Mockaco` prefix. For example, to set the `DefaultHttpStatusCode` to `NotFound` you can use the following command:
+
+```bash
+dotnet mockaco run --Mockaco:DefaultHttpStatusCode=NotFound
+```
+
+Please refer to the [ASP.NET Core documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration) for more information on how to customize the configuration.
 
 Mockaco specific options are listed in the next topics.
 
@@ -101,3 +119,8 @@ Default: `Mocks`
 
 Configure [Serilog logger](https://github.com/serilog/serilog-settings-configuration)
 
+Just as Mockaco options, to pass Serilog specific options through command line, you can use the `--Serilog` prefix. For example, to set the `MinimumLevel` to `Information` you can use the following command:
+
+```bash
+dotnet mockaco run --Serilog:MinimumLevel=Information
+```
