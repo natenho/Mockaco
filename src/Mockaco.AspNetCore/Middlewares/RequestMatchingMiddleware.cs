@@ -103,7 +103,7 @@ namespace Mockaco
 
             if (string.IsNullOrEmpty(body))
             {
-                _logger.LogDebug("Body is not present", body);
+                _logger.LogDebug("Body is not present");
             }
             else
             {

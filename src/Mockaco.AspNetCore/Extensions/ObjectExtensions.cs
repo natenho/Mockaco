@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Mockaco.Common;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System.Linq;
@@ -7,10 +8,13 @@ namespace System
 {
     internal static class ObjectExtensions
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
-            Converters = new JsonConverter[] { new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()} },
+            Converters = [
+                new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy()}, 
+                new SimpleExceptionConverter() 
+            ],
             NullValueHandling = NullValueHandling.Ignore
         };
 
@@ -24,7 +28,7 @@ namespace System
 
             try
             {
-                return JsonConvert.SerializeObject(param, JsonSerializerSettings);
+                return JsonConvert.SerializeObject(param, _jsonSerializerSettings);
             }
             catch
             {
