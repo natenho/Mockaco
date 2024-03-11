@@ -21,7 +21,7 @@ If omitted, empty or null, defaults to ```true```.
 }
 ```
 
-In the example above, the mock will be returned for `GET customers/1234/accounts/123ABC`, leveraging `condition` [scripting](/docs/scripting) to ensure that the mock matches only if the current time has an even second.
+In the example above, the mock will be returned for `GET customers/1234/accounts/123ABC`, leveraging `condition` [scripting](/docs/reference-scripting) to ensure that the mock matches only if the current time has an even second.
 
 The condition can also be used to match based on query parameters:
 
