@@ -32,7 +32,7 @@ Mockaco specific options are listed in the next topics.
         "DefaultHttpContentType": "application/json",
         "References": [],
         "Imports": [],
-        "MatchedRoutesCacheDuration": 60, 
+        "MatchedRoutesCacheDuration": 60,
         "MockacoEndpoint": "_mockaco",
         "VerificationEndpointName": "verification"
     }
@@ -59,13 +59,13 @@ Default: `application/json`
 
 ### `References`
 
-A list of references to other .NET assemblies to extend scripting engine.
+A list of additional references to other .NET assemblies to extend scripting engine.
 
 Default: `[]`
 
 ### `Imports`
 
-A list of namespaces to be imported and made available in scripting engine.
+A list of additional namespaces to be imported and made available in scripting engine. It is the same as calling `using` in C#.
 
 Default: `[]`
 
