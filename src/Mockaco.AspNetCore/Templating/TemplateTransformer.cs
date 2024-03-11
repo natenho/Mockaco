@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mockaco.Common;
 using Mono.TextTemplating;
 using Newtonsoft.Json;
 using System.Text;
@@ -31,7 +32,16 @@ namespace Mockaco
 
             var transformedTemplate = await Transform(rawTemplate.Content, scriptContext);
 
-            return JsonConvert.DeserializeObject<Template>(transformedTemplate);
+            try
+            {
+                return JsonConvert.DeserializeObject<Template>(transformedTemplate);
+            }
+            catch (JsonReaderException ex)
+            {
+                var jsonEx = new InvalidMockException("Generated output is invalid", ex);
+                jsonEx.Data.Add("Output", transformedTemplate);
+                throw jsonEx;
+            }
         }
 
         private async Task<string> Transform(string input, IScriptContext scriptContext)

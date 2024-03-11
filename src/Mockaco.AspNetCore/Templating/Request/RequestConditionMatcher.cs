@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Mockaco
 {
@@ -48,8 +49,10 @@ namespace Mockaco
 
                 return isMatch;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _mockacoContext.Errors.Add(new Error("Request condition could not be checked", ex));
+                _logger.LogError(ex, "Request condition could not be checked");
                 return false;
             }
         }
