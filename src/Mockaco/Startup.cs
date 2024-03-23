@@ -3,12 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
-using Mockaco.Templating.Generating;
+using System;
+using System.Linq;
 
 namespace Mockaco
 {
-    using Settings;
-
     public partial class Startup
     {
         private readonly IConfiguration _configuration;
@@ -29,9 +28,15 @@ namespace Mockaco
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
             var version = GitVersionInformation.InformationalVersion;
+            var isNoLogoPassed = Environment.GetCommandLineArgs().Contains("--no-logo");
 
-            logger.LogInformation("{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]\n\n{logo}", assemblyName, version, _logo);
-            
+            var logMessage = "{assemblyName} v{assemblyVersion} [github.com/natenho/Mockaco]";
+
+            if (!isNoLogoPassed)
+                logMessage += "\n\n{logo}";
+
+            logger.LogInformation(logMessage, assemblyName, version, _logo);
+
             app
                 .UseCors()
                 .UseMockaco();
