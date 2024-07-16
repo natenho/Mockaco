@@ -22,6 +22,8 @@ namespace Mockaco
 
         // Deprecated (use MockacoEndpoint instead)
         public string VerificationEndpointPrefix { get; set; }
+        
+        public ChaosOptions Chaos { get; set; }
 
         public string VerificationEndpointName { get; set; }
 
@@ -38,6 +40,7 @@ namespace Mockaco
             MockacoEndpoint = "_mockaco";
             VerificationEndpointName = "verification";
             TemplateFileProvider = new();
+            Chaos = new ChaosOptions();
         }
     }
 }

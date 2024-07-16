@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Mockaco;
+using Mockaco.Chaos.Strategies;
 using Mockaco.HealthChecks;
 using Mockaco.Settings;
 
@@ -15,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddMockaco(this IServiceCollection services, Action<MockacoOptions> config) =>
             services
                 .AddOptions<MockacoOptions>().Configure(config).Services
+                .AddOptions<ChaosOptions>().Configure<IOptions<MockacoOptions>>((options, parent) => options = parent.Value.Chaos).Services
                 .AddOptions<TemplateFileProviderOptions>()
                     .Configure<IOptions<MockacoOptions>>((options, parent) => options = parent.Value.TemplateFileProvider)
                     .Services
@@ -30,6 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 .AddOptions()
                 .Configure<MockacoOptions>(config)
+                .Configure<ChaosOptions>(config.GetSection("Chaos"))
                 .Configure<TemplateFileProviderOptions>(config.GetSection("TemplateFileProvider"));
 
         private static IServiceCollection AddCommonServices(this IServiceCollection services)
@@ -38,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddMemoryCache()
                 .AddHttpClient()
                 .AddInternalServices()
+                .AddChaosServices()
                 .AddHostedService<MockProviderWarmUp>();
 
             services
@@ -81,5 +85,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddTransient<ITemplateTransformer, TemplateTransformer>()
 
                 .AddTemplatesGenerating();
+        
+        private static IServiceCollection AddChaosServices(this IServiceCollection services) =>
+            services
+                .AddSingleton<IChaosStrategy, ChaosStrategyBehavior>()
+                .AddSingleton<IChaosStrategy, ChaosStrategyException>()
+                .AddSingleton<IChaosStrategy, ChaosStrategyLatency>()
+                .AddSingleton<IChaosStrategy, ChaosStrategyResult>()
+                .AddSingleton<IChaosStrategy, ChaosStrategyTimeout>();
     }
 }

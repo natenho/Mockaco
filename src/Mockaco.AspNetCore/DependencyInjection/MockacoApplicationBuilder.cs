@@ -16,6 +16,8 @@ namespace Microsoft.AspNetCore.Builder
 
             var options = app.ApplicationServices.GetRequiredService<IOptions<MockacoOptions>>().Value;
 
+            var optionsChaos = app.ApplicationServices.GetRequiredService<IOptions<ChaosOptions>>().Value;
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.Map($"/{options.VerificationEndpointPrefix ?? options.MockacoEndpoint}/{options.VerificationEndpointName}", VerifyerExtensions.Verify);
@@ -36,6 +38,7 @@ namespace Microsoft.AspNetCore.Builder
             app
                 .UseMiddleware<RequestMatchingMiddleware>()
                 .UseMiddleware<ResponseDelayMiddleware>()
+                .UseMiddleware<ChaosMiddleware>()
                 .UseMiddleware<ResponseMockingMiddleware>()
                 .UseMiddleware<CallbackMiddleware>();
 
