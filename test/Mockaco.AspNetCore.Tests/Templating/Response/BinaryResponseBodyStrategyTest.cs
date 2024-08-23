@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -87,6 +88,19 @@ namespace Mockaco.Tests.Templating.Response
 
             response.Should()
                 .BeNull();
+        }
+
+        [Fact]
+        public async Task Returns_Response_When_Body_Is_Set()
+        {
+            var bodyOnlyResponseTemplate = new ResponseTemplate { Body = "randomdata" };
+
+            var bodyBytes = Encoding.UTF8.GetBytes(bodyOnlyResponseTemplate.Body.ToString());
+
+            var response = await _strategy.GetResponseBodyBytesFromTemplate(bodyOnlyResponseTemplate);
+
+            response.Should()
+                .BeEquivalentTo(bodyBytes);
         }
     }
 }
