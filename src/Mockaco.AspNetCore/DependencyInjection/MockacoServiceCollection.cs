@@ -85,13 +85,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddTransient<ITemplateTransformer, TemplateTransformer>()
 
                 .AddTemplatesGenerating();
-        
+
         private static IServiceCollection AddChaosServices(this IServiceCollection services) =>
             services
-                .AddSingleton<IChaosStrategy, ChaosStrategyBehavior>()
-                .AddSingleton<IChaosStrategy, ChaosStrategyException>()
-                .AddSingleton<IChaosStrategy, ChaosStrategyLatency>()
-                .AddSingleton<IChaosStrategy, ChaosStrategyResult>()
-                .AddSingleton<IChaosStrategy, ChaosStrategyTimeout>();
+                .AddTransient<IChaosStrategy, ChaosStrategyBehavior>()
+                .AddTransient<IChaosStrategy, ChaosStrategyException>()
+                .AddTransient<IChaosStrategy, ChaosStrategyLatency>()
+                .AddTransient<IChaosStrategy, ChaosStrategyResult>()
+                .AddTransient<IChaosStrategy, ChaosStrategyTimeout>();
     }
 }
