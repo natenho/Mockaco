@@ -10,7 +10,7 @@ internal class ChaosStrategyException : IChaosStrategy
     {
         httpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var bodyBytes = Encoding.UTF8.GetBytes($"Error {httpResponse.StatusCode}: {HttpStatusCode.ServiceUnavailable}");
+        var bodyBytes = Encoding.UTF8.GetBytes($"Error {httpResponse.StatusCode}: {HttpStatusCode.InternalServerError}");
 
         return httpResponse.Body.WriteAsync(bodyBytes, 0, bodyBytes.Length);
     }
