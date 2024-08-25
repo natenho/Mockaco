@@ -39,5 +39,10 @@ namespace System.Collections.Generic
 
             return true;
         }
+        
+        public static T Random<T>(this IEnumerable<T> enumerable) { 
+            int index = new Random().Next(0, enumerable.Count());
+            return enumerable.ElementAt(index);
+        }
     }
 }

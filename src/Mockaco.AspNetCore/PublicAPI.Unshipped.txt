@@ -1,6 +1,18 @@
 ﻿Bogus.PhoneNumberExtensions
 Microsoft.AspNetCore.Builder.MockacoApplicationBuilder
 Microsoft.Extensions.DependencyInjection.MockacoServiceCollection
+Mockaco.ChaosOptions
+Mockaco.ChaosOptions.ChaosOptions() -> void
+Mockaco.ChaosOptions.ChaosRate.get -> int
+Mockaco.ChaosOptions.ChaosRate.set -> void
+Mockaco.ChaosOptions.Enabled.get -> bool
+Mockaco.ChaosOptions.Enabled.set -> void
+Mockaco.ChaosOptions.MaximumLatencyTime.get -> int
+Mockaco.ChaosOptions.MaximumLatencyTime.set -> void
+Mockaco.ChaosOptions.MinimumLatencyTime.get -> int
+Mockaco.ChaosOptions.MinimumLatencyTime.set -> void
+Mockaco.ChaosOptions.TimeBeforeTimeout.get -> int
+Mockaco.ChaosOptions.TimeBeforeTimeout.set -> void
 Mockaco.HealthChecks.StartupHealthCheck
 Mockaco.HealthChecks.StartupHealthCheck.CheckHealthAsync(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult>
 Mockaco.HealthChecks.StartupHealthCheck.StartupCompleted.get -> bool
@@ -42,6 +54,8 @@ Mockaco.Mock.RawTemplate.set -> void
 Mockaco.Mock.Route.get -> string
 Mockaco.Mock.Route.set -> void
 Mockaco.MockacoOptions
+Mockaco.MockacoOptions.Chaos.get -> Mockaco.ChaosOptions
+Mockaco.MockacoOptions.Chaos.set -> void
 Mockaco.MockacoOptions.DefaultHttpContentType.get -> string
 Mockaco.MockacoOptions.DefaultHttpContentType.set -> void
 Mockaco.MockacoOptions.DefaultHttpStatusCode.get -> System.Net.HttpStatusCode
