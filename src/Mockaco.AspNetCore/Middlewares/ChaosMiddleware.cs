@@ -32,6 +32,7 @@ internal class ChaosMiddleware
     {
         if (!_options.Value.Enabled)
         {
+            await _next(httpContext);
             return;
         }
 
@@ -51,7 +52,6 @@ internal class ChaosMiddleware
 
         if (httpContext.Response.StatusCode != (int)HttpStatusCode.OK)
             return;
-
 
         await _next(httpContext);
     }
