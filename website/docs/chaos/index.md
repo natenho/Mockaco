@@ -11,11 +11,12 @@ To enable chaos it is necessary to set the 'Enabled' variable to 'true' as shown
     ...
     "Chaos": {
         "Enabled": true,
-    }, 
+    },
     ...
   },
 ```
-in ```appsettings.json```.
+
+in `appsettings.json`.
 
 ## Types of answers with chaos
 
@@ -38,17 +39,17 @@ Parameters are defined inside the Chaos key
         "MinimumLatencyTime": 500,
         "MaximumLatencyTime": 3000,
         "TimeBeforeTimeout": 10000
-    }, 
+    },
     ...
   },
 ```
-in ```appsettings.json```.
 
+in `appsettings.json`.
 
-|Parameter           |Description                                                  |Default|
-|--------------------|-------------------------------------------------------------|-------|
-|Enabled             |Option to enable and disable chaos (true / false)            |true   |
-|ChaosRate           |Percentage of calls affected by chaos (0 - 100)              |20     |
-|MinimumLatencyTime  |Minimum latency in milliseconds when the latency strategy is drawn|500  |
-|MaximumLatencyTime  |Maximum latency in milliseconds when the latency strategy is drawn|3000 |
-|TimeBeforeTimeout   |Time in milliseconds before timeout error                 |10000 |
+| Parameter          | Description                                                        | Default |
+| ------------------ | ------------------------------------------------------------------ | ------- |
+| Enabled            | Option to enable and disable chaos (true / false)                  | false   |
+| ChaosRate          | Percentage of calls affected by chaos (0 - 100)                    | 20      |
+| MinimumLatencyTime | Minimum latency in milliseconds when the latency strategy is drawn | 500     |
+| MaximumLatencyTime | Maximum latency in milliseconds when the latency strategy is drawn | 3000    |
+| TimeBeforeTimeout  | Time in milliseconds before timeout error                          | 10000   |

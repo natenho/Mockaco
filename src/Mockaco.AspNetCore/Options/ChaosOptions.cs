@@ -10,7 +10,7 @@ public class ChaosOptions
 
     public ChaosOptions()
     {
-        Enabled = true;
+        Enabled = false;
         ChaosRate = 10;
         MinimumLatencyTime = 500;
         MaximumLatencyTime = 3000;
