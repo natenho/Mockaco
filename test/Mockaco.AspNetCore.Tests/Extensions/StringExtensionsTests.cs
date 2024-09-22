@@ -1,4 +1,4 @@
-namespace Mockaco.Tests.Extensions;
+namespace Mockaco.AspNetCore.Tests.Extensions;
 
 public class StringExtensionsTests
 {
