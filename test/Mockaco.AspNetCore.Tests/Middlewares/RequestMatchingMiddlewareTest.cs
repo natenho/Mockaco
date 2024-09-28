@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Xunit;
 
 namespace Mockaco.Tests.Middlewares
 {
@@ -57,6 +52,32 @@ namespace Mockaco.Tests.Middlewares
 
                 Moq.Mock.Verify(scriptContext);
             }
+        }
+        
+        [Theory]
+        [InlineData("{foo}", 2)]
+        [InlineData("/{foo}", 2)]
+        [InlineData("/{foo}/", 2)]
+        [InlineData("foo", 4)]
+        [InlineData("/foo", 4)]
+        [InlineData("foo/", 4)]
+        [InlineData("/foo/", 4)]
+        [InlineData("/{foo}/{bar}", 12)]
+        [InlineData("/{foo}/bar", 16)]
+        [InlineData("/foo/bar", 24)]
+        [InlineData("/{foo}/{bar}/{baz}", 42)]
+        [InlineData("/{foo}/{bar}/baz", 48)]
+        [InlineData("/{foo}/bar/{baz}", 54)]
+        [InlineData("/foo/{bar}/{baz}", 66)]
+        [InlineData("/{foo}/bar/baz", 60)]
+        [InlineData("/foo/bar/{baz}", 78)]
+        [InlineData("/foo/{bar}/baz", 72)]
+        [InlineData("/foo/bar/baz", 84)]
+        public void ScoreRouteTemplate(string routeTemplate, int expectedScore)
+        {
+            var result = RequestMatchingMiddleware.ScoreRouteTemplate(routeTemplate);
+            
+            Assert.Equal(expectedScore, result);
         }
     }
 }
