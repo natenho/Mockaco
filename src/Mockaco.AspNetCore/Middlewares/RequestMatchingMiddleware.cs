@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -40,30 +36,20 @@ namespace Mockaco
                 return;
             }
 
+            Mock bestMatch = null;
+            var bestScore = -1;
+
             foreach (var mock in mockProvider.GetMocks())
             {
-                if (await requestMatchers.AllAsync(_ => _.IsMatch(httpContext.Request, mock)))
+                if (await requestMatchers.AllAsync(e => e.IsMatch(httpContext.Request, mock)))
                 {
-                    cache.Set($"{nameof(RequestMatchingMiddleware)} {httpContext.Request.Path.Value}",new
+                    var score = ScoreRouteTemplate(mock.Route);
+
+                    if (score > bestScore)
                     {
-                        Route = httpContext.Request.Path.Value,
-                        Timestamp = $"{DateTime.Now.ToString("t")}",
-                        Headers = LoadHeaders(httpContext, options.Value.VerificationIgnoredHeaders),
-                        Body = await httpContext.Request.ReadBodyStream()
-                    }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
-
-                    _logger.LogInformation("Incoming request matched {mock}", mock);
-
-                    await scriptContext.AttachRouteParameters(httpContext.Request, mock);
-
-                    var template = await templateTransformer.TransformAndSetVariables(mock.RawTemplate, scriptContext);
-
-                    mockacoContext.Mock = mock;
-                    mockacoContext.TransformedTemplate = template;
-
-                    await _next(httpContext);
-
-                    return;
+                        bestMatch = mock;
+                        bestScore = score;
+                    }
                 }
                 else
                 {
@@ -71,9 +57,60 @@ namespace Mockaco
                 }
             }
 
+            if (bestMatch != null)
+            {
+                cache.Set($"{nameof(RequestMatchingMiddleware)} {httpContext.Request.Path.Value}", new
+                {
+                    Route = httpContext.Request.Path.Value,
+                    Timestamp = $"{DateTime.Now:t}",
+                    Headers = LoadHeaders(httpContext, options.Value.VerificationIgnoredHeaders),
+                    Body = await httpContext.Request.ReadBodyStream()
+                }, DateTime.Now.AddMinutes(options.Value.MatchedRoutesCacheDuration));
+
+                _logger.LogInformation("Incoming request matched {mock}", bestMatch);
+
+                await scriptContext.AttachRouteParameters(httpContext.Request, bestMatch);
+
+                var template = await templateTransformer.TransformAndSetVariables(bestMatch.RawTemplate, scriptContext);
+
+                mockacoContext.Mock = bestMatch;
+                mockacoContext.TransformedTemplate = template;
+
+                await _next(httpContext);
+
+                return;
+            }
+
             _logger.LogInformation("Incoming request didn't match any mock");
 
             mockacoContext.Errors.Add(new Error("Incoming request didn't match any mock"));
+        }
+
+        internal static int ScoreRouteTemplate(string route)
+        {
+            // Split the route into segments
+            var segments = route.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            var score = 0;
+            foreach (var segment in segments)
+            {
+                if (segment.StartsWith("{") && segment.EndsWith("}"))
+                {
+                    //Wildcards get the lowest score
+                    score++;
+                }
+                else
+                {
+                    //Give more weight to static segments
+                    score += 2;
+                }
+
+                //Give more weight to segments with multiple parameters
+                score *= 2;
+            }
+
+            //Give more weight to longer routes
+            return score * segments.Length;
         }
 
         //TODO Remove redundant code
