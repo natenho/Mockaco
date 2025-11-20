@@ -61,7 +61,7 @@ namespace Mockaco
             {
                 foreach (var header in responseTemplate.Headers)
                 {
-                    response.Headers.Add(header.Key, header.Value);
+                    response.Headers.Append(header.Key, header.Value);
                 }
             }
 
